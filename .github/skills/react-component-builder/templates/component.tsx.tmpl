@@ -1,0 +1,67 @@
+// src/components/{{.Category}}/{{.FileName}}.tsx
+import { forwardRef } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
+
+const {{.ComponentName | toLower}}Variants = cva(
+  // Base styles
+  '{{.BaseClasses}}',
+  {
+    variants: {
+      variant: {
+        default: '{{.DefaultVariantClasses}}',
+        {{range .Variants}}
+        {{.Name}}: '{{.Classes}}',
+        {{end}}
+      },
+      size: {
+        default: '{{.DefaultSizeClasses}}',
+        sm: '{{.SmallSizeClasses}}',
+        lg: '{{.LargeSizeClasses}}',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+);
+
+/**
+ * Props for the {{.ComponentName}} component.
+ */
+interface {{.ComponentName}}Props
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof {{.ComponentName | toLower}}Variants> {
+  {{range .Props}}
+  /**
+   * {{.Description}}
+   {{if .Default}}* @default {{.Default}}{{end}}
+   */
+  {{.Name}}{{if .Optional}}?{{end}}: {{.Type}};
+  {{end}}
+}
+
+/**
+ * {{.Description}}
+ *
+ * @example
+ * ```tsx
+ * <{{.ComponentName}} {{range .Props}}{{if not .Optional}}{{.Name}}={...} {{end}}{{end}}/>
+ * ```
+ */
+export const {{.ComponentName}} = forwardRef<HTMLDivElement, {{.ComponentName}}Props>(
+  ({ className, variant, size, {{range .Props}}{{.Name}}, {{end}}...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn({{.ComponentName | toLower}}Variants({ variant, size, className }))}
+        {...props}
+      >
+        {/* Component content */}
+      </div>
+    );
+  }
+);
+
+{{.ComponentName}}.displayName = '{{.ComponentName}}';

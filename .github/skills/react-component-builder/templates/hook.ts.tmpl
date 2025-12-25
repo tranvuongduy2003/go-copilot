@@ -1,0 +1,85 @@
+// src/hooks/use-{{.HookName | toKebab}}.ts
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { api } from '@/lib/api';
+import type { {{.EntityName}}, Create{{.EntityName}}Input, Update{{.EntityName}}Input } from '@/types/{{.EntityName | toLower}}';
+
+// Query keys for cache management
+export const {{.EntityName | toLower}}Keys = {
+  all: ['{{.EntityName | toLower}}s'] as const,
+  lists: () => [...{{.EntityName | toLower}}Keys.all, 'list'] as const,
+  list: (filters: Record<string, unknown>) => [...{{.EntityName | toLower}}Keys.lists(), filters] as const,
+  details: () => [...{{.EntityName | toLower}}Keys.all, 'detail'] as const,
+  detail: (id: string) => [...{{.EntityName | toLower}}Keys.details(), id] as const,
+};
+
+/**
+ * Hook to fetch a single {{.EntityName}} by ID
+ */
+export function use{{.EntityName}}(id: string | undefined) {
+  return useQuery({
+    queryKey: {{.EntityName | toLower}}Keys.detail(id ?? ''),
+    queryFn: () => api.get<{{.EntityName}}>(`/{{.RoutePath}}/${id}`),
+    enabled: !!id,
+  });
+}
+
+/**
+ * Hook to fetch a paginated list of {{.EntityName}}s
+ */
+export function use{{.EntityName}}s(params?: {
+  page?: number;
+  perPage?: number;
+  {{range .FilterFields}}
+  {{.Name | toLowerCamel}}?: {{.Type}};
+  {{end}}
+}) {
+  return useQuery({
+    queryKey: {{.EntityName | toLower}}Keys.list(params ?? {}),
+    queryFn: () => api.get<{ data: {{.EntityName}}[]; meta: { total: number } }>('/{{.RoutePath}}', { params }),
+  });
+}
+
+/**
+ * Hook to create a new {{.EntityName}}
+ */
+export function useCreate{{.EntityName}}() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: Create{{.EntityName}}Input) =>
+      api.post<{{.EntityName}}>('/{{.RoutePath}}', input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: {{.EntityName | toLower}}Keys.lists() });
+    },
+  });
+}
+
+/**
+ * Hook to update an existing {{.EntityName}}
+ */
+export function useUpdate{{.EntityName}}() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, ...input }: Update{{.EntityName}}Input & { id: string }) =>
+      api.put<{{.EntityName}}>(`/{{.RoutePath}}/${id}`, input),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: {{.EntityName | toLower}}Keys.detail(variables.id) });
+      queryClient.invalidateQueries({ queryKey: {{.EntityName | toLower}}Keys.lists() });
+    },
+  });
+}
+
+/**
+ * Hook to delete a {{.EntityName}}
+ */
+export function useDelete{{.EntityName}}() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/{{.RoutePath}}/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: {{.EntityName | toLower}}Keys.lists() });
+    },
+  });
+}

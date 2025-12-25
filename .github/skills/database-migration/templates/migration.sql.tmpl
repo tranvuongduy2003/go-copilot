@@ -1,0 +1,39 @@
+-- backend/migrations/sql/{{.Sequence}}_{{.TableName}}.sql
+
+-- +goose Up
+-- {{.Description}}
+CREATE TABLE IF NOT EXISTS {{.TableName}} (
+    -- Primary key
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    -- Core fields
+    {{range .Columns}}
+    {{.Name}} {{.Type}}{{if .NotNull}} NOT NULL{{end}}{{if .Default}} DEFAULT {{.Default}}{{end}},
+    {{end}}
+
+    -- Timestamps
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ
+
+    {{if .Constraints}}
+    -- Constraints
+    {{range .Constraints}}
+    ,CONSTRAINT {{.Name}} {{.Definition}}
+    {{end}}
+    {{end}}
+);
+
+-- Indexes
+{{range .Indexes}}
+CREATE INDEX {{.Name}} ON {{$.TableName}}({{.Columns}}){{if .Where}} WHERE {{.Where}}{{end}};
+{{end}}
+
+-- Comments
+COMMENT ON TABLE {{.TableName}} IS '{{.Description}}';
+{{range .Columns}}
+{{if .Comment}}COMMENT ON COLUMN {{$.TableName}}.{{.Name}} IS '{{.Comment}}';{{end}}
+{{end}}
+
+-- +goose Down
+DROP TABLE IF EXISTS {{.TableName}};

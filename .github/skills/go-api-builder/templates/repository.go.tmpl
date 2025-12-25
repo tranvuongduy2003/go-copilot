@@ -1,0 +1,37 @@
+// internal/domain/{{.Package}}/repository.go
+package {{.Package}}
+
+import (
+    "context"
+
+    "github.com/google/uuid"
+)
+
+// Repository defines the port for {{.EntityName}} persistence (DDD pattern).
+// Implementations should be in the infrastructure layer.
+type Repository interface {
+    // FindByID retrieves a {{.EntityName}} by its unique identifier.
+    // Returns Err{{.EntityName}}NotFound if the entity doesn't exist.
+    FindByID(ctx context.Context, id uuid.UUID) (*{{.EntityName}}, error)
+
+    // FindAll retrieves {{.EntityName}}s with pagination options.
+    // Returns the list, total count, and any error.
+    FindAll(ctx context.Context, opts ListOptions) ([]*{{.EntityName}}, int, error)
+
+    // Save persists a {{.EntityName}} to storage.
+    // Creates new or updates existing based on ID.
+    Save(ctx context.Context, entity *{{.EntityName}}) error
+
+    // Delete soft-deletes a {{.EntityName}} by ID.
+    // Returns Err{{.EntityName}}NotFound if the entity doesn't exist.
+    Delete(ctx context.Context, id uuid.UUID) error
+}
+
+// ListOptions defines pagination and filtering options.
+type ListOptions struct {
+    Page    int
+    PerPage int
+    {{range .FilterFields}}
+    {{.Name}} {{.Type}}
+    {{end}}
+}

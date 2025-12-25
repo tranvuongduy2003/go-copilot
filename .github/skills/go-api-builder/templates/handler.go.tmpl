@@ -1,0 +1,195 @@
+// internal/interfaces/http/handler/{{.Package}}_handler.go
+package handler
+
+import (
+    "encoding/json"
+    "errors"
+    "net/http"
+    "strconv"
+
+    "github.com/go-chi/chi/v5"
+    "github.com/go-playground/validator/v10"
+    "github.com/google/uuid"
+    "github.com/yourorg/app/internal/application/command"
+    "github.com/yourorg/app/internal/application/query"
+    "github.com/yourorg/app/internal/domain/{{.Package}}"
+    "github.com/yourorg/app/pkg/response"
+)
+
+var validate = validator.New()
+
+// {{.EntityName}}Handler handles HTTP requests for {{.EntityName}}s.
+type {{.EntityName}}Handler struct {
+    createHandler *command.Create{{.EntityName}}Handler
+    updateHandler *command.Update{{.EntityName}}Handler
+    deleteHandler *command.Delete{{.EntityName}}Handler
+    getHandler    *query.Get{{.EntityName}}Handler
+    listHandler   *query.List{{.EntityName}}sHandler
+}
+
+// New{{.EntityName}}Handler creates a new {{.EntityName}} handler with CQRS handlers.
+func New{{.EntityName}}Handler(
+    createHandler *command.Create{{.EntityName}}Handler,
+    updateHandler *command.Update{{.EntityName}}Handler,
+    deleteHandler *command.Delete{{.EntityName}}Handler,
+    getHandler *query.Get{{.EntityName}}Handler,
+    listHandler *query.List{{.EntityName}}sHandler,
+) *{{.EntityName}}Handler {
+    return &{{.EntityName}}Handler{
+        createHandler: createHandler,
+        updateHandler: updateHandler,
+        deleteHandler: deleteHandler,
+        getHandler:    getHandler,
+        listHandler:   listHandler,
+    }
+}
+
+// RegisterRoutes registers the {{.EntityName}} routes.
+func (h *{{.EntityName}}Handler) RegisterRoutes(r chi.Router) {
+    r.Route("/{{.RoutePath}}", func(r chi.Router) {
+        r.Get("/", h.List)
+        r.Post("/", h.Create)
+        r.Get("/{id}", h.Get)
+        r.Put("/{id}", h.Update)
+        r.Delete("/{id}", h.Delete)
+    })
+}
+
+// List handles GET /{{.RoutePath}}
+func (h *{{.EntityName}}Handler) List(w http.ResponseWriter, r *http.Request) {
+    ctx := r.Context()
+
+    page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+    if page < 1 {
+        page = 1
+    }
+    perPage, _ := strconv.Atoi(r.URL.Query().Get("per_page"))
+    if perPage < 1 || perPage > 100 {
+        perPage = 20
+    }
+
+    result, err := h.listHandler.Handle(ctx, query.List{{.EntityName}}sQuery{
+        Page:    page,
+        PerPage: perPage,
+    })
+    if err != nil {
+        response.InternalError(w, err)
+        return
+    }
+
+    response.JSONWithMeta(w, http.StatusOK, result.{{.EntityName}}s, &response.Meta{
+        Page:    page,
+        PerPage: perPage,
+        Total:   result.Total,
+    })
+}
+
+// Get handles GET /{{.RoutePath}}/{id}
+func (h *{{.EntityName}}Handler) Get(w http.ResponseWriter, r *http.Request) {
+    ctx := r.Context()
+    id, err := uuid.Parse(chi.URLParam(r, "id"))
+    if err != nil {
+        response.BadRequest(w, "Invalid {{.EntityName | toLower}} ID")
+        return
+    }
+
+    result, err := h.getHandler.Handle(ctx, query.Get{{.EntityName}}Query{ID: id})
+    if err != nil {
+        if errors.Is(err, {{.Package}}.ErrNotFound) {
+            response.NotFound(w, "{{.EntityName}} not found")
+            return
+        }
+        response.InternalError(w, err)
+        return
+    }
+
+    response.JSON(w, http.StatusOK, result)
+}
+
+// Create{{.EntityName}}Request is the request body for creating a {{.EntityName}}.
+type Create{{.EntityName}}Request struct {
+    {{range .CreateFields}}
+    {{.Name}} {{.Type}} `json:"{{.JSONTag}}" validate:"{{.Validation}}"`
+    {{end}}
+}
+
+// Create handles POST /{{.RoutePath}}
+func (h *{{.EntityName}}Handler) Create(w http.ResponseWriter, r *http.Request) {
+    ctx := r.Context()
+
+    var req Create{{.EntityName}}Request
+    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+        response.BadRequest(w, "Invalid request body")
+        return
+    }
+
+    if err := validate.Struct(req); err != nil {
+        response.ValidationError(w, formatValidationErrors(err.(validator.ValidationErrors)))
+        return
+    }
+
+    result, err := h.createHandler.Handle(ctx, command.Create{{.EntityName}}Command{
+        {{range .CreateFields}}
+        {{.Name}}: req.{{.Name}},
+        {{end}}
+    })
+    if err != nil {
+        response.InternalError(w, err)
+        return
+    }
+
+    response.JSON(w, http.StatusCreated, result)
+}
+
+// Update handles PUT /{{.RoutePath}}/{id}
+func (h *{{.EntityName}}Handler) Update(w http.ResponseWriter, r *http.Request) {
+    ctx := r.Context()
+    id, err := uuid.Parse(chi.URLParam(r, "id"))
+    if err != nil {
+        response.BadRequest(w, "Invalid {{.EntityName | toLower}} ID")
+        return
+    }
+
+    var req map[string]interface{}
+    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+        response.BadRequest(w, "Invalid request body")
+        return
+    }
+
+    // Build update command from request
+    cmd := command.Update{{.EntityName}}Command{ID: id}
+    // TODO: Map request fields to command fields
+
+    result, err := h.updateHandler.Handle(ctx, cmd)
+    if err != nil {
+        if errors.Is(err, {{.Package}}.ErrNotFound) {
+            response.NotFound(w, "{{.EntityName}} not found")
+            return
+        }
+        response.InternalError(w, err)
+        return
+    }
+
+    response.JSON(w, http.StatusOK, result)
+}
+
+// Delete handles DELETE /{{.RoutePath}}/{id}
+func (h *{{.EntityName}}Handler) Delete(w http.ResponseWriter, r *http.Request) {
+    ctx := r.Context()
+    id, err := uuid.Parse(chi.URLParam(r, "id"))
+    if err != nil {
+        response.BadRequest(w, "Invalid {{.EntityName | toLower}} ID")
+        return
+    }
+
+    if err := h.deleteHandler.Handle(ctx, command.Delete{{.EntityName}}Command{ID: id}); err != nil {
+        if errors.Is(err, {{.Package}}.ErrNotFound) {
+            response.NotFound(w, "{{.EntityName}} not found")
+            return
+        }
+        response.InternalError(w, err)
+        return
+    }
+
+    w.WriteHeader(http.StatusNoContent)
+}

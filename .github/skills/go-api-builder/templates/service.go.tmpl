@@ -1,0 +1,47 @@
+// internal/application/command/create_{{.Package}}.go
+package command
+
+import (
+    "context"
+    "fmt"
+    "log/slog"
+
+    "github.com/yourorg/app/internal/application/dto"
+    "github.com/yourorg/app/internal/domain/{{.Package}}"
+)
+
+// Create{{.EntityName}}Command contains the data needed to create a {{.EntityName}}.
+type Create{{.EntityName}}Command struct {
+    {{range .CreateFields}}
+    {{.Name}} {{.Type}} `json:"{{.JSONTag}}"`
+    {{end}}
+}
+
+// Create{{.EntityName}}Handler handles the Create{{.EntityName}}Command.
+type Create{{.EntityName}}Handler struct {
+    repo   {{.Package}}.Repository
+    logger *slog.Logger
+}
+
+// NewCreate{{.EntityName}}Handler creates a new handler for creating {{.EntityName}}s.
+func NewCreate{{.EntityName}}Handler(repo {{.Package}}.Repository, logger *slog.Logger) *Create{{.EntityName}}Handler {
+    return &Create{{.EntityName}}Handler{repo: repo, logger: logger}
+}
+
+// Handle executes the create {{.EntityName}} command.
+func (h *Create{{.EntityName}}Handler) Handle(ctx context.Context, cmd Create{{.EntityName}}Command) (*dto.{{.EntityName}}DTO, error) {
+    // Create domain entity with validation
+    entity, err := {{.Package}}.New{{.EntityName}}({{range $i, $f := .CreateFields}}{{if $i}}, {{end}}cmd.{{$f.Name}}{{end}})
+    if err != nil {
+        return nil, fmt.Errorf("invalid {{.EntityName | toLower}}: %w", err)
+    }
+
+    // Persist via repository
+    if err := h.repo.Save(ctx, entity); err != nil {
+        return nil, fmt.Errorf("save {{.EntityName | toLower}}: %w", err)
+    }
+
+    h.logger.Info("{{.EntityName | toLower}} created", "id", entity.ID())
+
+    return dto.{{.EntityName}}FromDomain(entity), nil
+}
