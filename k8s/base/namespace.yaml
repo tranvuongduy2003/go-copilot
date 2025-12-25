@@ -1,0 +1,13 @@
+# =============================================================================
+# Kubernetes Namespace Configuration
+# =============================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: app
+  labels:
+    app.kubernetes.io/name: fullstack-app
+    app.kubernetes.io/managed-by: kustomize
+  annotations:
+    description: "Full-stack application namespace"

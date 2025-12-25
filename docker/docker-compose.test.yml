@@ -1,141 +1,143 @@
 # =============================================================================
-# Docker Compose - Development Environment
+# Docker Compose - Testing Environment
 # =============================================================================
-# Usage: docker-compose up -d
+# Usage: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 # =============================================================================
 
 version: "3.9"
 
 services:
   # ---------------------------------------------------------------------------
-  # Frontend Service
+  # Test Runner
   # ---------------------------------------------------------------------------
-  frontend:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.frontend
-      target: deps
-    container_name: app-frontend
-    restart: unless-stopped
-    volumes:
-      - ../frontend:/app
-      - /app/node_modules
-      - /app/.next
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://localhost:8080
-      - WATCHPACK_POLLING=true
-    command: npm run dev
-    networks:
-      - app-network
-    depends_on:
-      - backend
-
-  # ---------------------------------------------------------------------------
-  # Backend Service
-  # ---------------------------------------------------------------------------
-  backend:
+  test-runner:
     build:
       context: ..
       dockerfile: docker/Dockerfile.backend
-      target: deps
-    container_name: app-backend
-    restart: unless-stopped
+      target: builder
+    container_name: app-test-runner
     volumes:
       - ../backend:/app
       - /app/node_modules
-    ports:
-      - "8080:8080"
+      - test_coverage:/app/coverage
     environment:
-      - NODE_ENV=development
-      - PORT=8080
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/app_dev
-      - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=dev-secret-change-in-production
-    command: npm run dev
-    networks:
-      - app-network
+      - NODE_ENV=test
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/app_test
+      - REDIS_URL=redis://redis-test:6379
+      - JWT_SECRET=test-secret
+    command: npm run test:ci
     depends_on:
-      postgres:
+      postgres-test:
         condition: service_healthy
-      redis:
+      redis-test:
         condition: service_healthy
+    networks:
+      - test-network
 
   # ---------------------------------------------------------------------------
-  # PostgreSQL Database
+  # Frontend Tests
   # ---------------------------------------------------------------------------
-  postgres:
-    image: postgres:16-alpine
-    container_name: app-postgres
-    restart: unless-stopped
+  frontend-test:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+      target: builder
+    container_name: app-frontend-test
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d
-    ports:
-      - "5432:5432"
+      - ../frontend:/app
+      - /app/node_modules
+      - test_coverage:/app/coverage
+    environment:
+      - NODE_ENV=test
+      - CI=true
+    command: npm run test:ci
+    networks:
+      - test-network
+
+  # ---------------------------------------------------------------------------
+  # E2E Tests (Playwright/Cypress)
+  # ---------------------------------------------------------------------------
+  e2e-tests:
+    image: mcr.microsoft.com/playwright:v1.40.0-jammy
+    container_name: app-e2e-tests
+    working_dir: /app
+    volumes:
+      - ../e2e:/app
+      - e2e_results:/app/test-results
+    environment:
+      - CI=true
+      - BASE_URL=http://nginx-test
+    command: npx playwright test
+    depends_on:
+      - nginx-test
+    networks:
+      - test-network
+    profiles:
+      - e2e
+
+  # ---------------------------------------------------------------------------
+  # Test PostgreSQL
+  # ---------------------------------------------------------------------------
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: app-postgres-test
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=app_dev
+      - POSTGRES_DB=app_test
+    tmpfs:
+      - /var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - app-network
+      - test-network
 
   # ---------------------------------------------------------------------------
-  # Redis Cache
+  # Test Redis
   # ---------------------------------------------------------------------------
-  redis:
+  redis-test:
     image: redis:7-alpine
-    container_name: app-redis
-    restart: unless-stopped
-    volumes:
-      - redis_data:/data
-    ports:
-      - "6379:6379"
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    container_name: app-redis-test
+    command: redis-server --appendonly no
+    tmpfs:
+      - /data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - app-network
+      - test-network
 
   # ---------------------------------------------------------------------------
-  # Nginx Reverse Proxy (Optional for local dev)
+  # Test Nginx (for E2E)
   # ---------------------------------------------------------------------------
-  nginx:
+  nginx-test:
     build:
       context: ..
       dockerfile: docker/Dockerfile.nginx
-    container_name: app-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
+    container_name: app-nginx-test
     depends_on:
-      - frontend
-      - backend
+      - frontend-test
+      - test-runner
     networks:
-      - app-network
+      - test-network
     profiles:
-      - full
+      - e2e
 
 # =============================================================================
 # Networks
 # =============================================================================
 networks:
-  app-network:
+  test-network:
     driver: bridge
 
 # =============================================================================
 # Volumes
 # =============================================================================
 volumes:
-  postgres_data:
-  redis_data:
+  test_coverage:
+  e2e_results:

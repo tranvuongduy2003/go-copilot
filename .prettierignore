@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+coverage/
+
+# Package manager locks
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated files
+*.generated.*
+generated/
+
+# Terraform
+terraform/.terraform/
+*.tfstate
+*.tfstate.*
+
+# Misc
+.git/
+.cache/
+*.min.js
+*.min.css

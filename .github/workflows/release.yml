@@ -1,0 +1,168 @@
+# =============================================================================
+# Release Pipeline
+# =============================================================================
+# Automated release workflow with semantic versioning
+# =============================================================================
+
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  packages: write
+  pull-requests: write
+
+jobs:
+  # ===========================================================================
+  # Semantic Release
+  # ===========================================================================
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      released: ${{ steps.release.outputs.released }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install -g semantic-release @semantic-release/changelog @semantic-release/git
+
+      - name: Semantic Release
+        id: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx semantic-release --dry-run > release-output.txt 2>&1 || true
+
+          if grep -q "Published release" release-output.txt; then
+            VERSION=$(grep "Published release" release-output.txt | grep -oP '\d+\.\d+\.\d+')
+            echo "released=true" >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "released=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Run actual release
+          npx semantic-release
+
+  # ===========================================================================
+  # Build Release Artifacts
+  # ===========================================================================
+  build-artifacts:
+    name: Build Release Artifacts
+    needs: release
+    if: needs.release.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v${{ needs.release.outputs.version }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+          tar -czf ../frontend-build.tar.gz .next public
+
+      - name: Build backend
+        run: |
+          cd backend
+          npm ci
+          npm run build
+          tar -czf ../backend-build.tar.gz dist
+
+      - name: Upload release artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.release.outputs.version }}
+          files: |
+            frontend-build.tar.gz
+            backend-build.tar.gz
+
+  # ===========================================================================
+  # Deploy Release
+  # ===========================================================================
+  deploy-release:
+    name: Deploy Release
+    needs: [release, build-artifacts]
+    if: needs.release.outputs.released == 'true'
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+
+  # ===========================================================================
+  # Notify Release
+  # ===========================================================================
+  notify:
+    name: Notify Release
+    needs: [release, deploy-release]
+    if: always() && needs.release.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🚀 New Release: v${{ needs.release.outputs.version }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Repository:*\n${{ github.repository }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Deployment:*\n${{ needs.deploy-release.result }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "<https://github.com/${{ github.repository }}/releases/tag/v${{ needs.release.outputs.version }}|View Release Notes>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

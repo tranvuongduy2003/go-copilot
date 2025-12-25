@@ -1,0 +1,154 @@
+# =============================================================================
+# Alertmanager Configuration
+# =============================================================================
+
+global:
+  # SMTP configuration for email alerts
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'alerts@example.com'
+  smtp_auth_username: 'alerts@example.com'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+  smtp_require_tls: true
+
+  # Slack configuration
+  slack_api_url: '${SLACK_WEBHOOK_URL}'
+
+  # PagerDuty configuration
+  pagerduty_url: 'https://events.pagerduty.com/v2/enqueue'
+
+# Templates for notifications
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Route tree
+route:
+  # Default receiver
+  receiver: 'slack-notifications'
+
+  # Group alerts by these labels
+  group_by: ['alertname', 'severity', 'service']
+
+  # Wait before sending first notification
+  group_wait: 30s
+
+  # Wait before sending updated notification
+  group_interval: 5m
+
+  # Wait before resending notification
+  repeat_interval: 4h
+
+  # Child routes
+  routes:
+    # Critical alerts go to PagerDuty
+    - match:
+        severity: critical
+      receiver: 'pagerduty-critical'
+      continue: true
+
+    # Critical also goes to Slack critical channel
+    - match:
+        severity: critical
+      receiver: 'slack-critical'
+
+    # Warning alerts go to Slack
+    - match:
+        severity: warning
+      receiver: 'slack-warnings'
+
+    # SLO breaches
+    - match_re:
+        slo: '.+'
+      receiver: 'slack-slo'
+      group_wait: 1m
+
+    # Database alerts
+    - match:
+        service: database
+      receiver: 'slack-database'
+
+# Inhibition rules
+inhibit_rules:
+  # If critical is firing, suppress warnings for same alertname
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'service']
+
+  # If service is down, suppress all other alerts for that service
+  - source_match:
+      alertname: 'ServiceDown'
+    target_match_re:
+      alertname: '.+'
+    equal: ['service']
+
+# Receivers
+receivers:
+  # Default Slack notifications
+  - name: 'slack-notifications'
+    slack_configs:
+      - channel: '#alerts'
+        send_resolved: true
+        title: '{{ template "slack.title" . }}'
+        text: '{{ template "slack.text" . }}'
+        actions:
+          - type: button
+            text: 'Runbook'
+            url: '{{ (index .Alerts 0).Annotations.runbook_url }}'
+          - type: button
+            text: 'Dashboard'
+            url: 'https://grafana.example.com/d/{{ (index .Alerts 0).Labels.dashboard }}'
+
+  # Critical Slack channel
+  - name: 'slack-critical'
+    slack_configs:
+      - channel: '#alerts-critical'
+        send_resolved: true
+        color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'
+        title: ':rotating_light: CRITICAL: {{ .CommonAnnotations.summary }}'
+        text: '{{ template "slack.text" . }}'
+
+  # Warning Slack channel
+  - name: 'slack-warnings'
+    slack_configs:
+      - channel: '#alerts-warnings'
+        send_resolved: true
+        color: '{{ if eq .Status "firing" }}warning{{ else }}good{{ end }}'
+        title: ':warning: {{ .CommonAnnotations.summary }}'
+        text: '{{ template "slack.text" . }}'
+
+  # SLO Slack channel
+  - name: 'slack-slo'
+    slack_configs:
+      - channel: '#slo-alerts'
+        send_resolved: true
+        title: ':chart_with_downwards_trend: SLO Breach: {{ .CommonAnnotations.summary }}'
+        text: '{{ template "slack.text" . }}'
+
+  # Database Slack channel
+  - name: 'slack-database'
+    slack_configs:
+      - channel: '#database-alerts'
+        send_resolved: true
+        title: ':floppy_disk: Database Alert: {{ .CommonAnnotations.summary }}'
+        text: '{{ template "slack.text" . }}'
+
+  # PagerDuty for critical alerts
+  - name: 'pagerduty-critical'
+    pagerduty_configs:
+      - service_key: '${PAGERDUTY_SERVICE_KEY}'
+        severity: critical
+        description: '{{ .CommonAnnotations.summary }}'
+        details:
+          firing: '{{ template "pagerduty.instances" .Alerts.Firing }}'
+          resolved: '{{ template "pagerduty.instances" .Alerts.Resolved }}'
+          num_firing: '{{ .Alerts.Firing | len }}'
+          num_resolved: '{{ .Alerts.Resolved | len }}'
+
+  # Email for critical alerts (backup)
+  - name: 'email-critical'
+    email_configs:
+      - to: 'oncall@example.com'
+        send_resolved: true
+        headers:
+          Subject: '[{{ .Status | toUpper }}] {{ .CommonAnnotations.summary }}'

@@ -1,0 +1,13 @@
+# =============================================================================
+# Staging Namespace
+# =============================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging
+  labels:
+    environment: staging
+    app.kubernetes.io/name: fullstack-app
+  annotations:
+    description: "Staging environment for full-stack application"

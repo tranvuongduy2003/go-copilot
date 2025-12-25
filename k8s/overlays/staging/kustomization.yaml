@@ -1,0 +1,82 @@
+# =============================================================================
+# Kustomize Staging Overlay
+# =============================================================================
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: staging
+
+namePrefix: staging-
+
+commonLabels:
+  environment: staging
+
+resources:
+  - ../../base
+  - namespace.yaml
+
+patches:
+  # Reduce replicas for staging
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: frontend
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: backend
+
+  # Reduce resource requests for staging
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "50m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "128Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "250m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "256Mi"
+    target:
+      kind: Deployment
+      name: frontend
+
+  # Update HPA for staging
+  - patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 3
+    target:
+      kind: HorizontalPodAutoscaler
+
+images:
+  - name: frontend
+    newName: ghcr.io/myorg/myapp/frontend
+    newTag: staging
+  - name: backend
+    newName: ghcr.io/myorg/myapp/backend
+    newTag: staging
+
+configMapGenerator:
+  - name: frontend-config
+    behavior: merge
+    literals:
+      - API_URL=https://api.staging.example.com
+  - name: backend-config
+    behavior: merge
+    literals:
+      - CORS_ORIGINS=https://staging.example.com
+      - LOG_LEVEL=debug

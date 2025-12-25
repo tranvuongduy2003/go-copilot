@@ -1,0 +1,66 @@
+# =============================================================================
+# Gitleaks Configuration - Secret Detection
+# =============================================================================
+
+title = "Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Global allowlist"
+paths = [
+    '''^\.gitleaks\.toml$''',
+    '''(.*)?\.lock$''',
+    '''go\.sum$''',
+    '''package-lock\.json$''',
+    '''pnpm-lock\.yaml$''',
+    '''yarn\.lock$''',
+    '''\.env\.example$''',
+    '''\.env\.sample$''',
+    '''\.env\.template$''',
+    '''node_modules''',
+    '''vendor''',
+    '''\.git''',
+    '''dist''',
+    '''build''',
+    '''coverage''',
+]
+
+# Allowlist specific patterns that are known false positives
+regexes = [
+    '''EXAMPLE_''',
+    '''example\.com''',
+    '''localhost''',
+    '''127\.0\.0\.1''',
+    '''placeholder''',
+    '''your-.*-here''',
+    '''<.*>''',
+    '''\$\{.*\}''',
+]
+
+# Custom rules for project-specific patterns
+[[rules]]
+id = "custom-api-key"
+description = "Custom API Key Detection"
+regex = '''(?i)(?:api[_-]?key|apikey)[\s]*[:=][\s]*['\"]?([a-zA-Z0-9_-]{20,})'''
+tags = ["api-key", "secret"]
+
+[[rules]]
+id = "jwt-secret"
+description = "JWT Secret Detection"
+regex = '''(?i)(?:jwt[_-]?secret)[\s]*[:=][\s]*['\"]?([a-zA-Z0-9_-]{16,})'''
+tags = ["jwt", "secret"]
+
+[[rules]]
+id = "database-url"
+description = "Database Connection String"
+regex = '''(?i)(?:database[_-]?url|db[_-]?url)[\s]*[:=][\s]*['\"]?(postgres(?:ql)?|mysql|mongodb)://[^\s'"]+'''
+tags = ["database", "connection-string"]
+
+# Entropy-based detection
+[rules.entropy]
+enabled = true
+words = false
+regex = '''[0-9a-zA-Z_-]{32,}'''
+threshold = 4.5

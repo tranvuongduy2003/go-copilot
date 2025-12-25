@@ -1,0 +1,52 @@
+# =============================================================================
+# CODEOWNERS - Automatic Review Assignment
+# =============================================================================
+# Define who should review changes to specific parts of the codebase
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# =============================================================================
+
+# Default owners for everything in the repo
+*                       @team-leads
+
+# Frontend
+/frontend/              @team-frontend
+/frontend/src/components/ @team-frontend @design-team
+/frontend/src/styles/   @team-frontend @design-team
+
+# Backend
+/backend/               @team-backend
+/backend/src/auth/      @team-backend @security-team
+/backend/src/api/       @team-backend
+
+# Infrastructure & DevOps
+/terraform/             @devops-team @security-team
+/k8s/                   @devops-team
+/docker/                @devops-team
+/.github/workflows/     @devops-team @team-leads
+
+# Monitoring & Observability
+/monitoring/            @devops-team @sre-team
+
+# Security configurations
+/.github/dependabot.yml @security-team @devops-team
+/.github/workflows/security.yml @security-team
+/k8s/overlays/production/sealed-secrets.yaml @security-team
+
+# Documentation
+/docs/                  @team-leads @docs-team
+*.md                    @team-leads
+
+# CI/CD & Build
+/Makefile               @devops-team
+/scripts/               @devops-team
+
+# Database migrations
+/backend/prisma/        @team-backend @dba-team
+/backend/migrations/    @team-backend @dba-team
+
+# API definitions
+/docs/API.md            @team-backend @team-frontend
+/backend/src/openapi/   @team-backend @team-frontend
+
+# Configuration files
+/.env.example           @devops-team @security-team

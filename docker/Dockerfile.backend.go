@@ -1,5 +1,8 @@
 # =============================================================================
-# Go Backend - Multi-stage Production Build
+# Go Backend - Multi-stage Production Build (Legacy Name)
+# =============================================================================
+# NOTE: This file is kept for backwards compatibility.
+# Primary backend Dockerfile is now Dockerfile.backend
 # =============================================================================
 
 # -----------------------------------------------------------------------------
@@ -44,7 +47,7 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 # Copy binary
 COPY --from=builder /app/server /app/server
 
-# Copy migrations if present (optional - comment out if no migrations folder)
+# Copy migrations if present (optional - uncomment if migrations folder exists)
 # COPY --from=builder /app/migrations ./migrations/
 
 # Set ownership
@@ -52,7 +55,6 @@ RUN chown -R appuser:appgroup /app
 
 USER appuser
 
-# Environment
 ENV PORT=8080
 
 EXPOSE 8080
