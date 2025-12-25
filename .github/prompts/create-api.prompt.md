@@ -1,6 +1,5 @@
 ---
 description: Create a new REST API endpoint with handler, service, repository, and tests
-agent: "Backend Engineer"
 ---
 
 # Create REST API Endpoint
@@ -35,35 +34,35 @@ Include:
 - Appropriate indexes
 - Foreign key constraints if needed
 
-### 2. Domain Model
+### 2. Domain Layer
 
-Create `backend/internal/domain/{{resourceName}}.go`:
-- Define the main struct with JSON tags
-- Define CreateInput struct with validation tags
-- Define UpdateInput struct with pointer fields
-- Add any domain-specific errors
+Create `backend/internal/domain/{{resourceName}}/`:
+- `{{resourceName}}.go` - Entity with private fields + getter methods
+- `repository.go` - Repository interface (port)
+- `errors.go` - Domain-specific errors
+- Define value objects if needed
 
-### 3. Repository
+### 3. Application Layer (CQRS)
 
-Create `backend/internal/repository/postgres/{{resourceName}}_repository.go`:
-- Implement FindByID
-- Implement FindAll with pagination
-- Implement Create
-- Implement Update
-- Implement Delete (soft delete)
+Create command handlers in `backend/internal/application/command/`:
+- `create_{{resourceName}}.go` - Create command handler
+- `update_{{resourceName}}.go` - Update command handler
+- `delete_{{resourceName}}.go` - Delete command handler
+
+Create query handlers in `backend/internal/application/query/`:
+- `get_{{resourceName}}.go` - Get by ID query handler
+- `list_{{resourceName}}s.go` - List query handler with pagination
+
+### 4. Infrastructure Layer
+
+Create `backend/internal/infrastructure/persistence/postgres/{{resourceName}}_repository.go`:
+- Implement the domain repository interface
+- Use parameterized queries
 - Handle errors properly (ErrNotFound, etc.)
-
-### 4. Service
-
-Create `backend/internal/service/{{resourceName}}_service.go`:
-- Implement business logic
-- Add validation
-- Handle authorization if needed
-- Add logging
 
 ### 5. Handler
 
-Create `backend/internal/handlers/{{resourceName}}_handler.go`:
+Create `backend/internal/interfaces/http/handler/{{resourceName}}_handler.go`:
 - Implement HTTP handlers for each operation
 - Parse and validate request input
 - Handle errors with appropriate status codes
@@ -73,20 +72,35 @@ Create `backend/internal/handlers/{{resourceName}}_handler.go`:
 ### 6. Tests
 
 Create tests:
-- `backend/internal/service/{{resourceName}}_service_test.go`
-- `backend/internal/handlers/{{resourceName}}_handler_test.go`
+- `backend/internal/application/command/create_{{resourceName}}_test.go`
+- `backend/internal/application/query/get_{{resourceName}}_test.go`
+- `backend/internal/interfaces/http/handler/{{resourceName}}_handler_test.go`
 
 ## Code Templates
 
 Use these patterns from the project:
 
 ```go
-// Domain model template
+// Domain entity template (private fields + getters)
+// internal/domain/{{resourceName}}/{{resourceName}}.go
+package {{resourceName}}
+
 type {{ResourceName}} struct {
-    ID          string    `json:"id"`
-    // Add fields
-    CreatedAt   time.Time `json:"created_at"`
-    UpdatedAt   time.Time `json:"updated_at"`
+    id        uuid.UUID
+    name      string
+    createdAt time.Time
+    updatedAt time.Time
+}
+
+func (e *{{ResourceName}}) ID() uuid.UUID      { return e.id }
+func (e *{{ResourceName}}) Name() string       { return e.name }
+func (e *{{ResourceName}}) CreatedAt() time.Time { return e.createdAt }
+
+// Repository interface (port)
+// internal/domain/{{resourceName}}/repository.go
+type Repository interface {
+    FindByID(ctx context.Context, id uuid.UUID) (*{{ResourceName}}, error)
+    Save(ctx context.Context, entity *{{ResourceName}}) error
 }
 
 // Handler error handling template
@@ -99,9 +113,9 @@ if errors.Is(err, domain.ErrNotFound) {
 ## Validation
 
 After implementation:
-1. Run migrations: `migrate -path migrations -database "$DATABASE_URL" up`
-2. Run tests: `go test ./...`
-3. Run linter: `golangci-lint run`
+1. Run migrations: `goose -dir backend/migrations/sql postgres "$DATABASE_URL" up`
+2. Run tests: `cd backend && go test ./...`
+3. Run linter: `cd backend && golangci-lint run`
 4. Test manually with curl or API client
 
 ## Output

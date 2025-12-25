@@ -83,13 +83,13 @@ CREATE INDEX idx_products_created_at ON products(created_at DESC);
 DROP TABLE IF EXISTS products;
 ```
 
-### Step 3: Implement the Repository
+### Step 3: Define Repository Interface (Domain Layer)
 
-Create the repository interface and PostgreSQL implementation.
+Create the repository interface in the domain layer (port):
 
 ```go
-// internal/repository/product_repository.go
-package repository
+// internal/domain/product/repository.go
+package product
 
 import (
     "context"
@@ -106,8 +106,10 @@ type ProductRepository interface {
 }
 ```
 
+### Step 4: Implement Repository (Infrastructure Layer)
+
 ```go
-// internal/repository/postgres/product_repository.go
+// internal/infrastructure/persistence/postgres/product_repository.go
 package postgres
 
 import (
@@ -247,13 +249,13 @@ func (r *productRepository) Delete(ctx context.Context, id string) error {
 }
 ```
 
-### Step 4: Implement the Service
+### Step 5: Implement Command/Query Handlers (Application Layer)
 
-Create the service layer with business logic.
+Create the CQRS handlers with business logic.
 
 ```go
-// internal/service/product_service.go
-package service
+// internal/application/command/create_product.go
+package command
 
 import (
     "context"
@@ -341,13 +343,13 @@ func (s *ProductService) DeleteProduct(ctx context.Context, id string) error {
 }
 ```
 
-### Step 5: Implement the Handler
+### Step 6: Implement the HTTP Handler (Interface Layer)
 
 Create the HTTP handler with validation.
 
 ```go
-// internal/handlers/product_handler.go
-package handlers
+// internal/interfaces/http/handler/product_handler.go
+package handler
 
 import (
     "encoding/json"
@@ -496,13 +498,13 @@ func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-### Step 6: Write Tests
+### Step 7: Write Tests
 
-Create comprehensive tests for the service and handler.
+Create comprehensive tests for the command/query handlers.
 
 ```go
-// internal/service/product_service_test.go
-package service_test
+// internal/application/command/create_product_test.go
+package command_test
 
 import (
     "context"

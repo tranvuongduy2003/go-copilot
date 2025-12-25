@@ -1,6 +1,6 @@
-# 🎨 Color Palette Documentation
+# Color Palette Documentation
 
-> **For AI Agents**: This document defines the official color system. ALWAYS use these exact colors and semantic tokens. Never generate arbitrary hex values or create new colors.
+> **For AI Agents**: This document defines the official color system using W3C DTCG format. ALWAYS use these exact colors and semantic tokens. Never generate arbitrary hex values or create new colors.
 
 ---
 
@@ -9,33 +9,50 @@
 Our color system uses **OKLCH** (Oklch Lightness Chroma Hue) for perceptual uniformity. This means colors look equally vibrant across the palette and transitions are smooth.
 
 ```
-oklch(L C H)
-  │  │  └── Hue: 0-360 (color wheel position)
-  │  └───── Chroma: 0-0.4 (saturation/vibrancy)
-  └──────── Lightness: 0-1 (brightness)
+oklch(L C H / A)
+  │  │  │   └── Alpha: 0-1 (optional opacity)
+  │  │  └───── Hue: 0-360 (color wheel position)
+  │  └──────── Chroma: 0-0.4 (saturation/vibrancy)
+  └─────────── Lightness: 0-1 (brightness)
+```
+
+### Token Format (W3C DTCG)
+
+```json
+{
+  "color": {
+    "$type": "color",
+    "primary": {
+      "500": {
+        "$value": "oklch(0.60 0.20 290)",
+        "$description": "Primary actions (dark mode)"
+      }
+    }
+  }
+}
 ```
 
 ---
 
-## 🎯 Primary Brand Colors
+## Primary Brand Colors
 
-**Hue: 285 (Purple/Violet)**
+**Hue: 290 (Violet/Purple)**
 
 Use for: Primary actions, buttons, links, active states, brand elements
 
 | Token | OKLCH Value | Usage |
 |-------|-------------|-------|
-| `brand-50` | `oklch(0.970 0.030 280)` | Subtle backgrounds |
-| `brand-100` | `oklch(0.943 0.054 281)` | Light backgrounds, hover states |
-| `brand-200` | `oklch(0.894 0.098 282)` | Borders, dividers |
-| `brand-300` | `oklch(0.831 0.150 283)` | Icons, secondary elements |
-| `brand-400` | `oklch(0.750 0.190 284)` | **Dark mode primary** |
-| `brand-500` | `oklch(0.667 0.210 285)` | ⭐ **Light mode primary** |
-| `brand-600` | `oklch(0.585 0.200 286)` | Hover state |
-| `brand-700` | `oklch(0.510 0.180 287)` | Active/pressed state |
-| `brand-800` | `oklch(0.432 0.150 288)` | Dark emphasis |
-| `brand-900` | `oklch(0.365 0.120 289)` | Very dark |
-| `brand-950` | `oklch(0.257 0.090 290)` | Dark mode backgrounds |
+| `primary-50` | `oklch(0.97 0.02 290)` | Subtle backgrounds |
+| `primary-100` | `oklch(0.94 0.04 290)` | Light backgrounds, hover states |
+| `primary-200` | `oklch(0.88 0.08 290)` | Borders, dividers |
+| `primary-300` | `oklch(0.79 0.12 290)` | Icons, secondary elements |
+| `primary-400` | `oklch(0.70 0.16 290)` | Dark mode hover |
+| `primary-500` | `oklch(0.60 0.20 290)` | **Dark mode primary** |
+| `primary-600` | `oklch(0.52 0.20 290)` | **Light mode primary** |
+| `primary-700` | `oklch(0.44 0.18 290)` | Hover state |
+| `primary-800` | `oklch(0.36 0.14 290)` | Active/pressed state |
+| `primary-900` | `oklch(0.28 0.10 290)` | Text on light backgrounds |
+| `primary-950` | `oklch(0.20 0.08 290)` | Darkest primary |
 
 ### Usage Examples
 
@@ -56,79 +73,79 @@ Use for: Primary actions, buttons, links, active states, brand elements
 
 ---
 
-## 💎 Accent Colors
+## Secondary Colors
 
-**Hue: 195 (Cyan/Teal)**
+**Hue: 220 (Cyan/Blue)**
 
 Use for: Secondary actions, highlights, links, decorative elements
 
 | Token | OKLCH Value | Usage |
 |-------|-------------|-------|
-| `accent-50` | `oklch(0.972 0.025 195)` | Subtle backgrounds |
-| `accent-100` | `oklch(0.948 0.050 195)` | Light backgrounds |
-| `accent-200` | `oklch(0.901 0.095 195)` | Borders |
-| `accent-300` | `oklch(0.837 0.140 195)` | Icons |
-| `accent-400` | `oklch(0.752 0.175 195)` | **Dark mode accent** |
-| `accent-500` | `oklch(0.665 0.190 195)` | ⭐ **Light mode accent** |
-| `accent-600` | `oklch(0.580 0.175 195)` | Hover state |
-| `accent-700` | `oklch(0.500 0.155 195)` | Active state |
-| `accent-800` | `oklch(0.425 0.130 195)` | Dark emphasis |
-| `accent-900` | `oklch(0.360 0.105 195)` | Very dark |
-| `accent-950` | `oklch(0.250 0.075 195)` | Dark backgrounds |
+| `secondary-50` | `oklch(0.97 0.02 220)` | Subtle backgrounds |
+| `secondary-100` | `oklch(0.94 0.04 220)` | Light backgrounds |
+| `secondary-200` | `oklch(0.88 0.08 220)` | Borders |
+| `secondary-300` | `oklch(0.79 0.12 220)` | Icons |
+| `secondary-400` | `oklch(0.70 0.16 220)` | **Dark mode secondary** |
+| `secondary-500` | `oklch(0.60 0.18 220)` | Secondary actions |
+| `secondary-600` | `oklch(0.52 0.18 220)` | Hover state |
+| `secondary-700` | `oklch(0.44 0.16 220)` | Active state |
+| `secondary-800` | `oklch(0.36 0.12 220)` | Dark emphasis |
+| `secondary-900` | `oklch(0.28 0.08 220)` | Text |
+| `secondary-950` | `oklch(0.20 0.06 220)` | Darkest secondary |
 
 ---
 
-## 🔘 Neutral Gray Scale
+## Neutral Gray Scale
 
-**Hue: 264 (Slight blue undertone for modern feel)**
+**Hue: 290 (Slight violet undertone for brand consistency)**
 
 Use for: Text, backgrounds, borders, shadows
 
 | Token | OKLCH Value | Light Mode Usage | Dark Mode Usage |
 |-------|-------------|------------------|-----------------|
-| `gray-50` | `oklch(0.985 0.002 264)` | Background | — |
-| `gray-100` | `oklch(0.967 0.003 264)` | Subtle bg | Foreground |
-| `gray-200` | `oklch(0.928 0.006 264)` | Borders | — |
-| `gray-300` | `oklch(0.872 0.010 264)` | Emphasis bg | — |
-| `gray-400` | `oklch(0.707 0.015 264)` | Muted fg (dark) | Muted foreground |
-| `gray-500` | `oklch(0.551 0.018 264)` | Placeholder | Subtle foreground |
-| `gray-600` | `oklch(0.446 0.018 264)` | Muted foreground | — |
-| `gray-700` | `oklch(0.372 0.016 264)` | — | Emphasis border |
-| `gray-800` | `oklch(0.279 0.012 264)` | — | Borders |
-| `gray-900` | `oklch(0.208 0.010 264)` | Foreground | Subtle bg |
-| `gray-950` | `oklch(0.129 0.008 264)` | — | Background |
+| `neutral-50` | `oklch(0.98 0.005 290)` | Background | — |
+| `neutral-100` | `oklch(0.96 0.008 290)` | Subtle bg | Foreground |
+| `neutral-200` | `oklch(0.92 0.010 290)` | Borders | — |
+| `neutral-300` | `oklch(0.87 0.012 290)` | Emphasis bg | — |
+| `neutral-400` | `oklch(0.70 0.015 290)` | Muted fg (dark) | Muted foreground |
+| `neutral-500` | `oklch(0.55 0.015 290)` | Placeholder | Subtle foreground |
+| `neutral-600` | `oklch(0.45 0.015 290)` | Muted foreground | — |
+| `neutral-700` | `oklch(0.35 0.012 290)` | — | Emphasis border |
+| `neutral-800` | `oklch(0.25 0.010 290)` | — | Borders |
+| `neutral-900` | `oklch(0.18 0.008 290)` | Foreground | Subtle bg |
+| `neutral-950` | `oklch(0.12 0.005 290)` | — | Background |
 
 ---
 
-## ✅ Semantic Status Colors
+## Semantic Status Colors
 
-### Success (Green)
-**Hue: 155**
-
-| Token | Value | Usage |
-|-------|-------|-------|
-| `success-500` | `oklch(0.680 0.195 155)` | Success states, checkmarks |
-| `success-600` | `oklch(0.590 0.175 155)` | Hover state |
-
-### Warning (Amber)
-**Hue: 85**
+### Success (Green - Hue: 145)
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `warning-500` | `oklch(0.770 0.195 85)` | Warnings, alerts |
-| `warning-600` | `oklch(0.680 0.175 85)` | Hover state |
+| `success-50` | `oklch(0.97 0.02 145)` | Success backgrounds |
+| `success-500` | `oklch(0.60 0.18 145)` | Success states, checkmarks |
+| `success-600` | `oklch(0.52 0.16 145)` | Hover state |
 
-### Error (Red)
-**Hue: 25**
+### Warning (Amber - Hue: 85)
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `error-500` | `oklch(0.680 0.205 25)` | Errors, destructive |
-| `error-600` | `oklch(0.590 0.190 25)` | Hover state |
+| `warning-50` | `oklch(0.97 0.02 85)` | Warning backgrounds |
+| `warning-500` | `oklch(0.75 0.18 85)` | Warnings, alerts |
+| `warning-600` | `oklch(0.65 0.16 70)` | Hover state |
+
+### Error/Destructive (Red - Hue: 25)
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `error-50` | `oklch(0.97 0.02 25)` | Error backgrounds |
+| `error-500` | `oklch(0.60 0.20 25)` | Errors, destructive |
+| `error-600` | `oklch(0.52 0.20 25)` | Hover state |
 
 ---
 
-## 🌓 Theme Mapping
+## Theme Mapping
 
 ### Semantic Variables
 
@@ -136,16 +153,21 @@ Always use semantic variables in components, not primitive colors:
 
 ```css
 /* Light Mode */
---background: var(--color-gray-50);
---foreground: var(--color-gray-900);
---primary: var(--color-brand-500);
---border: var(--color-gray-200);
+:root {
+  --background: var(--color-neutral-50);
+  --foreground: var(--color-neutral-950);
+  --primary: var(--color-primary-600);
+  --primary-foreground: oklch(1 0 0);
+  --border: var(--color-neutral-200);
+}
 
 /* Dark Mode */
---background: var(--color-gray-950);
---foreground: var(--color-gray-50);
---primary: var(--color-brand-400);
---border: var(--color-gray-800);
+.dark {
+  --background: var(--color-neutral-950);
+  --foreground: var(--color-neutral-50);
+  --primary: var(--color-primary-500);
+  --border: var(--color-neutral-800);
+}
 ```
 
 ### Component Example
@@ -162,31 +184,28 @@ Always use semantic variables in components, not primitive colors:
 </Card>
 
 // ❌ WRONG - Uses primitive colors directly
-<Card className="bg-gray-50 dark:bg-gray-950">...</Card>
+<Card className="bg-neutral-50 dark:bg-neutral-950">...</Card>
 ```
 
 ---
 
-## 🎨 Gradients
+## Gradients
 
 ### Brand Gradient
 ```css
-background: linear-gradient(135deg, var(--color-brand-400), var(--color-accent-400));
+background: linear-gradient(135deg, var(--color-primary-400), var(--color-secondary-400));
 ```
 
 ### Text Gradient
 ```tsx
-<span className="text-gradient-brand">Gradient Text</span>
-```
-
-### Glow Effects
-```tsx
-<Button className="glow-brand">Glowing Button</Button>
+<span className="bg-linear-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent">
+  Gradient Text
+</span>
 ```
 
 ---
 
-## 🔒 Rules for AI Agents
+## Rules for AI Agents
 
 ### ✅ DO
 

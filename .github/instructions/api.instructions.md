@@ -1,17 +1,19 @@
 ---
-applyTo: "backend/internal/handlers/**/*.go"
+applyTo: "backend/internal/interfaces/http/handler/**/*.go"
 ---
 
 # API Handler Development Instructions
 
-These instructions apply to all HTTP handlers in the backend.
+These instructions apply to all HTTP handlers in the backend, following the DDD + CQRS architecture.
 
-## Handler Structure
+## Handler Structure (CQRS Pattern)
+
+Handlers delegate to Command handlers (writes) and Query handlers (reads).
 
 ### Basic Handler Template
 
 ```go
-package handlers
+package handler
 
 import (
     "encoding/json"
@@ -19,22 +21,37 @@ import (
     "net/http"
 
     "github.com/go-chi/chi/v5"
-    "github.com/yourorg/app/internal/domain"
-    "github.com/yourorg/app/internal/service"
+    "github.com/google/uuid"
+    "github.com/yourorg/app/internal/application/command"
+    "github.com/yourorg/app/internal/application/query"
+    "github.com/yourorg/app/internal/domain/shared"
+    "github.com/yourorg/app/internal/domain/user"
     "github.com/yourorg/app/pkg/response"
 )
 
 // UserHandler handles HTTP requests for user operations.
 type UserHandler struct {
-    svc    service.UserService
-    logger *slog.Logger
+    createUser *command.CreateUserHandler
+    updateUser *command.UpdateUserHandler
+    getUser    *query.GetUserHandler
+    listUsers  *query.ListUsersHandler
+    logger     *slog.Logger
 }
 
 // NewUserHandler creates a new UserHandler with the given dependencies.
-func NewUserHandler(svc service.UserService, logger *slog.Logger) *UserHandler {
+func NewUserHandler(
+    createUser *command.CreateUserHandler,
+    updateUser *command.UpdateUserHandler,
+    getUser *query.GetUserHandler,
+    listUsers *query.ListUsersHandler,
+    logger *slog.Logger,
+) *UserHandler {
     return &UserHandler{
-        svc:    svc,
-        logger: logger,
+        createUser: createUser,
+        updateUser: updateUser,
+        getUser:    getUser,
+        listUsers:  listUsers,
+        logger:     logger,
     }
 }
 

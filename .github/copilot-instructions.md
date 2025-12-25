@@ -4,34 +4,94 @@ This document provides global instructions that are always loaded by GitHub Copi
 
 ## Project Overview
 
-This is a full-stack application built with:
+This is a production-ready full-stack application for building modern web services. The backend follows **Clean Architecture + Domain-Driven Design (DDD) + CQRS** patterns, while the frontend uses **React 19 with Tailwind CSS v4 and shadcn/ui** components. The application demonstrates best practices for scalable, maintainable enterprise software.
 
-- **Backend**: Go 1.25 with clean architecture, REST APIs, PostgreSQL
-- **Frontend**: React 19 + TypeScript + Tailwind CSS v4 + shadcn/ui (new-york style)
-- **Infrastructure**: Docker, Docker Compose, GitHub Actions
+## Tech Stack
 
-## Tech Stack Details
+| Layer | Technology | Version | Notes |
+|-------|------------|---------|-------|
+| **Backend** | Go | 1.25+ | Clean Architecture + DDD + CQRS |
+| **Router** | Chi | v5 | Lightweight, idiomatic |
+| **Database** | PostgreSQL | 16+ | With pgx v5 driver |
+| **Migrations** | Goose | v3 | CLI-based migrations |
+| **Frontend** | React | 19 | With TypeScript 5.x strict |
+| **Styling** | Tailwind CSS | v4 | CSS-first configuration |
+| **Components** | shadcn/ui | Latest | new-york style |
+| **State** | TanStack Query + Zustand | Latest | Server + client state |
+| **Forms** | React Hook Form + Zod | Latest | Validation |
+| **Testing** | Vitest + testify | Latest | Frontend + Backend |
 
-### Backend (Go 1.25)
+## Available Scripts & Commands
 
-- **Framework**: Standard library `net/http` with Chi router
-- **Database**: PostgreSQL with `pgx` driver
-- **Migrations**: `golang-migrate`
-- **Validation**: `go-playground/validator`
-- **Logging**: `slog` (structured logging)
-- **Configuration**: Environment variables with `envconfig`
-- **Testing**: Standard `testing` package with `testify`
+### Backend Commands
 
-### Frontend (React 19)
+```bash
+# Run the API server
+cd backend && go run cmd/api/main.go
 
-- **Build Tool**: Vite
-- **Language**: TypeScript 5.x (strict mode)
-- **Styling**: Tailwind CSS v4 with CSS-first configuration
-- **Components**: shadcn/ui (new-york style)
-- **State Management**: TanStack Query for server state, Zustand for client state
-- **Forms**: React Hook Form with Zod validation
-- **Routing**: TanStack Router (type-safe)
-- **Testing**: Vitest + React Testing Library
+# Run tests
+cd backend && go test ./...
+
+# Run tests with coverage
+cd backend && go test -cover ./...
+
+# Run linter
+cd backend && golangci-lint run
+
+# Build binary
+cd backend && go build -o bin/api cmd/api/main.go
+```
+
+### Database Migrations (Goose CLI)
+
+```bash
+# Install goose
+go install github.com/pressly/goose/v3/cmd/goose@latest
+
+# Create new migration
+goose -dir backend/migrations/sql create <name> sql
+
+# Apply all migrations
+goose -dir backend/migrations/sql postgres "$DATABASE_URL" up
+
+# Rollback last migration
+goose -dir backend/migrations/sql postgres "$DATABASE_URL" down
+
+# Check status
+goose -dir backend/migrations/sql postgres "$DATABASE_URL" status
+```
+
+### Frontend Commands
+
+```bash
+# Install dependencies
+cd frontend && npm install
+
+# Start dev server
+cd frontend && npm run dev
+
+# Run tests
+cd frontend && npm test
+
+# Build for production
+cd frontend && npm run build
+
+# Run linter
+cd frontend && npm run lint
+```
+
+### Docker Commands
+
+```bash
+# Start all services
+docker-compose up -d
+
+# Stop all services
+docker-compose down
+
+# View logs
+docker-compose logs -f api
+```
 
 ---
 
@@ -105,7 +165,7 @@ Use these colors exclusively. Reference them via CSS custom properties or Tailwi
 |-------|-------------|-------|
 | `--primary` | `oklch(0.7 0.15 290)` | Primary actions, links, focus states |
 | `--primary-dark` | `oklch(0.6 0.2 280)` | Primary hover states, gradients |
-| `--secondary` | `oklch(0.75 0.15 200)` | Secondary actions, accents |
+| `--secondary` | `oklch(0.75 0.15 220)` | Secondary actions, accents |
 | `--background-dark` | `oklch(0.1 0.01 260)` | Dark mode background |
 | `--background-light` | `oklch(0.98 0.01 260)` | Light mode background |
 | `--success` | `oklch(0.7 0.17 160)` | Success states, confirmations |
@@ -168,33 +228,58 @@ Use violet-tinted shadows for elevated elements:
 
 ---
 
-## File Naming Conventions
+## Project Structure
 
-### Backend (Go)
+### Backend (DDD + CQRS Architecture)
 
 ```
 backend/
 ├── cmd/
 │   └── api/
-│       └── main.go
+│       └── main.go                    # Entry point, dependency wiring
 ├── internal/
-│   ├── config/
-│   │   └── config.go
-│   ├── domain/
-│   │   └── user.go           # Domain models
-│   ├── handlers/
-│   │   └── user_handler.go   # HTTP handlers
-│   ├── middleware/
-│   │   └── auth.go
-│   ├── repository/
-│   │   └── user_repository.go
-│   └── service/
-│       └── user_service.go
+│   ├── domain/                        # Domain Layer (innermost, pure business logic)
+│   │   ├── user/                      # User aggregate
+│   │   │   ├── user.go                # Entity with private fields + getters
+│   │   │   ├── repository.go          # Repository interface (port)
+│   │   │   ├── errors.go              # Domain-specific errors
+│   │   │   └── events.go              # Domain events
+│   │   └── shared/                    # Shared domain concepts
+│   │       ├── errors.go
+│   │       └── valueobjects.go
+│   │
+│   ├── application/                   # Application Layer (CQRS)
+│   │   ├── command/                   # Commands (write operations)
+│   │   │   ├── create_user.go
+│   │   │   └── update_user.go
+│   │   ├── query/                     # Queries (read operations)
+│   │   │   ├── get_user.go
+│   │   │   └── list_users.go
+│   │   └── dto/                       # Data Transfer Objects
+│   │       └── user_dto.go
+│   │
+│   ├── infrastructure/                # Infrastructure Layer (adapters)
+│   │   ├── persistence/
+│   │   │   └── postgres/
+│   │   │       ├── user_repository.go # Implements domain.UserRepository
+│   │   │       └── unit_of_work.go
+│   │   └── cache/
+│   │       └── redis/
+│   │
+│   └── interfaces/                    # Interface Adapters Layer
+│       └── http/
+│           ├── handler/
+│           │   └── user_handler.go
+│           ├── middleware/
+│           └── router/
+│
 ├── migrations/
-│   └── 001_create_users.up.sql
+│   └── sql/
+│       └── 00001_create_users.sql     # Goose migrations
 └── pkg/
-    └── response/
-        └── response.go
+    ├── config/
+    ├── logger/
+    └── validator/
 ```
 
 ### Frontend (React)

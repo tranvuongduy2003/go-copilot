@@ -1,6 +1,5 @@
 ---
 description: Perform thorough code review
-agent: "Code Reviewer"
 ---
 
 # Code Review

@@ -15,7 +15,7 @@ This skill guides you through configuring and customizing the shadcn/ui theme to
 |-------|------------|-----------|-------|
 | Primary | `oklch(0.7 0.15 290)` | `oklch(0.7 0.15 290)` | Main actions |
 | Primary Dark | `oklch(0.6 0.2 280)` | `oklch(0.6 0.2 280)` | Hover states |
-| Secondary | `oklch(0.75 0.15 200)` | `oklch(0.75 0.15 200)` | Secondary actions |
+| Secondary | `oklch(0.75 0.15 220)` | `oklch(0.75 0.15 220)` | Secondary actions |
 | Background | `oklch(0.98 0.01 260)` | `oklch(0.1 0.01 260)` | Page background |
 | Card | `oklch(1 0 0)` | `oklch(0.15 0.01 260)` | Card surfaces |
 | Success | `oklch(0.7 0.17 160)` | `oklch(0.7 0.17 160)` | Success states |
@@ -99,8 +99,8 @@ This skill guides you through configuring and customizing the shadcn/ui theme to
   --primary-foreground: oklch(0.98 0.01 290);
 
   /* Secondary - Cyan/Blue */
-  --secondary: oklch(0.75 0.15 200);
-  --secondary-foreground: oklch(0.15 0.02 200);
+  --secondary: oklch(0.75 0.15 220);
+  --secondary-foreground: oklch(0.15 0.02 220);
 
   /* Background & Surfaces */
   --background: oklch(0.98 0.01 260);
@@ -133,7 +133,7 @@ This skill guides you through configuring and customizing the shadcn/ui theme to
 
   /* Chart Colors */
   --chart-1: oklch(0.7 0.15 290);
-  --chart-2: oklch(0.75 0.15 200);
+  --chart-2: oklch(0.75 0.15 220);
   --chart-3: oklch(0.7 0.17 160);
   --chart-4: oklch(0.8 0.15 85);
   --chart-5: oklch(0.65 0.2 15);
@@ -150,8 +150,8 @@ This skill guides you through configuring and customizing the shadcn/ui theme to
   --primary-foreground: oklch(0.15 0.02 290);
 
   /* Secondary - Cyan/Blue */
-  --secondary: oklch(0.35 0.08 200);
-  --secondary-foreground: oklch(0.9 0.02 200);
+  --secondary: oklch(0.35 0.08 220);
+  --secondary-foreground: oklch(0.9 0.02 220);
 
   /* Background & Surfaces */
   --background: oklch(0.1 0.01 260);

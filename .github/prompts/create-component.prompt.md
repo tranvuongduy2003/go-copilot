@@ -1,6 +1,5 @@
 ---
 description: Create a new React component with shadcn/ui following design system
-agent: "Frontend Engineer"
 ---
 
 # Create React Component

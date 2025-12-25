@@ -1,6 +1,5 @@
 ---
 description: Refactor code for better quality and maintainability
-agent: "Fullstack Engineer"
 ---
 
 # Code Refactoring

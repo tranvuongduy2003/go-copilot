@@ -1,430 +1,401 @@
-# Copilot Coding Agent Instructions
+# AI Agent Instructions
 
-This document provides root-level instructions for the GitHub Copilot Coding Agent working on this project.
+This document provides global instructions for AI coding assistants (GitHub Copilot, Claude, Cursor) working on this codebase.
 
 ## Project Overview
 
-Full-stack application with:
-- **Backend**: Go 1.25 with clean architecture
-- **Frontend**: React 19 + Tailwind CSS v4 + shadcn/ui
-- **Database**: PostgreSQL 16
-- **Infrastructure**: Docker, Docker Compose
+Full-stack application following **Clean Architecture + Domain-Driven Design (DDD) + CQRS** patterns.
 
-## Quick Start
-
-### Prerequisites
-
-- Go 1.25+
-- Node.js 20+
-- Docker and Docker Compose
-- PostgreSQL 16 (or use Docker)
-
-### Development Setup
-
-```bash
-# Clone and setup
-git clone <repository-url>
-cd copilot
-
-# Start infrastructure
-docker compose up -d postgres redis
-
-# Backend setup
-cd backend
-cp .env.example .env
-go mod download
-go run cmd/api/main.go
-
-# Frontend setup (new terminal)
-cd frontend
-npm install
-npm run dev
-```
-
-### Environment Variables
-
-Backend (`backend/.env`):
-```env
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/app?sslmode=disable
-REDIS_URL=redis://localhost:6379
-JWT_SECRET=your-secret-key
-PORT=8080
-ENVIRONMENT=development
-```
-
-Frontend (`frontend/.env`):
-```env
-VITE_API_URL=http://localhost:8080/api/v1
-```
+| Layer | Technology | Version | Notes |
+|-------|------------|---------|-------|
+| **Backend** | Go | 1.25+ | Clean Architecture + DDD + CQRS |
+| **Router** | Chi | v5 | Lightweight, idiomatic |
+| **Database** | PostgreSQL | 16+ | With pgx v5 driver |
+| **Migrations** | Goose | v3 | CLI-based SQL migrations |
+| **Frontend** | React | 19 | With TypeScript 5.x strict |
+| **Styling** | Tailwind CSS | v4 | CSS-first configuration |
+| **Components** | shadcn/ui | Latest | new-york style |
+| **State** | TanStack Query + Zustand | Latest | Server + client state |
+| **Testing** | Vitest + testify | Latest | Frontend + Backend |
 
 ---
 
-## Build Commands
+## Quick Commands
 
 ### Backend
 
 ```bash
-# Build
+# Run the API server
+cd backend && go run cmd/api/main.go
+
+# Run tests
+cd backend && go test ./...
+
+# Run tests with coverage
+cd backend && go test -cover ./...
+
+# Run linter
+cd backend && golangci-lint run
+
+# Build binary
 cd backend && go build -o bin/api cmd/api/main.go
+```
 
-# Run
-./bin/api
+### Database Migrations (Goose CLI)
 
-# Run with hot reload (using air)
-air
+```bash
+# Install goose
+go install github.com/pressly/goose/v3/cmd/goose@latest
 
-# Build Docker image
-docker build -t app-backend -f docker/Dockerfile.backend .
+# Create new migration
+goose -dir backend/migrations/sql create <name> sql
+
+# Apply all migrations
+goose -dir backend/migrations/sql postgres "$DATABASE_URL" up
+
+# Rollback last migration
+goose -dir backend/migrations/sql postgres "$DATABASE_URL" down
+
+# Check status
+goose -dir backend/migrations/sql postgres "$DATABASE_URL" status
 ```
 
 ### Frontend
 
 ```bash
-# Development
+# Install dependencies
+cd frontend && npm install
+
+# Start dev server
 cd frontend && npm run dev
 
+# Run tests
+cd frontend && npm test
+
 # Build for production
-npm run build
+cd frontend && npm run build
 
-# Preview production build
-npm run preview
-
-# Build Docker image
-docker build -t app-frontend -f docker/Dockerfile.frontend .
+# Run linter
+cd frontend && npm run lint
 ```
 
-### Full Stack
+### Docker
 
 ```bash
 # Start all services
-docker compose up -d
-
-# View logs
-docker compose logs -f
+docker-compose up -d
 
 # Stop all services
-docker compose down
+docker-compose down
 
-# Rebuild and restart
-docker compose up -d --build
+# View logs
+docker-compose logs -f api
 ```
 
 ---
 
-## Test Commands
+## Architecture Boundaries
 
-### Backend Tests
+### Always Do
 
-```bash
-cd backend
+**Backend (DDD + CQRS)**
+- Follow dependency rule: domain <- application <- infrastructure <- interfaces
+- Use CQRS pattern: separate Command handlers (writes) from Query handlers (reads)
+- Define repository interfaces (ports) in domain layer
+- Implement repositories in infrastructure layer
+- Pass `context.Context` as first parameter to all functions
+- Wrap errors with context: `fmt.Errorf("failed to do X: %w", err)`
+- Use value objects for domain concepts (Email, Role, etc.)
 
-# Run all tests
-go test ./...
+**Frontend (React + Design System)**
+- Use design system colors: `bg-primary`, `text-foreground`, `bg-destructive`
+- Use standard spacing: `p-4`, `gap-6`, `mt-8` (4px base unit)
+- Use shadcn/ui components from `@/components/ui/`
+- Create TypeScript types that match Go domain models
+- Use React Query for server state, Zustand for client state
+- Handle loading, error, and empty states in all components
 
-# Run with coverage
-go test -coverprofile=coverage.out ./...
-go tool cover -html=coverage.out
+### Ask First
 
-# Run specific package tests
-go test ./internal/service/...
+- Before creating new database tables or migrations
+- Before adding new external dependencies
+- Before making breaking API changes
+- Before modifying authentication/authorization flows
+- Before creating new aggregates or domain entities
+- When multiple valid implementation approaches exist
 
-# Run with verbose output
-go test -v ./...
+### Never Do
 
-# Run integration tests
-go test -tags=integration ./...
+**Backend**
+- Never put business logic in HTTP handlers (use application layer)
+- Never import infrastructure packages in domain layer
+- Never ignore errors - always handle explicitly
+- Never use string concatenation for SQL queries (use parameterized)
+- Never log sensitive data (passwords, tokens, PII)
+
+**Frontend**
+- Never use arbitrary colors: `bg-[#7c3aed]`, `bg-purple-500`
+- Never use arbitrary spacing: `p-[13px]`, `mt-[7px]`
+- Never use `any` type - provide proper TypeScript types
+- Never store sensitive data in localStorage
+- Never use `dangerouslySetInnerHTML` without sanitization
+
+**Security**
+- Never hardcode secrets or credentials
+- Never commit .env files with real values
+- Never approve code with SQL injection vulnerabilities
+
+---
+
+## Project Structure
+
+### Backend (DDD + CQRS Architecture)
+
+```
+backend/
+├── cmd/
+│   └── api/
+│       └── main.go                    # Entry point, dependency wiring
+├── internal/
+│   ├── domain/                        # Domain Layer (innermost, pure business logic)
+│   │   ├── user/                      # User aggregate
+│   │   │   ├── user.go                # Entity with private fields + getters
+│   │   │   ├── repository.go          # Repository interface (port)
+│   │   │   ├── errors.go              # Domain-specific errors
+│   │   │   └── events.go              # Domain events
+│   │   └── shared/                    # Shared domain concepts
+│   │       ├── errors.go
+│   │       └── valueobjects.go
+│   │
+│   ├── application/                   # Application Layer (CQRS)
+│   │   ├── command/                   # Commands (write operations)
+│   │   │   ├── create_user.go
+│   │   │   └── update_user.go
+│   │   ├── query/                     # Queries (read operations)
+│   │   │   ├── get_user.go
+│   │   │   └── list_users.go
+│   │   └── dto/                       # Data Transfer Objects
+│   │       └── user_dto.go
+│   │
+│   ├── infrastructure/                # Infrastructure Layer (adapters)
+│   │   ├── persistence/
+│   │   │   └── postgres/
+│   │   │       ├── user_repository.go # Implements domain.UserRepository
+│   │   │       └── unit_of_work.go
+│   │   └── cache/
+│   │       └── redis/
+│   │
+│   └── interfaces/                    # Interface Adapters Layer
+│       └── http/
+│           ├── handler/
+│           │   └── user_handler.go
+│           ├── middleware/
+│           └── router/
+│
+├── migrations/
+│   └── sql/
+│       └── 00001_create_users.sql     # Goose migrations
+└── pkg/
+    ├── config/
+    ├── logger/
+    └── validator/
 ```
 
-### Frontend Tests
+### Frontend (React)
 
-```bash
-cd frontend
-
-# Run all tests
-npm test
-
-# Run with coverage
-npm run test:coverage
-
-# Run in watch mode
-npm run test:watch
-
-# Run e2e tests
-npm run test:e2e
+```
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── ui/               # shadcn/ui components
+│   │   │   ├── button.tsx
+│   │   │   └── card.tsx
+│   │   └── features/         # Feature-specific components
+│   │       └── user-profile/
+│   │           ├── user-profile.tsx
+│   │           └── user-avatar.tsx
+│   ├── hooks/
+│   │   └── use-user.ts
+│   ├── lib/
+│   │   ├── api.ts
+│   │   └── utils.ts
+│   ├── pages/
+│   │   └── dashboard.tsx
+│   ├── stores/
+│   │   └── auth-store.ts
+│   ├── styles/
+│   │   └── globals.css
+│   └── types/
+│       └── user.ts
 ```
 
 ---
 
-## Development Workflow
+## Design System
 
-### Starting New Feature
+### Color Palette (OKLCH)
 
-1. Create a new branch from `main`
-2. Implement the feature following architecture patterns
-3. Write tests (aim for 80%+ coverage)
-4. Update documentation if needed
-5. Create a pull request
-6. Address code review feedback
-7. Merge after approval
+| Token | Usage |
+|-------|-------|
+| `primary` | Primary actions, links, focus states (violet hue 290) |
+| `primary-dark` | Primary hover states, gradients |
+| `secondary` | Secondary actions, accents (cyan hue 220) |
+| `destructive` | Error states, destructive actions |
+| `muted` | Subtle backgrounds, secondary text |
+| `success` | Success states, confirmations |
+| `warning` | Warning states, cautions |
 
-### Database Migrations
+```tsx
+// CORRECT: Using design system colors
+<button className="bg-primary hover:bg-primary/90 text-primary-foreground">
 
-```bash
-cd backend
-
-# Create new migration
-migrate create -ext sql -dir migrations -seq <migration_name>
-
-# Run migrations
-migrate -path migrations -database "$DATABASE_URL" up
-
-# Rollback last migration
-migrate -path migrations -database "$DATABASE_URL" down 1
-
-# Check migration status
-migrate -path migrations -database "$DATABASE_URL" version
+// WRONG: Using arbitrary colors
+<button className="bg-purple-500 hover:bg-purple-600 text-white">
 ```
 
-### Code Generation
+### Spacing Scale (4px base)
 
-```bash
-# Generate mocks (backend)
-go generate ./...
+| Token | Value | Usage |
+|-------|-------|-------|
+| `1` | 4px | Tight padding |
+| `2` | 8px | Inline elements |
+| `3` | 12px | Medium-small |
+| `4` | 16px | Default component padding |
+| `6` | 24px | Card spacing |
+| `8` | 32px | Section padding |
+| `12` | 48px | Page sections |
 
-# Generate API types from OpenAPI spec
-npm run generate:api
+```tsx
+// CORRECT: Using spacing scale
+<div className="p-4 gap-6 mt-8">
 
-# Generate shadcn/ui component
-npx shadcn@latest add <component-name>
+// WRONG: Using arbitrary spacing
+<div className="p-[13px] gap-[7px] mt-[15px]">
+```
+
+### Border Radius
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `sm` | 4px | Badges, chips |
+| `md` | 8px | Buttons, inputs (default) |
+| `lg` | 12px | Cards, dialogs |
+| `xl` | 16px | Large cards, modals |
+| `full` | 9999px | Pills, avatars |
+
+---
+
+## Code Patterns
+
+### Go Error Handling
+
+```go
+result, err := service.DoSomething(ctx, input)
+if err != nil {
+    return fmt.Errorf("failed to do something: %w", err)
+}
+```
+
+### Go Domain Entity
+
+```go
+// Entity with private fields and getters
+type User struct {
+    id        uuid.UUID
+    email     Email     // Value Object
+    name      string
+    createdAt time.Time
+}
+
+func (u *User) ID() uuid.UUID { return u.id }
+func (u *User) Email() Email  { return u.email }
+```
+
+### React Component with Props
+
+```tsx
+interface UserCardProps {
+  user: User;
+  onEdit?: () => void;
+}
+
+export function UserCard({ user, onEdit }: UserCardProps) {
+  return (
+    <Card className="p-4">
+      <CardHeader>
+        <CardTitle>{user.name}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-muted-foreground">{user.email}</p>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+### React Query Hook
+
+```tsx
+export function useUsers() {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: () => api.get<User[]>('/users'),
+  });
+}
+
+export function useCreateUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: CreateUserInput) => api.post<User>('/users', input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+}
 ```
 
 ---
 
-## Branch Naming Conventions
+## Available Agents
 
-Use the following branch naming format:
-
-```
-<type>/<ticket-id>-<short-description>
-```
-
-### Types
-
-| Type | Usage |
-|------|-------|
-| `feature/` | New features |
-| `fix/` | Bug fixes |
-| `hotfix/` | Critical production fixes |
-| `refactor/` | Code refactoring |
-| `docs/` | Documentation changes |
-| `test/` | Test additions or fixes |
-| `chore/` | Maintenance tasks |
-
-### Examples
-
-- `feature/PROJ-123-user-authentication`
-- `fix/PROJ-456-login-redirect-loop`
-- `refactor/PROJ-789-simplify-error-handling`
-- `docs/update-api-documentation`
+| Agent | Description |
+|-------|-------------|
+| `backend-engineer` | Go backend with Clean Architecture + DDD + CQRS |
+| `frontend-engineer` | React 19 + Tailwind CSS v4 + shadcn/ui |
+| `fullstack-engineer` | End-to-end feature development |
+| `test-agent` | Comprehensive test suites (Go + React) |
+| `code-reviewer` | Code review for quality, security, design system |
+| `security-auditor` | OWASP Top 10 vulnerability auditing |
+| `documentation-writer` | Technical documentation |
+| `technical-planner` | Feature planning and technical designs |
 
 ---
 
 ## Commit Message Format
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
+Follow Conventional Commits:
 
 ```
 <type>(<scope>): <description>
 
 [optional body]
 
-[optional footer(s)]
+[optional footer]
 ```
 
-### Types
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `perf`
 
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, semicolons, etc.)
-- `refactor`: Code refactoring (no feature or fix)
-- `perf`: Performance improvements
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
-- `ci`: CI/CD changes
-- `build`: Build system changes
-
-### Scopes
-
-- `api`: Backend API changes
-- `ui`: Frontend UI changes
-- `auth`: Authentication related
-- `db`: Database related
-- `config`: Configuration changes
-- `deps`: Dependency updates
-
-### Examples
-
-```
-feat(api): add user registration endpoint
-
-Implement POST /api/v1/users endpoint with:
-- Email validation
-- Password hashing
-- Duplicate email check
-
-Closes #123
-```
-
-```
-fix(ui): resolve button focus state in dark mode
-
-The primary button was not showing focus ring in dark mode
-due to incorrect color contrast calculation.
-```
+Examples:
+- `feat(api): add user registration endpoint`
+- `fix(ui): resolve button focus state in dark mode`
+- `docs(readme): update installation instructions`
 
 ---
 
-## Pull Request Requirements
+## References
 
-### Before Creating PR
-
-- [ ] Code follows project coding standards
-- [ ] All tests pass locally
-- [ ] New code has appropriate test coverage (80%+)
-- [ ] Documentation updated if needed
-- [ ] No linting errors or warnings
-- [ ] Commit messages follow conventional format
-- [ ] Branch is up to date with main
-
-### PR Description Template
-
-```markdown
-## Summary
-Brief description of changes
-
-## Changes
-- Change 1
-- Change 2
-
-## Type of Change
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Breaking change
-- [ ] Documentation update
-
-## Testing
-Describe testing performed
-
-## Screenshots (if applicable)
-Add screenshots for UI changes
-
-## Checklist
-- [ ] Self-review completed
-- [ ] Tests added/updated
-- [ ] Documentation updated
-- [ ] No breaking changes (or documented)
-```
-
-### Review Process
-
-1. Automated checks must pass (CI, tests, linting)
-2. At least 1 approval required
-3. All comments must be resolved
-4. Branch must be up to date with main
-5. Squash merge to main
-
----
-
-## Architecture Guidelines
-
-### Backend Structure (Clean Architecture)
-
-```
-backend/
-├── cmd/api/           # Application entry point
-├── internal/          # Private application code
-│   ├── config/        # Configuration
-│   ├── domain/        # Domain models and interfaces
-│   ├── handlers/      # HTTP handlers
-│   ├── middleware/    # HTTP middleware
-│   ├── repository/    # Data access layer
-│   └── service/       # Business logic
-├── migrations/        # Database migrations
-└── pkg/              # Public packages
-```
-
-### Frontend Structure
-
-```
-frontend/src/
-├── components/        # UI components
-│   ├── ui/           # shadcn/ui components
-│   └── features/     # Feature-specific components
-├── hooks/            # Custom React hooks
-├── lib/              # Utilities and helpers
-├── pages/            # Page components
-├── stores/           # State management
-├── styles/           # Global styles
-└── types/            # TypeScript types
-```
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-**Database connection failed**
-```bash
-# Check if PostgreSQL is running
-docker compose ps
-
-# Check connection
-psql "$DATABASE_URL" -c "SELECT 1"
-```
-
-**Frontend build errors**
-```bash
-# Clear cache and reinstall
-rm -rf node_modules .vite
-npm install
-```
-
-**Go module issues**
-```bash
-# Clear module cache
-go clean -modcache
-go mod download
-```
-
-**Port already in use**
-```bash
-# Find and kill process
-lsof -i :8080
-kill -9 <PID>
-```
-
----
-
-## Useful Commands
-
-```bash
-# Format Go code
-gofmt -w .
-
-# Lint Go code
-golangci-lint run
-
-# Format frontend code
-npm run format
-
-# Lint frontend code
-npm run lint
-
-# Check types
-npm run typecheck
-
-# Database shell
-docker compose exec postgres psql -U postgres -d app
-```
+- [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- [DDD + CQRS in Go](https://threedots.tech/post/ddd-cqrs-clean-architecture-combined/)
+- [W3C Design Tokens](https://tr.designtokens.org/format/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Tailwind CSS v4](https://tailwindcss.com/docs/v4-beta)

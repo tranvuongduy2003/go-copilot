@@ -1,10 +1,15 @@
 /*
- * Global Styles - Tailwind CSS v4
+ * Global Styles - Tailwind CSS v4 + shadcn/ui
  * Design System: OKLCH-based color palette
  * Fonts: Inter (sans), JetBrains Mono (mono)
+ *
+ * References:
+ * - https://ui.shadcn.com/docs/tailwind-v4
+ * - https://www.designtokens.org/
  */
 
 @import "tailwindcss";
+@import "tw-animate-css";
 
 /* ============================================
    @theme - Tailwind CSS v4 Configuration

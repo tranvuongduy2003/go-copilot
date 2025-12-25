@@ -1,6 +1,5 @@
 ---
 description: Debug and fix a bug with root cause analysis
-agent: "Fullstack Engineer"
 ---
 
 # Bug Fix

@@ -2,6 +2,36 @@
 
 This document outlines the component patterns and best practices for building UI components using shadcn/ui with our design system.
 
+## Tailwind CSS v4 + shadcn/ui
+
+Our frontend uses Tailwind CSS v4 with CSS-first configuration and shadcn/ui components (new-york style).
+
+### Key Dependencies
+
+```json
+{
+  "dependencies": {
+    "tailwindcss": "^4.0.0",
+    "tw-animate-css": "^1.0.0",
+    "@radix-ui/react-*": "latest"
+  }
+}
+```
+
+### CSS Configuration
+
+```css
+/* globals.css */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --radius: 8px;
+  /* ... other theme tokens */
+}
+```
+
 ## Component Architecture
 
 ### File Structure

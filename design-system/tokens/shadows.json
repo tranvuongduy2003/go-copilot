@@ -1,0 +1,194 @@
+{
+  "$description": "Shadow tokens with violet tint for brand consistency",
+
+  "shadow": {
+    "$type": "shadow",
+    "$description": "Box shadow scale with violet-tinted colors (hue 290)",
+
+    "sm": {
+      "$value": {
+        "offsetX": "0px",
+        "offsetY": "1px",
+        "blur": "2px",
+        "spread": "0px",
+        "color": "oklch(0.3 0.05 290 / 0.05)"
+      },
+      "$description": "Subtle elevation"
+    },
+
+    "md": {
+      "$value": [
+        {
+          "offsetX": "0px",
+          "offsetY": "4px",
+          "blur": "6px",
+          "spread": "-1px",
+          "color": "oklch(0.3 0.05 290 / 0.1)"
+        },
+        {
+          "offsetX": "0px",
+          "offsetY": "2px",
+          "blur": "4px",
+          "spread": "-2px",
+          "color": "oklch(0.3 0.05 290 / 0.1)"
+        }
+      ],
+      "$description": "Card elevation"
+    },
+
+    "lg": {
+      "$value": [
+        {
+          "offsetX": "0px",
+          "offsetY": "10px",
+          "blur": "15px",
+          "spread": "-3px",
+          "color": "oklch(0.3 0.05 290 / 0.1)"
+        },
+        {
+          "offsetX": "0px",
+          "offsetY": "4px",
+          "blur": "6px",
+          "spread": "-4px",
+          "color": "oklch(0.3 0.05 290 / 0.1)"
+        }
+      ],
+      "$description": "Dropdown/popover elevation"
+    },
+
+    "xl": {
+      "$value": [
+        {
+          "offsetX": "0px",
+          "offsetY": "20px",
+          "blur": "25px",
+          "spread": "-5px",
+          "color": "oklch(0.3 0.05 290 / 0.1)"
+        },
+        {
+          "offsetX": "0px",
+          "offsetY": "8px",
+          "blur": "10px",
+          "spread": "-6px",
+          "color": "oklch(0.3 0.05 290 / 0.1)"
+        }
+      ],
+      "$description": "Modal elevation"
+    },
+
+    "2xl": {
+      "$value": {
+        "offsetX": "0px",
+        "offsetY": "25px",
+        "blur": "50px",
+        "spread": "-12px",
+        "color": "oklch(0.3 0.05 290 / 0.25)"
+      },
+      "$description": "High elevation"
+    },
+
+    "inner": {
+      "$value": {
+        "offsetX": "0px",
+        "offsetY": "2px",
+        "blur": "4px",
+        "spread": "0px",
+        "color": "oklch(0 0 0 / 0.05)",
+        "inset": true
+      },
+      "$description": "Inset shadow for inputs"
+    },
+
+    "none": {
+      "$value": {
+        "offsetX": "0px",
+        "offsetY": "0px",
+        "blur": "0px",
+        "spread": "0px",
+        "color": "transparent"
+      }
+    }
+  },
+
+  "shadow-dark": {
+    "$type": "shadow",
+    "$description": "Dark mode shadows with increased opacity",
+
+    "sm": {
+      "$value": {
+        "offsetX": "0px",
+        "offsetY": "1px",
+        "blur": "2px",
+        "spread": "0px",
+        "color": "oklch(0 0 0 / 0.3)"
+      }
+    },
+
+    "md": {
+      "$value": [
+        {
+          "offsetX": "0px",
+          "offsetY": "4px",
+          "blur": "6px",
+          "spread": "-1px",
+          "color": "oklch(0 0 0 / 0.4)"
+        },
+        {
+          "offsetX": "0px",
+          "offsetY": "2px",
+          "blur": "4px",
+          "spread": "-2px",
+          "color": "oklch(0 0 0 / 0.3)"
+        }
+      ]
+    },
+
+    "lg": {
+      "$value": [
+        {
+          "offsetX": "0px",
+          "offsetY": "10px",
+          "blur": "15px",
+          "spread": "-3px",
+          "color": "oklch(0 0 0 / 0.4)"
+        },
+        {
+          "offsetX": "0px",
+          "offsetY": "4px",
+          "blur": "6px",
+          "spread": "-4px",
+          "color": "oklch(0 0 0 / 0.3)"
+        }
+      ]
+    },
+
+    "xl": {
+      "$value": [
+        {
+          "offsetX": "0px",
+          "offsetY": "20px",
+          "blur": "25px",
+          "spread": "-5px",
+          "color": "oklch(0 0 0 / 0.4)"
+        },
+        {
+          "offsetX": "0px",
+          "offsetY": "8px",
+          "blur": "10px",
+          "spread": "-6px",
+          "color": "oklch(0 0 0 / 0.3)"
+        }
+      ]
+    },
+
+    "2xl": {
+      "$value": {
+        "offsetX": "0px",
+        "offsetY": "25px",
+        "blur": "50px",
+        "spread": "-12px",
+        "color": "oklch(0 0 0 / 0.5)"
+      }
+    }
+  }
+}

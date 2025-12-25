@@ -2,13 +2,51 @@
 
 This document provides a comprehensive reference for all design tokens used in our design system. Design tokens are the visual design atoms of the design system — specifically, they are named entities that store visual design attributes.
 
-## Token Categories
+## W3C Design Tokens Community Group (DTCG) Format
 
-| Category | Description | Location |
-|----------|-------------|----------|
+Our design tokens follow the [W3C DTCG](https://tr.designtokens.org/format/) specification for interoperability and tooling support.
+
+### Token Structure
+
+```json
+{
+  "$description": "Token group description",
+  "tokenName": {
+    "$type": "color",
+    "$value": "oklch(0.60 0.20 290)",
+    "$description": "Usage description"
+  }
+}
+```
+
+| Property | Required | Description |
+|----------|----------|-------------|
+| `$value` | Yes | The token value |
+| `$type` | No* | The token type (color, dimension, fontFamily, etc.) |
+| `$description` | No | Human-readable description |
+
+*`$type` can be inherited from parent groups
+
+### Supported Token Types
+
+| Type | Example Value |
+|------|---------------|
+| `color` | `oklch(0.60 0.20 290)`, `#7c3aed` |
+| `dimension` | `16px`, `1rem`, `0.5em` |
+| `fontFamily` | `["Inter", "sans-serif"]` |
+| `fontWeight` | `400`, `600` |
+| `number` | `1.5`, `100` |
+| `shadow` | Array of shadow objects |
+| `typography` | Composite font properties |
+
+## Token Files
+
+| File | Description | Location |
+|------|-------------|----------|
 | Colors | OKLCH color palette with semantic tokens | `design-system/tokens/colors.json` |
 | Typography | Font families, sizes, weights, line heights | `design-system/tokens/typography.json` |
-| Spacing | Spacing scale, border radius, shadows | `design-system/tokens/spacing.json` |
+| Spacing | Spacing scale, border radius, z-index | `design-system/tokens/spacing.json` |
+| Shadows | Elevation shadows with brand tint | `design-system/tokens/shadows.json` |
 
 ## Why OKLCH?
 
@@ -159,6 +197,19 @@ All shadows use a violet tint (hue 290) for brand consistency.
 
 ## Using Tokens in Code
 
+### Tailwind CSS v4 (@theme block)
+
+```css
+/* globals.css */
+@import "tailwindcss";
+
+@theme inline {
+  --spacing-4: 16px;
+  --radius-md: 8px;
+  --shadow-md: 0 4px 6px -1px oklch(0.3 0.05 290 / 0.1);
+}
+```
+
 ### CSS Custom Properties
 
 ```css
@@ -171,7 +222,7 @@ All shadows use a violet tint (hue 290) for brand consistency.
 }
 ```
 
-### Tailwind CSS
+### Tailwind CSS Classes
 
 ```tsx
 <div className="bg-card text-card-foreground p-6 rounded-lg shadow-md">
@@ -179,20 +230,32 @@ All shadows use a violet tint (hue 290) for brand consistency.
 </div>
 ```
 
-### Direct Token Reference
+### Direct Token Reference (DTCG Format)
 
 ```tsx
-import { tokens } from '@/design-system/tokens';
+import tokens from '@/design-system/tokens/spacing.json';
 
 const styles = {
-  padding: tokens.spacing[6],
-  borderRadius: tokens.borderRadius.lg,
+  padding: tokens.spacing['6'].$value,  // "1.5rem"
+  borderRadius: tokens.borderRadius.lg.$value,  // "0.75rem"
 };
 ```
 
 ## Token Naming Convention
 
-Tokens follow this naming pattern:
+### JSON Token Path (DTCG)
+
+```
+{category}.{scale/variant}.$value
+```
+
+Examples:
+- `color.primary.500.$value` - Primary color at 500 scale
+- `spacing.4.$value` - 4 unit spacing (16px)
+- `borderRadius.md.$value` - Medium border radius
+- `shadow.lg.$value` - Large shadow
+
+### CSS Custom Properties
 
 ```
 --{category}-{scale/variant}
@@ -204,19 +267,15 @@ Examples:
 - `--radius-md` - Medium border radius
 - `--shadow-lg` - Large shadow
 
-## Migration Guide
-
-When updating tokens:
-
-1. Update the JSON source file
-2. Run the token build script: `npm run build:tokens`
-3. Update any direct CSS property references
-4. Test across light and dark modes
-5. Verify WCAG contrast ratios
-
 ## Accessibility Considerations
 
 - All color combinations meet WCAG 2.1 AA contrast requirements
 - Interactive elements maintain 3:1 contrast against backgrounds
 - Focus states use high-visibility ring color (primary-500)
 - Text colors ensure minimum 4.5:1 contrast ratio
+
+## References
+
+- [W3C Design Tokens Format](https://tr.designtokens.org/format/)
+- [OKLCH Color Space](https://oklch.com/)
+- [Tailwind CSS v4 Theme Configuration](https://tailwindcss.com/docs/v4-beta)

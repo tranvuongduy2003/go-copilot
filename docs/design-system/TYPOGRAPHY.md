@@ -2,6 +2,35 @@
 
 This document details our typography system, built around Inter for UI text and JetBrains Mono for code.
 
+## Token Format (W3C DTCG)
+
+Typography tokens follow the W3C Design Tokens Community Group specification:
+
+```json
+{
+  "fontFamily": {
+    "$type": "fontFamily",
+    "sans": {
+      "$value": ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+      "$description": "Primary font for body text and UI"
+    }
+  },
+  "typography": {
+    "$type": "typography",
+    "heading": {
+      "h1": {
+        "$value": {
+          "fontFamily": "{fontFamily.sans}",
+          "fontSize": "{fontSize.4xl}",
+          "fontWeight": "{fontWeight.bold}",
+          "lineHeight": "{lineHeight.tight}"
+        }
+      }
+    }
+  }
+}
+```
+
 ## Font Families
 
 ### Inter (Sans-serif)

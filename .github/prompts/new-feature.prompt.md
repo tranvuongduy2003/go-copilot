@@ -1,6 +1,5 @@
 ---
-description: Plan and implement a new feature end-to-end
-agent: "Fullstack Engineer"
+description: Plan and implement a new feature end-to-end following DDD + CQRS patterns
 ---
 
 # New Feature Implementation
@@ -26,18 +25,24 @@ I need to implement a new feature. Help me plan and build it end-to-end.
 ### Phase 2: Planning
 Create a detailed implementation plan including:
 - Database changes needed (migrations)
-- Backend components (domain, repository, service, handler)
+- Backend components (domain aggregate, application command/query handlers, infrastructure repository, interface handler)
 - Frontend components (types, API client, hooks, components, pages)
 - Tests to write
 
 ### Phase 3: Implementation
 
 #### Backend (if applicable)
-1. Create database migration
-2. Define domain models in `backend/internal/domain/`
-3. Implement repository in `backend/internal/repository/postgres/`
-4. Implement service in `backend/internal/service/`
-5. Create handler in `backend/internal/handlers/`
+1. Create database migration using Goose in `backend/migrations/sql/`
+2. Define domain aggregate in `backend/internal/domain/{aggregate}/`
+   - Entity with private fields + getters
+   - Repository interface (port)
+   - Domain errors
+3. Implement CQRS handlers in `backend/internal/application/`
+   - Command handlers in `command/`
+   - Query handlers in `query/`
+   - DTOs in `dto/`
+4. Implement repository adapter in `backend/internal/infrastructure/persistence/postgres/`
+5. Create HTTP handler in `backend/internal/interfaces/http/handler/`
 6. Register routes
 
 #### Frontend (if applicable)

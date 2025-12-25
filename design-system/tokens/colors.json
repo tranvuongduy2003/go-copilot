@@ -1,203 +1,155 @@
 {
-  "$schema": "https://design-tokens.org/schema.json",
-  "name": "Project Design Tokens - Colors",
-  "version": "1.0.0",
-  "description": "Centralized color system using OKLCH for perceptual uniformity",
-  
-  "primitive": {
-    "gray": {
-      "50":  { "value": "oklch(0.985 0.002 264)", "type": "color" },
-      "100": { "value": "oklch(0.967 0.003 264)", "type": "color" },
-      "200": { "value": "oklch(0.928 0.006 264)", "type": "color" },
-      "300": { "value": "oklch(0.872 0.010 264)", "type": "color" },
-      "400": { "value": "oklch(0.707 0.015 264)", "type": "color" },
-      "500": { "value": "oklch(0.551 0.018 264)", "type": "color" },
-      "600": { "value": "oklch(0.446 0.018 264)", "type": "color" },
-      "700": { "value": "oklch(0.372 0.016 264)", "type": "color" },
-      "800": { "value": "oklch(0.279 0.012 264)", "type": "color" },
-      "900": { "value": "oklch(0.208 0.010 264)", "type": "color" },
-      "950": { "value": "oklch(0.129 0.008 264)", "type": "color" }
+  "$description": "OKLCH-based color system with perceptual uniformity. Primary: Violet (hue 290), Secondary: Cyan (hue 220)",
+
+  "color": {
+    "$type": "color",
+
+    "primary": {
+      "$description": "Primary brand colors - Violet (hue 290)",
+      "50": { "$value": "oklch(0.97 0.02 290)", "$description": "Subtle backgrounds" },
+      "100": { "$value": "oklch(0.94 0.04 290)", "$description": "Hover states" },
+      "200": { "$value": "oklch(0.88 0.08 290)", "$description": "Selection backgrounds" },
+      "300": { "$value": "oklch(0.79 0.12 290)", "$description": "Borders" },
+      "400": { "$value": "oklch(0.70 0.16 290)", "$description": "Icons, dark mode primary" },
+      "500": { "$value": "oklch(0.60 0.20 290)", "$description": "Primary actions (dark mode)" },
+      "600": { "$value": "oklch(0.52 0.20 290)", "$description": "Primary actions (light mode)" },
+      "700": { "$value": "oklch(0.44 0.18 290)", "$description": "Hover states" },
+      "800": { "$value": "oklch(0.36 0.14 290)", "$description": "Active states" },
+      "900": { "$value": "oklch(0.28 0.10 290)", "$description": "Text on light backgrounds" },
+      "950": { "$value": "oklch(0.20 0.08 290)", "$description": "Darkest primary" }
     },
-    "brand": {
-      "50":  { "value": "oklch(0.970 0.030 280)", "type": "color" },
-      "100": { "value": "oklch(0.943 0.054 281)", "type": "color" },
-      "200": { "value": "oklch(0.894 0.098 282)", "type": "color" },
-      "300": { "value": "oklch(0.831 0.150 283)", "type": "color" },
-      "400": { "value": "oklch(0.750 0.190 284)", "type": "color" },
-      "500": { "value": "oklch(0.667 0.210 285)", "type": "color", "description": "Primary brand color" },
-      "600": { "value": "oklch(0.585 0.200 286)", "type": "color" },
-      "700": { "value": "oklch(0.510 0.180 287)", "type": "color" },
-      "800": { "value": "oklch(0.432 0.150 288)", "type": "color" },
-      "900": { "value": "oklch(0.365 0.120 289)", "type": "color" },
-      "950": { "value": "oklch(0.257 0.090 290)", "type": "color" }
+
+    "secondary": {
+      "$description": "Secondary brand colors - Cyan (hue 220)",
+      "50": { "$value": "oklch(0.97 0.02 220)", "$description": "Subtle backgrounds" },
+      "100": { "$value": "oklch(0.94 0.04 220)", "$description": "Hover states" },
+      "200": { "$value": "oklch(0.88 0.08 220)", "$description": "Selection backgrounds" },
+      "300": { "$value": "oklch(0.79 0.12 220)", "$description": "Borders" },
+      "400": { "$value": "oklch(0.70 0.16 220)", "$description": "Icons" },
+      "500": { "$value": "oklch(0.60 0.18 220)", "$description": "Secondary actions" },
+      "600": { "$value": "oklch(0.52 0.18 220)", "$description": "Hover states" },
+      "700": { "$value": "oklch(0.44 0.16 220)", "$description": "Active states" },
+      "800": { "$value": "oklch(0.36 0.12 220)", "$description": "Text" },
+      "900": { "$value": "oklch(0.28 0.08 220)", "$description": "Dark text" },
+      "950": { "$value": "oklch(0.20 0.06 220)", "$description": "Darkest secondary" }
     },
-    "accent": {
-      "50":  { "value": "oklch(0.972 0.025 195)", "type": "color" },
-      "100": { "value": "oklch(0.948 0.050 195)", "type": "color" },
-      "200": { "value": "oklch(0.901 0.095 195)", "type": "color" },
-      "300": { "value": "oklch(0.837 0.140 195)", "type": "color" },
-      "400": { "value": "oklch(0.752 0.175 195)", "type": "color" },
-      "500": { "value": "oklch(0.665 0.190 195)", "type": "color", "description": "Accent/Secondary color" },
-      "600": { "value": "oklch(0.580 0.175 195)", "type": "color" },
-      "700": { "value": "oklch(0.500 0.155 195)", "type": "color" },
-      "800": { "value": "oklch(0.425 0.130 195)", "type": "color" },
-      "900": { "value": "oklch(0.360 0.105 195)", "type": "color" },
-      "950": { "value": "oklch(0.250 0.075 195)", "type": "color" }
+
+    "neutral": {
+      "$description": "Neutral colors with subtle violet tint (hue 290)",
+      "50": { "$value": "oklch(0.98 0.005 290)", "$description": "Page backgrounds" },
+      "100": { "$value": "oklch(0.96 0.008 290)", "$description": "Card backgrounds" },
+      "200": { "$value": "oklch(0.92 0.010 290)", "$description": "Borders, dividers" },
+      "300": { "$value": "oklch(0.87 0.012 290)", "$description": "Disabled states" },
+      "400": { "$value": "oklch(0.70 0.015 290)", "$description": "Placeholder text" },
+      "500": { "$value": "oklch(0.55 0.015 290)", "$description": "Muted text" },
+      "600": { "$value": "oklch(0.45 0.015 290)", "$description": "Secondary text" },
+      "700": { "$value": "oklch(0.35 0.012 290)", "$description": "Body text (dark mode)" },
+      "800": { "$value": "oklch(0.25 0.010 290)", "$description": "Headings (dark mode)" },
+      "900": { "$value": "oklch(0.18 0.008 290)", "$description": "Dark backgrounds" },
+      "950": { "$value": "oklch(0.12 0.005 290)", "$description": "Darkest backgrounds" }
     },
+
     "success": {
-      "50":  { "value": "oklch(0.975 0.030 155)", "type": "color" },
-      "100": { "value": "oklch(0.950 0.060 155)", "type": "color" },
-      "200": { "value": "oklch(0.905 0.110 155)", "type": "color" },
-      "300": { "value": "oklch(0.845 0.155 155)", "type": "color" },
-      "400": { "value": "oklch(0.765 0.185 155)", "type": "color" },
-      "500": { "value": "oklch(0.680 0.195 155)", "type": "color" },
-      "600": { "value": "oklch(0.590 0.175 155)", "type": "color" },
-      "700": { "value": "oklch(0.505 0.150 155)", "type": "color" },
-      "800": { "value": "oklch(0.430 0.120 155)", "type": "color" },
-      "900": { "value": "oklch(0.365 0.095 155)", "type": "color" },
-      "950": { "value": "oklch(0.255 0.065 155)", "type": "color" }
+      "$description": "Success/positive colors - Green (hue 145)",
+      "50": { "$value": "oklch(0.97 0.02 145)" },
+      "100": { "$value": "oklch(0.94 0.04 145)" },
+      "200": { "$value": "oklch(0.88 0.08 145)" },
+      "300": { "$value": "oklch(0.79 0.12 145)" },
+      "400": { "$value": "oklch(0.70 0.16 145)" },
+      "500": { "$value": "oklch(0.60 0.18 145)", "$description": "Success states" },
+      "600": { "$value": "oklch(0.52 0.16 145)" },
+      "700": { "$value": "oklch(0.44 0.14 145)" },
+      "800": { "$value": "oklch(0.36 0.10 145)" },
+      "900": { "$value": "oklch(0.28 0.08 145)" },
+      "950": { "$value": "oklch(0.20 0.06 145)" }
     },
+
     "warning": {
-      "50":  { "value": "oklch(0.980 0.035 85)", "type": "color" },
-      "100": { "value": "oklch(0.960 0.075 85)", "type": "color" },
-      "200": { "value": "oklch(0.925 0.135 85)", "type": "color" },
-      "300": { "value": "oklch(0.885 0.180 85)", "type": "color" },
-      "400": { "value": "oklch(0.830 0.200 85)", "type": "color" },
-      "500": { "value": "oklch(0.770 0.195 85)", "type": "color" },
-      "600": { "value": "oklch(0.680 0.175 85)", "type": "color" },
-      "700": { "value": "oklch(0.580 0.145 85)", "type": "color" },
-      "800": { "value": "oklch(0.490 0.115 85)", "type": "color" },
-      "900": { "value": "oklch(0.415 0.090 85)", "type": "color" },
-      "950": { "value": "oklch(0.290 0.060 85)", "type": "color" }
+      "$description": "Warning/caution colors - Amber (hue 85)",
+      "50": { "$value": "oklch(0.97 0.02 85)" },
+      "100": { "$value": "oklch(0.94 0.05 85)" },
+      "200": { "$value": "oklch(0.90 0.10 85)" },
+      "300": { "$value": "oklch(0.85 0.15 85)" },
+      "400": { "$value": "oklch(0.80 0.18 85)" },
+      "500": { "$value": "oklch(0.75 0.18 85)", "$description": "Warning states" },
+      "600": { "$value": "oklch(0.65 0.16 70)" },
+      "700": { "$value": "oklch(0.55 0.14 60)" },
+      "800": { "$value": "oklch(0.45 0.12 55)" },
+      "900": { "$value": "oklch(0.35 0.08 50)" },
+      "950": { "$value": "oklch(0.25 0.06 50)" }
     },
+
     "error": {
-      "50":  { "value": "oklch(0.975 0.025 25)", "type": "color" },
-      "100": { "value": "oklch(0.950 0.055 25)", "type": "color" },
-      "200": { "value": "oklch(0.905 0.105 25)", "type": "color" },
-      "300": { "value": "oklch(0.845 0.155 25)", "type": "color" },
-      "400": { "value": "oklch(0.765 0.195 25)", "type": "color" },
-      "500": { "value": "oklch(0.680 0.205 25)", "type": "color" },
-      "600": { "value": "oklch(0.590 0.190 25)", "type": "color" },
-      "700": { "value": "oklch(0.505 0.165 25)", "type": "color" },
-      "800": { "value": "oklch(0.430 0.135 25)", "type": "color" },
-      "900": { "value": "oklch(0.365 0.105 25)", "type": "color" },
-      "950": { "value": "oklch(0.255 0.075 25)", "type": "color" }
+      "$description": "Error/destructive colors - Red (hue 25)",
+      "50": { "$value": "oklch(0.97 0.02 25)" },
+      "100": { "$value": "oklch(0.94 0.04 25)" },
+      "200": { "$value": "oklch(0.88 0.08 25)" },
+      "300": { "$value": "oklch(0.79 0.14 25)" },
+      "400": { "$value": "oklch(0.70 0.18 25)" },
+      "500": { "$value": "oklch(0.60 0.20 25)", "$description": "Error states" },
+      "600": { "$value": "oklch(0.52 0.20 25)" },
+      "700": { "$value": "oklch(0.44 0.18 25)" },
+      "800": { "$value": "oklch(0.36 0.14 25)" },
+      "900": { "$value": "oklch(0.28 0.10 25)" },
+      "950": { "$value": "oklch(0.20 0.08 25)" }
+    },
+
+    "accent": {
+      "$description": "Accent colors for charts and decorative elements",
+      "pink": { "$value": "oklch(0.70 0.18 350)" },
+      "orange": { "$value": "oklch(0.75 0.16 50)" },
+      "teal": { "$value": "oklch(0.70 0.14 180)" },
+      "indigo": { "$value": "oklch(0.55 0.22 270)" }
     }
   },
 
   "semantic": {
-    "light": {
-      "background": {
-        "default":    { "value": "{primitive.gray.50}", "type": "color" },
-        "subtle":     { "value": "{primitive.gray.100}", "type": "color" },
-        "muted":      { "value": "{primitive.gray.200}", "type": "color" },
-        "emphasis":   { "value": "{primitive.gray.300}", "type": "color" },
-        "inverse":    { "value": "{primitive.gray.900}", "type": "color" }
-      },
-      "foreground": {
-        "default":    { "value": "{primitive.gray.900}", "type": "color" },
-        "muted":      { "value": "{primitive.gray.600}", "type": "color" },
-        "subtle":     { "value": "{primitive.gray.500}", "type": "color" },
-        "inverse":    { "value": "{primitive.gray.50}", "type": "color" }
-      },
-      "border": {
-        "default":    { "value": "{primitive.gray.200}", "type": "color" },
-        "muted":      { "value": "{primitive.gray.100}", "type": "color" },
-        "emphasis":   { "value": "{primitive.gray.300}", "type": "color" }
-      },
-      "primary": {
-        "default":    { "value": "{primitive.brand.500}", "type": "color" },
-        "hover":      { "value": "{primitive.brand.600}", "type": "color" },
-        "active":     { "value": "{primitive.brand.700}", "type": "color" },
-        "subtle":     { "value": "{primitive.brand.100}", "type": "color" },
-        "foreground": { "value": "white", "type": "color" }
-      },
-      "secondary": {
-        "default":    { "value": "{primitive.accent.500}", "type": "color" },
-        "hover":      { "value": "{primitive.accent.600}", "type": "color" },
-        "active":     { "value": "{primitive.accent.700}", "type": "color" },
-        "subtle":     { "value": "{primitive.accent.100}", "type": "color" },
-        "foreground": { "value": "white", "type": "color" }
-      }
-    },
-    "dark": {
-      "background": {
-        "default":    { "value": "{primitive.gray.950}", "type": "color" },
-        "subtle":     { "value": "{primitive.gray.900}", "type": "color" },
-        "muted":      { "value": "{primitive.gray.800}", "type": "color" },
-        "emphasis":   { "value": "{primitive.gray.700}", "type": "color" },
-        "inverse":    { "value": "{primitive.gray.100}", "type": "color" }
-      },
-      "foreground": {
-        "default":    { "value": "{primitive.gray.50}", "type": "color" },
-        "muted":      { "value": "{primitive.gray.400}", "type": "color" },
-        "subtle":     { "value": "{primitive.gray.500}", "type": "color" },
-        "inverse":    { "value": "{primitive.gray.900}", "type": "color" }
-      },
-      "border": {
-        "default":    { "value": "{primitive.gray.800}", "type": "color" },
-        "muted":      { "value": "{primitive.gray.900}", "type": "color" },
-        "emphasis":   { "value": "{primitive.gray.700}", "type": "color" }
-      },
-      "primary": {
-        "default":    { "value": "{primitive.brand.400}", "type": "color" },
-        "hover":      { "value": "{primitive.brand.300}", "type": "color" },
-        "active":     { "value": "{primitive.brand.200}", "type": "color" },
-        "subtle":     { "value": "{primitive.brand.950}", "type": "color" },
-        "foreground": { "value": "{primitive.gray.950}", "type": "color" }
-      },
-      "secondary": {
-        "default":    { "value": "{primitive.accent.400}", "type": "color" },
-        "hover":      { "value": "{primitive.accent.300}", "type": "color" },
-        "active":     { "value": "{primitive.accent.200}", "type": "color" },
-        "subtle":     { "value": "{primitive.accent.950}", "type": "color" },
-        "foreground": { "value": "{primitive.gray.950}", "type": "color" }
-      }
-    }
-  },
+    "$description": "Semantic color tokens for light and dark modes",
 
-  "component": {
-    "button": {
-      "primary": {
-        "bg": "{semantic.light.primary.default}",
-        "bg-hover": "{semantic.light.primary.hover}",
-        "bg-active": "{semantic.light.primary.active}",
-        "text": "{semantic.light.primary.foreground}",
-        "border": "transparent"
-      },
-      "secondary": {
-        "bg": "{semantic.light.background.subtle}",
-        "bg-hover": "{semantic.light.background.muted}",
-        "bg-active": "{semantic.light.background.emphasis}",
-        "text": "{semantic.light.foreground.default}",
-        "border": "{semantic.light.border.default}"
-      },
-      "ghost": {
-        "bg": "transparent",
-        "bg-hover": "{semantic.light.background.subtle}",
-        "bg-active": "{semantic.light.background.muted}",
-        "text": "{semantic.light.foreground.default}",
-        "border": "transparent"
-      },
-      "destructive": {
-        "bg": "{primitive.error.500}",
-        "bg-hover": "{primitive.error.600}",
-        "bg-active": "{primitive.error.700}",
-        "text": "white",
-        "border": "transparent"
-      }
+    "light": {
+      "background": { "$value": "{color.neutral.50}", "$type": "color" },
+      "background-secondary": { "$value": "{color.neutral.100}", "$type": "color" },
+      "foreground": { "$value": "{color.neutral.950}", "$type": "color" },
+      "foreground-secondary": { "$value": "{color.neutral.700}", "$type": "color" },
+      "foreground-muted": { "$value": "{color.neutral.500}", "$type": "color" },
+      "card": { "$value": "oklch(1 0 0)", "$type": "color" },
+      "card-foreground": { "$value": "{color.neutral.950}", "$type": "color" },
+      "primary": { "$value": "{color.primary.600}", "$type": "color" },
+      "primary-foreground": { "$value": "oklch(1 0 0)", "$type": "color" },
+      "secondary": { "$value": "{color.secondary.100}", "$type": "color" },
+      "secondary-foreground": { "$value": "{color.secondary.900}", "$type": "color" },
+      "muted": { "$value": "{color.neutral.100}", "$type": "color" },
+      "muted-foreground": { "$value": "{color.neutral.500}", "$type": "color" },
+      "accent": { "$value": "{color.primary.100}", "$type": "color" },
+      "accent-foreground": { "$value": "{color.primary.900}", "$type": "color" },
+      "destructive": { "$value": "{color.error.500}", "$type": "color" },
+      "destructive-foreground": { "$value": "oklch(1 0 0)", "$type": "color" },
+      "border": { "$value": "{color.neutral.200}", "$type": "color" },
+      "input": { "$value": "{color.neutral.200}", "$type": "color" },
+      "ring": { "$value": "{color.primary.500}", "$type": "color" }
     },
-    "card": {
-      "bg": "{semantic.light.background.default}",
-      "border": "{semantic.light.border.default}",
-      "shadow": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)"
-    },
-    "input": {
-      "bg": "{semantic.light.background.default}",
-      "border": "{semantic.light.border.default}",
-      "border-focus": "{semantic.light.primary.default}",
-      "placeholder": "{semantic.light.foreground.subtle}",
-      "text": "{semantic.light.foreground.default}"
+
+    "dark": {
+      "background": { "$value": "{color.neutral.950}", "$type": "color" },
+      "background-secondary": { "$value": "{color.neutral.900}", "$type": "color" },
+      "foreground": { "$value": "{color.neutral.50}", "$type": "color" },
+      "foreground-secondary": { "$value": "{color.neutral.300}", "$type": "color" },
+      "foreground-muted": { "$value": "{color.neutral.500}", "$type": "color" },
+      "card": { "$value": "{color.neutral.900}", "$type": "color" },
+      "card-foreground": { "$value": "{color.neutral.50}", "$type": "color" },
+      "primary": { "$value": "{color.primary.500}", "$type": "color" },
+      "primary-foreground": { "$value": "oklch(1 0 0)", "$type": "color" },
+      "secondary": { "$value": "{color.neutral.800}", "$type": "color" },
+      "secondary-foreground": { "$value": "{color.neutral.100}", "$type": "color" },
+      "muted": { "$value": "{color.neutral.800}", "$type": "color" },
+      "muted-foreground": { "$value": "{color.neutral.400}", "$type": "color" },
+      "accent": { "$value": "{color.neutral.800}", "$type": "color" },
+      "accent-foreground": { "$value": "{color.neutral.50}", "$type": "color" },
+      "destructive": { "$value": "{color.error.600}", "$type": "color" },
+      "destructive-foreground": { "$value": "oklch(1 0 0)", "$type": "color" },
+      "border": { "$value": "{color.neutral.800}", "$type": "color" },
+      "input": { "$value": "{color.neutral.800}", "$type": "color" },
+      "ring": { "$value": "{color.primary.500}", "$type": "color" }
     }
   }
 }

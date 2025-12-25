@@ -1,6 +1,5 @@
 ---
 description: Add comprehensive tests for existing code
-agent: "Testing Specialist"
 ---
 
 # Add Tests
