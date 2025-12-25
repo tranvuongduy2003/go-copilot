@@ -1,40 +1,30 @@
 {
-  "$schema": "https://raw.githubusercontent.com/anthropics/model-context-protocol/main/schemas/mcp.schema.json",
-  "mcpServers": {
+  "servers": {
     "github": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_TOKEN}"
-      },
-      "description": "GitHub API integration for repository operations, issues, PRs, and more"
+      }
     },
     "postgres": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-postgres"],
       "env": {
         "DATABASE_URL": "${env:DATABASE_URL}"
-      },
-      "description": "PostgreSQL database access for schema inspection and queries"
+      }
     },
     "fetch": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch"],
-      "description": "HTTP fetch capabilities for API testing and web content retrieval"
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
     },
     "filesystem": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "${workspaceFolder}"
-      ],
-      "description": "Enhanced filesystem operations within the project"
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${workspaceFolder}"]
     },
     "memory": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory"],
-      "description": "Persistent memory for storing context across sessions"
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
     }
   }
 }

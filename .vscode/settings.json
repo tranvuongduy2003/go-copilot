@@ -55,12 +55,7 @@
   "javascript.preferences.quoteStyle": "single",
 
   // ESLint
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "eslint.workingDirectories": ["frontend"],
 
   // Prettier
@@ -126,14 +121,17 @@
   "git.confirmSync": false,
   "git.autofetch": true,
 
-  // GitHub Copilot
+  // GitHub Copilot - Code Completions
   "github.copilot.enable": {
     "*": true,
     "yaml": true,
     "plaintext": true,
     "markdown": true,
-    "scminput": false
+    "scminput": true
   },
+
+  // GitHub Copilot Chat - Use instruction files (.github/copilot-instructions.md)
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
 
   // File nesting
   "explorer.fileNesting.enabled": true,
@@ -178,8 +176,5 @@
   },
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[sql]": {
-    "editor.defaultFormatter": "mtxr.sqltools"
   }
 }
