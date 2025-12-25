@@ -1,0 +1,238 @@
+{
+  "$schema": "https://design-tokens.org/schema.json",
+  "name": "Project Design Tokens - Spacing",
+  "version": "1.0.0",
+  "description": "Consistent spacing scale based on 4px base unit",
+
+  "spacing": {
+    "0": {
+      "value": "0px",
+      "type": "spacing"
+    },
+    "px": {
+      "value": "1px",
+      "type": "spacing",
+      "description": "Hairline borders"
+    },
+    "0.5": {
+      "value": "2px",
+      "type": "spacing"
+    },
+    "1": {
+      "value": "4px",
+      "type": "spacing",
+      "description": "Minimal spacing, tight padding"
+    },
+    "1.5": {
+      "value": "6px",
+      "type": "spacing"
+    },
+    "2": {
+      "value": "8px",
+      "type": "spacing",
+      "description": "Small spacing, inline elements"
+    },
+    "2.5": {
+      "value": "10px",
+      "type": "spacing"
+    },
+    "3": {
+      "value": "12px",
+      "type": "spacing",
+      "description": "Medium-small spacing"
+    },
+    "3.5": {
+      "value": "14px",
+      "type": "spacing"
+    },
+    "4": {
+      "value": "16px",
+      "type": "spacing",
+      "description": "Default spacing, component padding"
+    },
+    "5": {
+      "value": "20px",
+      "type": "spacing",
+      "description": "Medium spacing"
+    },
+    "6": {
+      "value": "24px",
+      "type": "spacing",
+      "description": "Large component padding, card spacing"
+    },
+    "7": {
+      "value": "28px",
+      "type": "spacing"
+    },
+    "8": {
+      "value": "32px",
+      "type": "spacing",
+      "description": "Section padding"
+    },
+    "9": {
+      "value": "36px",
+      "type": "spacing"
+    },
+    "10": {
+      "value": "40px",
+      "type": "spacing",
+      "description": "Large section spacing"
+    },
+    "11": {
+      "value": "44px",
+      "type": "spacing"
+    },
+    "12": {
+      "value": "48px",
+      "type": "spacing",
+      "description": "XL spacing, page sections"
+    },
+    "14": {
+      "value": "56px",
+      "type": "spacing"
+    },
+    "16": {
+      "value": "64px",
+      "type": "spacing",
+      "description": "2XL spacing"
+    },
+    "20": {
+      "value": "80px",
+      "type": "spacing",
+      "description": "3XL spacing"
+    },
+    "24": {
+      "value": "96px",
+      "type": "spacing",
+      "description": "Hero/banner spacing"
+    },
+    "28": {
+      "value": "112px",
+      "type": "spacing"
+    },
+    "32": {
+      "value": "128px",
+      "type": "spacing",
+      "description": "Maximum spacing"
+    }
+  },
+
+  "borderRadius": {
+    "none": {
+      "value": "0px",
+      "type": "borderRadius"
+    },
+    "sm": {
+      "value": "4px",
+      "type": "borderRadius",
+      "description": "Small elements, badges, chips"
+    },
+    "md": {
+      "value": "8px",
+      "type": "borderRadius",
+      "description": "Buttons, inputs, default"
+    },
+    "lg": {
+      "value": "12px",
+      "type": "borderRadius",
+      "description": "Cards, dialogs"
+    },
+    "xl": {
+      "value": "16px",
+      "type": "borderRadius",
+      "description": "Large cards, modals"
+    },
+    "2xl": {
+      "value": "24px",
+      "type": "borderRadius",
+      "description": "Feature sections"
+    },
+    "3xl": {
+      "value": "32px",
+      "type": "borderRadius"
+    },
+    "full": {
+      "value": "9999px",
+      "type": "borderRadius",
+      "description": "Pills, avatars, circles"
+    }
+  },
+
+  "borderWidth": {
+    "0": {
+      "value": "0px",
+      "type": "borderWidth"
+    },
+    "1": {
+      "value": "1px",
+      "type": "borderWidth",
+      "description": "Default border"
+    },
+    "2": {
+      "value": "2px",
+      "type": "borderWidth",
+      "description": "Emphasis border, focus rings"
+    },
+    "4": {
+      "value": "4px",
+      "type": "borderWidth",
+      "description": "Heavy emphasis"
+    },
+    "8": {
+      "value": "8px",
+      "type": "borderWidth",
+      "description": "Decorative borders"
+    }
+  },
+
+  "shadows": {
+    "sm": {
+      "value": "0 1px 2px oklch(0.3 0.05 290 / 0.05)",
+      "type": "boxShadow",
+      "description": "Subtle elevation"
+    },
+    "md": {
+      "value": "0 4px 6px -1px oklch(0.3 0.05 290 / 0.1), 0 2px 4px -2px oklch(0.3 0.05 290 / 0.1)",
+      "type": "boxShadow",
+      "description": "Card elevation"
+    },
+    "lg": {
+      "value": "0 10px 15px -3px oklch(0.3 0.05 290 / 0.1), 0 4px 6px -4px oklch(0.3 0.05 290 / 0.1)",
+      "type": "boxShadow",
+      "description": "Dropdown/popover elevation"
+    },
+    "xl": {
+      "value": "0 20px 25px -5px oklch(0.3 0.05 290 / 0.1), 0 8px 10px -6px oklch(0.3 0.05 290 / 0.1)",
+      "type": "boxShadow",
+      "description": "Modal elevation"
+    },
+    "2xl": {
+      "value": "0 25px 50px -12px oklch(0.3 0.05 290 / 0.25)",
+      "type": "boxShadow",
+      "description": "High elevation"
+    },
+    "inner": {
+      "value": "inset 0 2px 4px 0 oklch(0 0 0 / 0.05)",
+      "type": "boxShadow",
+      "description": "Inset shadow for inputs"
+    },
+    "none": {
+      "value": "none",
+      "type": "boxShadow"
+    }
+  },
+
+  "zIndex": {
+    "auto": { "value": "auto", "type": "zIndex" },
+    "0": { "value": "0", "type": "zIndex" },
+    "10": { "value": "10", "type": "zIndex", "description": "Base layer" },
+    "20": { "value": "20", "type": "zIndex", "description": "Sticky elements" },
+    "30": { "value": "30", "type": "zIndex", "description": "Fixed headers" },
+    "40": { "value": "40", "type": "zIndex", "description": "Dropdowns" },
+    "50": { "value": "50", "type": "zIndex", "description": "Modals" },
+    "60": { "value": "60", "type": "zIndex", "description": "Popovers" },
+    "70": { "value": "70", "type": "zIndex", "description": "Tooltips" },
+    "80": { "value": "80", "type": "zIndex", "description": "Toasts" },
+    "90": { "value": "90", "type": "zIndex", "description": "Maximum" }
+  }
+}

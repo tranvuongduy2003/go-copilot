@@ -1,0 +1,60 @@
+{
+  "recommendations": [
+    // Essential
+    "github.copilot",
+    "github.copilot-chat",
+
+    // Go Development
+    "golang.go",
+
+    // JavaScript/TypeScript
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+
+    // React
+    "dsznajder.es7-react-js-snippets",
+    "formulahendry.auto-rename-tag",
+
+    // Tailwind CSS
+    "bradlc.vscode-tailwindcss",
+
+    // CSS
+    "stylelint.vscode-stylelint",
+
+    // Git
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+
+    // Database
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-pg",
+
+    // Docker
+    "ms-azuretools.vscode-docker",
+
+    // API Development
+    "humao.rest-client",
+    "42crunch.vscode-openapi",
+
+    // Testing
+    "vitest.explorer",
+
+    // Utilities
+    "usernamehw.errorlens",
+    "christian-kohler.path-intellisense",
+    "streetsidesoftware.code-spell-checker",
+    "wayou.vscode-todo-highlight",
+    "gruntfuggly.todo-tree",
+
+    // Markdown
+    "yzhang.markdown-all-in-one",
+    "bierner.markdown-mermaid",
+
+    // Theme & Icons
+    "pkief.material-icon-theme",
+
+    // Remote Development
+    "ms-vscode-remote.remote-containers"
+  ],
+  "unwantedRecommendations": []
+}
