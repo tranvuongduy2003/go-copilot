@@ -246,10 +246,27 @@ jobs:
           version: latest
           working-directory: backend
 
+      - name: Install golang-migrate
+        run: go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+      - name: Run migrations up
+        run: migrate -path ./migrations -database "postgresql://test:test@localhost:5432/test?sslmode=disable" up
+
+      - name: Run migrations down (test rollback)
+        run: migrate -path ./migrations -database "postgresql://test:test@localhost:5432/test?sslmode=disable" down -all
+
+      - name: Run migrations up again (test re-apply)
+        run: migrate -path ./migrations -database "postgresql://test:test@localhost:5432/test?sslmode=disable" up
+
       - name: Test
         run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test
+          TEST_DB_HOST: localhost
+          TEST_DB_PORT: 5432
+          TEST_DB_USER: test
+          TEST_DB_PASSWORD: test
+          TEST_DB_NAME: test
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v4

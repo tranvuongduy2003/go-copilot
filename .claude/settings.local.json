@@ -11,7 +11,8 @@
       "Bash(dir:*)",
       "Bash(go run:*)",
       "Bash(tree:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(goose:*)"
     ]
   }
 }

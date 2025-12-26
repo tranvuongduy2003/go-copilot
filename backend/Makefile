@@ -44,7 +44,7 @@ setup: ## First-time project setup (install tools, copy env files)
 	@echo "$(GREEN)Setting up project...$(NC)"
 	@cp -n .env.example .env 2>/dev/null || true
 	@echo "$(GREEN)Installing Go tools...$(NC)"
-	go install github.com/pressly/goose/v3/cmd/goose@latest
+	go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install golang.org/x/tools/cmd/goimports@latest
 	go install github.com/google/wire/cmd/wire@latest
@@ -148,26 +148,36 @@ check: fmt lint vet test ## Run all checks (format, lint, vet, test)
 
 migrate-create: ## Create a new migration (usage: make migrate-create name=create_users_table)
 	@if [ -z "$(name)" ]; then echo "$(RED)Error: name is required. Usage: make migrate-create name=migration_name$(NC)"; exit 1; fi
-	goose -dir $(MIGRATIONS_DIR) create $(name) sql
+	migrate create -ext sql -dir $(MIGRATIONS_DIR) -seq $(name)
 	@echo "$(GREEN)Migration created!$(NC)"
 
 migrate-up: ## Run all pending migrations
 	@echo "$(GREEN)Running migrations...$(NC)"
-	goose -dir $(MIGRATIONS_DIR) postgres "$(DB_DSN)" up
+	migrate -path $(MIGRATIONS_DIR) -database "$(DB_DSN)" up
 	@echo "$(GREEN)Migrations complete!$(NC)"
+
+migrate-up-one: ## Run next migration
+	@echo "$(GREEN)Running next migration...$(NC)"
+	migrate -path $(MIGRATIONS_DIR) -database "$(DB_DSN)" up 1
+	@echo "$(GREEN)Migration complete!$(NC)"
 
 migrate-down: ## Rollback last migration
 	@echo "$(YELLOW)Rolling back last migration...$(NC)"
-	goose -dir $(MIGRATIONS_DIR) postgres "$(DB_DSN)" down
+	migrate -path $(MIGRATIONS_DIR) -database "$(DB_DSN)" down 1
 	@echo "$(GREEN)Rollback complete!$(NC)"
 
 migrate-down-all: ## Rollback all migrations
 	@echo "$(RED)Rolling back ALL migrations...$(NC)"
-	goose -dir $(MIGRATIONS_DIR) postgres "$(DB_DSN)" down-to 0
+	migrate -path $(MIGRATIONS_DIR) -database "$(DB_DSN)" down -all
 	@echo "$(GREEN)Rollback complete!$(NC)"
 
-migrate-status: ## Show migration status
-	goose -dir $(MIGRATIONS_DIR) postgres "$(DB_DSN)" status
+migrate-version: ## Show current migration version
+	migrate -path $(MIGRATIONS_DIR) -database "$(DB_DSN)" version
+
+migrate-force: ## Force set migration version (usage: make migrate-force version=1)
+	@if [ -z "$(version)" ]; then echo "$(RED)Error: version is required. Usage: make migrate-force version=1$(NC)"; exit 1; fi
+	migrate -path $(MIGRATIONS_DIR) -database "$(DB_DSN)" force $(version)
+	@echo "$(GREEN)Version forced!$(NC)"
 
 migrate-reset: migrate-down-all migrate-up ## Reset database (rollback all and re-run)
 	@echo "$(GREEN)Database reset complete!$(NC)"

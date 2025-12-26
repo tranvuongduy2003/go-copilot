@@ -284,209 +284,209 @@
 
 ### 4.1.1 Connection Pool Setup
 
-- [ ] Define DB struct wrapping pgxpool.Pool
-- [ ] Implement NewDB constructor accepting config
-- [ ] Parse connection string from config
-- [ ] Configure connection pool size (min, max connections)
-- [ ] Configure connection lifetime and idle timeout
-- [ ] Configure connection health check period
-- [ ] Implement Connect() method with retry logic
-- [ ] Define maximum retry attempts
-- [ ] Define retry backoff strategy (exponential with jitter)
-- [ ] Log connection attempts and failures
-- [ ] Implement Close() method for graceful shutdown
-- [ ] Implement Ping() method for health checks
-- [ ] Implement Stats() method for monitoring connection pool metrics
-- [ ] Write integration tests for connection management
+- [x] Define DB struct wrapping pgxpool.Pool
+- [x] Implement NewDB constructor accepting config
+- [x] Parse connection string from config
+- [x] Configure connection pool size (min, max connections)
+- [x] Configure connection lifetime and idle timeout
+- [x] Configure connection health check period
+- [x] Implement Connect() method with retry logic
+- [x] Define maximum retry attempts
+- [x] Define retry backoff strategy (exponential with jitter)
+- [x] Log connection attempts and failures
+- [x] Implement Close() method for graceful shutdown
+- [x] Implement Ping() method for health checks
+- [x] Implement Stats() method for monitoring connection pool metrics
+- [x] Write integration tests for connection management
 
 ### 4.1.2 Transaction Support
 
-- [ ] Define Transaction interface with Commit, Rollback methods
-- [ ] Implement BeginTx() method to start transaction
-- [ ] Accept context for cancellation
-- [ ] Accept transaction options (isolation level)
-- [ ] Implement WithTransaction() helper for transaction scope
-- [ ] Accept function to execute within transaction
-- [ ] Automatically rollback on error or panic
-- [ ] Automatically commit on success
-- [ ] Implement transaction context propagation
-- [ ] Create helper to extract transaction from context
-- [ ] Create helper to inject transaction into context
+- [x] Define Transaction interface with Commit, Rollback methods
+- [x] Implement BeginTx() method to start transaction
+- [x] Accept context for cancellation
+- [x] Accept transaction options (isolation level)
+- [x] Implement WithTransaction() helper for transaction scope
+- [x] Accept function to execute within transaction
+- [x] Automatically rollback on error or panic
+- [x] Automatically commit on success
+- [x] Implement transaction context propagation
+- [x] Create helper to extract transaction from context
+- [x] Create helper to inject transaction into context
 
 ### 4.1.3 Query Builder Helpers (Optional)
 
-- [ ] Implement helper for building dynamic WHERE clauses
-- [ ] Implement helper for building ORDER BY clauses
-- [ ] Implement helper for building pagination (LIMIT, OFFSET)
-- [ ] Implement helper for building RETURNING clauses
-- [ ] All helpers must use parameterized queries to prevent SQL injection
+- [x] Implement helper for building dynamic WHERE clauses
+- [x] Implement helper for building ORDER BY clauses
+- [x] Implement helper for building pagination (LIMIT, OFFSET)
+- [x] Implement helper for building RETURNING clauses
+- [x] All helpers must use parameterized queries to prevent SQL injection
 
 ## 4.2 Database Migrations (`migrations/`)
 
-### 4.2.1 Goose CLI Setup
+### 4.2.1 golang-migrate CLI Setup
 
-- [ ] Install goose CLI tool: `go install github.com/pressly/goose/v3/cmd/goose@latest`
-- [ ] Create `migrations/` directory in project root
-- [ ] Configure default database connection in environment variables
-- [ ] Document migration commands in Makefile
-- [ ] Document migration workflow in README
+- [x] Install golang-migrate CLI: `go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest`
+- [x] Create `migrations/` directory in project root
+- [x] Configure default database connection in environment variables
+- [x] Document migration commands in Makefile
+- [x] Document migration workflow in README
 
 ### 4.2.2 User Table Migration
 
-- [ ] Generate migration file: `goose -dir migrations create create_users_table sql`
-- [ ] Write UP migration: CREATE TABLE users
-- [ ] Define id column as UUID PRIMARY KEY
-- [ ] Define email column as VARCHAR(255) UNIQUE NOT NULL
-- [ ] Define password_hash column as VARCHAR(255) NOT NULL
-- [ ] Define full_name column as VARCHAR(255) NOT NULL
-- [ ] Define status column as VARCHAR(50) NOT NULL with DEFAULT
-- [ ] Define created_at column as TIMESTAMPTZ NOT NULL with DEFAULT NOW()
-- [ ] Define updated_at column as TIMESTAMPTZ NOT NULL with DEFAULT NOW()
-- [ ] Define deleted_at column as TIMESTAMPTZ NULL for soft delete
-- [ ] Write DOWN migration: DROP TABLE users
-- [ ] Test migration up and down in development environment
+- [x] Generate migration file: `migrate create -ext sql -dir migrations -seq create_users_table`
+- [x] Write UP migration: CREATE TABLE users
+- [x] Define id column as UUID PRIMARY KEY
+- [x] Define email column as VARCHAR(255) UNIQUE NOT NULL
+- [x] Define password_hash column as VARCHAR(255) NOT NULL
+- [x] Define full_name column as VARCHAR(255) NOT NULL
+- [x] Define status column as VARCHAR(50) NOT NULL with DEFAULT
+- [x] Define created_at column as TIMESTAMPTZ NOT NULL with DEFAULT NOW()
+- [x] Define updated_at column as TIMESTAMPTZ NOT NULL with DEFAULT NOW()
+- [x] Define deleted_at column as TIMESTAMPTZ NULL for soft delete
+- [x] Write DOWN migration: DROP TABLE users
+- [x] Test migration up and down in development environment
 
 ### 4.2.3 User Table Indexes Migration
 
-- [ ] Generate migration file: `goose -dir migrations create add_users_indexes sql`
-- [ ] Write UP migration: CREATE INDEX on email column
-- [ ] Write UP migration: CREATE INDEX on status column
-- [ ] Write UP migration: CREATE INDEX on created_at column
-- [ ] Write UP migration: CREATE INDEX on deleted_at for soft delete queries
-- [ ] Consider composite indexes for common query patterns
-- [ ] Write DOWN migration: DROP all created indexes
-- [ ] Test migration up and down
+- [x] Generate migration file: `migrate create -ext sql -dir migrations -seq add_users_indexes`
+- [x] Write UP migration: CREATE INDEX on email column
+- [x] Write UP migration: CREATE INDEX on status column
+- [x] Write UP migration: CREATE INDEX on created_at column
+- [x] Write UP migration: CREATE INDEX on deleted_at for soft delete queries
+- [x] Consider composite indexes for common query patterns
+- [x] Write DOWN migration: DROP all created indexes
+- [x] Test migration up and down
 
 ### 4.2.4 Audit Trigger Migration (Optional)
 
-- [ ] Generate migration file: `goose -dir migrations create add_updated_at_trigger sql`
-- [ ] Write UP migration: CREATE FUNCTION to update updated_at column
-- [ ] Write UP migration: CREATE TRIGGER on users table BEFORE UPDATE
-- [ ] Write DOWN migration: DROP TRIGGER and FUNCTION
-- [ ] Test that updated_at automatically updates on row modification
+- [x] Generate migration file: `migrate create -ext sql -dir migrations -seq add_updated_at_trigger`
+- [x] Write UP migration: CREATE FUNCTION to update updated_at column
+- [x] Write UP migration: CREATE TRIGGER on users table BEFORE UPDATE
+- [x] Write DOWN migration: DROP TRIGGER and FUNCTION
+- [x] Test that updated_at automatically updates on row modification
 
 ### 4.2.5 Migration Testing
 
-- [ ] Test full migration sequence from empty database
-- [ ] Test rollback of each migration individually
-- [ ] Test rollback of all migrations
-- [ ] Test re-applying migrations after rollback
-- [ ] Add migration tests to CI pipeline
+- [x] Test full migration sequence from empty database
+- [x] Test rollback of each migration individually
+- [x] Test rollback of all migrations
+- [x] Test re-applying migrations after rollback
+- [x] Add migration tests to CI pipeline
 
 ## 4.3 User Repository Implementation (`internal/infrastructure/persistence/postgres/`)
 
 ### 4.3.1 Repository Structure
 
-- [ ] Define UserRepository struct with DB pool dependency
-- [ ] Implement NewUserRepository constructor
-- [ ] Define SQL query constants as private package variables
-- [ ] Use parameterized queries for all SQL statements
-- [ ] Implement domain entity to database row mapping
-- [ ] Implement database row to domain entity mapping
+- [x] Define UserRepository struct with DB pool dependency
+- [x] Implement NewUserRepository constructor
+- [x] Define SQL query constants as private package variables
+- [x] Use parameterized queries for all SQL statements
+- [x] Implement domain entity to database row mapping
+- [x] Implement database row to domain entity mapping
 
 ### 4.3.2 Create Method Implementation
 
-- [ ] Implement Create(ctx, user) error
-- [ ] Extract transaction from context if present
-- [ ] Use INSERT query with all user fields
-- [ ] Map domain User to database columns
-- [ ] Handle unique constraint violation for email
-- [ ] Return ErrEmailAlreadyExists for duplicate email
-- [ ] Wrap other database errors with context
-- [ ] Write integration test for successful creation
-- [ ] Write integration test for duplicate email handling
+- [x] Implement Create(ctx, user) error
+- [x] Extract transaction from context if present
+- [x] Use INSERT query with all user fields
+- [x] Map domain User to database columns
+- [x] Handle unique constraint violation for email
+- [x] Return ErrEmailAlreadyExists for duplicate email
+- [x] Wrap other database errors with context
+- [x] Write integration test for successful creation
+- [x] Write integration test for duplicate email handling
 
 ### 4.3.3 Update Method Implementation
 
-- [ ] Implement Update(ctx, user) error
-- [ ] Extract transaction from context if present
-- [ ] Use UPDATE query with all mutable fields
-- [ ] Include WHERE clause for ID
-- [ ] Check rows affected to detect not found
-- [ ] Return ErrUserNotFound if no rows updated
-- [ ] Wrap database errors with context
-- [ ] Write integration test for successful update
-- [ ] Write integration test for not found handling
+- [x] Implement Update(ctx, user) error
+- [x] Extract transaction from context if present
+- [x] Use UPDATE query with all mutable fields
+- [x] Include WHERE clause for ID
+- [x] Check rows affected to detect not found
+- [x] Return ErrUserNotFound if no rows updated
+- [x] Wrap database errors with context
+- [x] Write integration test for successful update
+- [x] Write integration test for not found handling
 
 ### 4.3.4 Delete Method Implementation
 
-- [ ] Implement Delete(ctx, id) error for soft delete
-- [ ] Update deleted_at column to current timestamp
-- [ ] Check rows affected to detect not found
-- [ ] Return ErrUserNotFound if no rows updated
-- [ ] Write integration test for successful deletion
-- [ ] Write integration test for not found handling
+- [x] Implement Delete(ctx, id) error for soft delete
+- [x] Update deleted_at column to current timestamp
+- [x] Check rows affected to detect not found
+- [x] Return ErrUserNotFound if no rows updated
+- [x] Write integration test for successful deletion
+- [x] Write integration test for not found handling
 
 ### 4.3.5 FindByID Method Implementation
 
-- [ ] Implement FindByID(ctx, id) (\*User, error)
-- [ ] Use SELECT query with WHERE id = $1
-- [ ] Add condition to exclude soft-deleted records
-- [ ] Map database row to domain User entity
-- [ ] Handle pgx.ErrNoRows
-- [ ] Return ErrUserNotFound for no rows
-- [ ] Return nil, nil is NOT acceptable - always return error for not found
-- [ ] Write integration test for successful retrieval
-- [ ] Write integration test for not found handling
-- [ ] Write integration test confirming soft-deleted excluded
+- [x] Implement FindByID(ctx, id) (\*User, error)
+- [x] Use SELECT query with WHERE id = $1
+- [x] Add condition to exclude soft-deleted records
+- [x] Map database row to domain User entity
+- [x] Handle pgx.ErrNoRows
+- [x] Return ErrUserNotFound for no rows
+- [x] Return nil, nil is NOT acceptable - always return error for not found
+- [x] Write integration test for successful retrieval
+- [x] Write integration test for not found handling
+- [x] Write integration test confirming soft-deleted excluded
 
 ### 4.3.6 FindByEmail Method Implementation
 
-- [ ] Implement FindByEmail(ctx, email) (\*User, error)
-- [ ] Use SELECT query with WHERE email = $1
-- [ ] Add condition to exclude soft-deleted records
-- [ ] Case-insensitive comparison using LOWER()
-- [ ] Handle not found scenario
-- [ ] Write integration test for successful retrieval
-- [ ] Write integration test for case insensitivity
+- [x] Implement FindByEmail(ctx, email) (\*User, error)
+- [x] Use SELECT query with WHERE email = $1
+- [x] Add condition to exclude soft-deleted records
+- [x] Case-insensitive comparison using LOWER()
+- [x] Handle not found scenario
+- [x] Write integration test for successful retrieval
+- [x] Write integration test for case insensitivity
 
 ### 4.3.7 ExistsByEmail Method Implementation
 
-- [ ] Implement ExistsByEmail(ctx, email) (bool, error)
-- [ ] Use SELECT EXISTS query for efficiency
-- [ ] Add condition to exclude soft-deleted records
-- [ ] Return false, nil for not exists
-- [ ] Return true, nil for exists
-- [ ] Write integration test for both cases
+- [x] Implement ExistsByEmail(ctx, email) (bool, error)
+- [x] Use SELECT EXISTS query for efficiency
+- [x] Add condition to exclude soft-deleted records
+- [x] Return false, nil for not exists
+- [x] Return true, nil for exists
+- [x] Write integration test for both cases
 
 ### 4.3.8 List Method Implementation
 
-- [ ] Implement List(ctx, filter, pagination) ([]\*User, int64, error)
-- [ ] Build dynamic WHERE clause based on filter
-- [ ] Support filtering by status
-- [ ] Support filtering by search term (email, name)
-- [ ] Support filtering by date range
-- [ ] Exclude soft-deleted records
-- [ ] Apply pagination using LIMIT and OFFSET
-- [ ] Execute count query for total records
-- [ ] Execute data query for current page
-- [ ] Consider using single query with window function for count
-- [ ] Map all rows to domain entities
-- [ ] Return empty slice (not nil) when no results
-- [ ] Write integration test for unfiltered listing
-- [ ] Write integration test for each filter type
-- [ ] Write integration test for pagination
-- [ ] Write integration test for empty results
+- [x] Implement List(ctx, filter, pagination) ([]\*User, int64, error)
+- [x] Build dynamic WHERE clause based on filter
+- [x] Support filtering by status
+- [x] Support filtering by search term (email, name)
+- [x] Support filtering by date range
+- [x] Exclude soft-deleted records
+- [x] Apply pagination using LIMIT and OFFSET
+- [x] Execute count query for total records
+- [x] Execute data query for current page
+- [x] Consider using single query with window function for count
+- [x] Map all rows to domain entities
+- [x] Return empty slice (not nil) when no results
+- [x] Write integration test for unfiltered listing
+- [x] Write integration test for each filter type
+- [x] Write integration test for pagination
+- [x] Write integration test for empty results
 
 ## 4.4 Unit of Work Pattern (`internal/infrastructure/persistence/postgres/`)
 
 ### 4.4.1 Unit of Work Interface
 
-- [ ] Define UnitOfWork interface in application layer
-- [ ] Define Begin(ctx) (UnitOfWorkContext, error) method
-- [ ] Define UnitOfWorkContext interface with Commit, Rollback, Context methods
+- [x] Define UnitOfWork interface in application layer
+- [x] Define Begin(ctx) (UnitOfWorkContext, error) method
+- [x] Define UnitOfWorkContext interface with Commit, Rollback, Context methods
 
 ### 4.4.2 Unit of Work Implementation
 
-- [ ] Implement PostgresUnitOfWork struct
-- [ ] Implement Begin() method starting database transaction
-- [ ] Implement Commit() method committing transaction
-- [ ] Implement Rollback() method rolling back transaction
-- [ ] Implement Context() returning context with transaction
-- [ ] Ensure repositories can extract transaction from context
-- [ ] Write integration test for commit scenario
-- [ ] Write integration test for rollback scenario
-- [ ] Write integration test for concurrent transactions
+- [x] Implement PostgresUnitOfWork struct
+- [x] Implement Begin() method starting database transaction
+- [x] Implement Commit() method committing transaction
+- [x] Implement Rollback() method rolling back transaction
+- [x] Implement Context() returning context with transaction
+- [x] Ensure repositories can extract transaction from context
+- [x] Write integration test for commit scenario
+- [x] Write integration test for rollback scenario
+- [x] Write integration test for concurrent transactions
 
 ## 4.5 Event Bus Implementation (`internal/infrastructure/messaging/`)
 

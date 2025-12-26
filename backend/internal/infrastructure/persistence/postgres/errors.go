@@ -31,3 +31,7 @@ func (e *DBError) Unwrap() error {
 func newDBError(op string, err error) *DBError {
 	return &DBError{Op: op, Err: err}
 }
+
+func NewDBError(op string, err error) *DBError {
+	return &DBError{Op: op, Err: err}
+}
