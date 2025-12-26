@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"os"
+
+	"github.com/tranvuongduy2003/go-copilot/pkg/config"
+	"github.com/tranvuongduy2003/go-copilot/pkg/logger"
 )
 
-// Build information (injected via ldflags)
 var (
 	Version   = "dev"
 	BuildTime = "unknown"
@@ -13,11 +14,24 @@ var (
 )
 
 func main() {
-	fmt.Printf("Go Copilot API Server\n")
-	fmt.Printf("Version: %s\n", Version)
-	fmt.Printf("Build Time: %s\n", BuildTime)
-	fmt.Printf("Go Version: %s\n", GoVersion)
-	fmt.Println()
-	fmt.Println("TODO: Implement server startup")
+	cfg, err := config.LoadFromEnv()
+	if err != nil {
+		logger.Fatal("failed to load config", logger.Err(err))
+	}
+
+	if err := logger.Init(cfg.Log, cfg.IsProduction()); err != nil {
+		logger.Fatal("failed to initialize logger", logger.Err(err))
+	}
+	defer logger.Sync()
+
+	logger.Info("starting server",
+		logger.String("app", cfg.App.Name),
+		logger.String("version", Version),
+		logger.String("build_time", BuildTime),
+		logger.String("go_version", GoVersion),
+		logger.String("env", cfg.App.Env),
+	)
+
+	logger.Info("TODO: implement server startup")
 	os.Exit(0)
 }

@@ -1,4 +1,5 @@
 # Expert-Level Backend Setup Checklist
+
 ## Clean Architecture + DDD + CQRS | Golang + PostgreSQL
 
 ---
@@ -6,6 +7,7 @@
 # Phase 1: Project Foundation
 
 ## 1.1 Repository Initialization
+
 - [x] Initialize Go module with proper module path following organization naming convention
 - [x] Create `.gitignore` with Go-specific patterns (binaries, IDE files, env files, vendor/)
 - [x] Create `.editorconfig` for consistent coding style across team
@@ -14,11 +16,13 @@
 - [x] Create `README.md` with project overview, prerequisites, and quick start guide
 
 ## 1.2 Development Environment Setup
+
 - [x] Refer folder `../docker` for local development services
 - [x] Create `.env.example` with all required environment variables documented
 - [ ] Verify all team members can spin up environment with single command
 
 ## 1.3 Makefile Configuration
+
 - [x] Define `help` target as default with all available commands documented
 - [x] Add `setup` target for first-time project setup (install tools, copy env files)
 - [x] Add `dev` target to start docker-compose services
@@ -33,6 +37,7 @@
 - [x] Add `clean` target to remove build artifacts
 
 ## 1.4 Dependency Management
+
 - [x] Review and correct Go version in `go.mod` (should be stable release)
 - [x] Add chi/v5 for HTTP routing (already present)
 - [x] Add pgx/v5 for PostgreSQL driver (already present)
@@ -44,11 +49,12 @@
 - [x] Add testify for testing assertions and mocks
 - [x] Add bcrypt or argon2 for password hashing
 - [x] Add jwt/v5 for JWT token handling (if authentication required)
-- [ ] Add otel packages for OpenTelemetry tracing (optional, production)
+- [x] Add otel packages for OpenTelemetry tracing (optional, production)
 - [x] Run `go mod tidy` to clean up dependencies
 - [x] Run `go mod verify` to verify dependency integrity
 
 ## 1.5 Code Quality Tools Setup
+
 - [x] Install golangci-lint locally and add to CI pipeline
 - [x] Create `.golangci.yml` configuration file
 - [x] Enable essential linters: gofmt, goimports, govet, errcheck, staticcheck
@@ -65,52 +71,55 @@
 # Phase 2: Configuration & Logging Infrastructure
 
 ## 2.1 Configuration Package (`pkg/config/`)
-- [ ] Define main Config struct with nested structs for each component
-- [ ] Define Server config: host, port, read timeout, write timeout, idle timeout
-- [ ] Define Database config: host, port, user, password, database name, SSL mode, pool size
-- [ ] Define Redis config (if used): host, port, password, database number
-- [ ] Define JWT config (if used): secret key, access token TTL, refresh token TTL
-- [ ] Define Log config: level, format (json/console), output destination
-- [ ] Implement configuration loading from environment variables
-- [ ] Implement configuration loading from YAML/JSON file as fallback
-- [ ] Implement environment-specific config file loading (dev, staging, prod)
-- [ ] Add configuration validation with detailed error messages
-- [ ] Validate required fields are present and non-empty
-- [ ] Validate numeric fields are within acceptable ranges
-- [ ] Validate URLs and connection strings are properly formatted
-- [ ] Implement config hot-reload capability for non-critical settings (optional)
-- [ ] Add helper methods for constructing DSN strings
-- [ ] Write unit tests for configuration loading and validation
+
+- [x] Define main Config struct with nested structs for each component
+- [x] Define Server config: host, port, read timeout, write timeout, idle timeout
+- [x] Define Database config: host, port, user, password, database name, SSL mode, pool size
+- [x] Define Redis config (if used): host, port, password, database number
+- [x] Define JWT config (if used): secret key, access token TTL, refresh token TTL
+- [x] Define Log config: level, format (json/console), output destination
+- [x] Implement configuration loading from environment variables
+- [x] Implement configuration loading from YAML/JSON file as fallback
+- [x] Implement environment-specific config file loading (dev, staging, prod)
+- [x] Add configuration validation with detailed error messages
+- [x] Validate required fields are present and non-empty
+- [x] Validate numeric fields are within acceptable ranges
+- [x] Validate URLs and connection strings are properly formatted
+- [x] Implement config hot-reload capability for non-critical settings (optional)
+- [x] Add helper methods for constructing DSN strings
+- [x] Write unit tests for configuration loading and validation
 
 ## 2.2 Logger Package (`pkg/logger/`)
-- [ ] Define Logger interface with methods: Debug, Info, Warn, Error, Fatal
-- [ ] Define structured logging methods that accept key-value pairs
-- [ ] Implement logger using zap as underlying library
-- [ ] Configure log level based on configuration
-- [ ] Configure output format: JSON for production, console for development
-- [ ] Add caller information (file, line number) to log entries
-- [ ] Add timestamp in ISO8601 format to all log entries
-- [ ] Implement request-scoped logger with context support
-- [ ] Create helper to extract logger from context
-- [ ] Create helper to inject logger into context
-- [ ] Add request ID field injection capability
-- [ ] Add user ID field injection capability (after authentication)
-- [ ] Implement log sampling for high-volume debug logs in production
-- [ ] Create global logger instance for application-wide use
-- [ ] Write unit tests for logger functionality
+
+- [x] Define Logger interface with methods: Debug, Info, Warn, Error, Fatal
+- [x] Define structured logging methods that accept key-value pairs
+- [x] Implement logger using zap as underlying library
+- [x] Configure log level based on configuration
+- [x] Configure output format: JSON for production, console for development
+- [x] Add caller information (file, line number) to log entries
+- [x] Add timestamp in ISO8601 format to all log entries
+- [x] Implement request-scoped logger with context support
+- [x] Create helper to extract logger from context
+- [x] Create helper to inject logger into context
+- [x] Add request ID field injection capability
+- [x] Add user ID field injection capability (after authentication)
+- [x] Implement log sampling for high-volume debug logs in production
+- [x] Create global logger instance for application-wide use
+- [x] Write unit tests for logger functionality
 
 ## 2.3 Validator Package (`pkg/validator/`)
-- [ ] Create validator wrapper around go-playground/validator
-- [ ] Register custom validation tags for domain-specific rules
-- [ ] Add custom validation for email format with DNS check option
-- [ ] Add custom validation for phone number formats
-- [ ] Add custom validation for password strength requirements
-- [ ] Add custom validation for UUID format
-- [ ] Implement error message translation to user-friendly messages
-- [ ] Create map of validation tag to human-readable error message
-- [ ] Implement locale-aware error messages (optional)
-- [ ] Create helper function to validate struct and return formatted errors
-- [ ] Write unit tests for all custom validators
+
+- [x] Create validator wrapper around go-playground/validator
+- [x] Register custom validation tags for domain-specific rules
+- [x] Add custom validation for email format with DNS check option
+- [x] Add custom validation for phone number formats
+- [x] Add custom validation for password strength requirements
+- [x] Add custom validation for UUID format
+- [x] Implement error message translation to user-friendly messages
+- [x] Create map of validation tag to human-readable error message
+- [x] Implement locale-aware error messages (optional)
+- [x] Create helper function to validate struct and return formatted errors
+- [x] Write unit tests for all custom validators
 
 ---
 
@@ -119,143 +128,153 @@
 ## 3.1 Shared Domain Components (`internal/domain/shared/`)
 
 ### 3.1.1 Base Types
-- [ ] Define Entity base struct with ID field and equality comparison method
-- [ ] Define AggregateRoot struct embedding Entity with domain events slice
-- [ ] Add method to AggregateRoot for registering domain events
-- [ ] Add method to AggregateRoot for retrieving and clearing domain events
-- [ ] Define DomainEvent interface with event type, timestamp, and aggregate ID
-- [ ] Define base DomainEvent struct implementing common fields
+
+- [x] Define Entity base struct with ID field and equality comparison method
+- [x] Define AggregateRoot struct embedding Entity with domain events slice
+- [x] Add method to AggregateRoot for registering domain events
+- [x] Add method to AggregateRoot for retrieving and clearing domain events
+- [x] Define DomainEvent interface with event type, timestamp, and aggregate ID
+- [x] Define base DomainEvent struct implementing common fields
 
 ### 3.1.2 Shared Value Objects
-- [ ] Define Email value object with validation in constructor
-- [ ] Implement Email equality comparison
-- [ ] Implement Email string representation
-- [ ] Implement Email domain extraction method
-- [ ] Define PhoneNumber value object with country code support
+
+- [x] Define Email value object with validation in constructor
+- [x] Implement Email equality comparison
+- [x] Implement Email string representation
+- [x] Implement Email domain extraction method
+- [x] Define PhoneNumber value object with country code support
 - [ ] Define Money value object with currency and amount (if e-commerce)
 - [ ] Implement Money arithmetic operations with currency validation
 - [ ] Define Address value object with component fields (if needed)
-- [ ] Define DateRange value object for temporal queries (if needed)
-- [ ] Define Pagination value object with page, limit, offset calculations
+- [x] Define DateRange value object for temporal queries (if needed)
+- [x] Define Pagination value object with page, limit, offset calculations
 
 ### 3.1.3 Domain Errors
-- [ ] Define base DomainError interface extending error
-- [ ] Add error code method to DomainError interface
-- [ ] Define NotFoundError struct with entity type and identifier
-- [ ] Define ValidationError struct with field and message
-- [ ] Define ConflictError struct for duplicate/constraint violations
-- [ ] Define AuthorizationError struct for permission denied scenarios
-- [ ] Define BusinessRuleViolationError for domain invariant violations
-- [ ] Implement Error() method for each error type
-- [ ] Implement Is() method for error comparison support
-- [ ] Create constructor functions for each error type
-- [ ] Write unit tests for error type assertions
+
+- [x] Define base DomainError interface extending error
+- [x] Add error code method to DomainError interface
+- [x] Define NotFoundError struct with entity type and identifier
+- [x] Define ValidationError struct with field and message
+- [x] Define ConflictError struct for duplicate/constraint violations
+- [x] Define AuthorizationError struct for permission denied scenarios
+- [x] Define BusinessRuleViolationError for domain invariant violations
+- [x] Implement Error() method for each error type
+- [x] Implement Is() method for error comparison support
+- [x] Create constructor functions for each error type
+- [x] Write unit tests for error type assertions
 
 ## 3.2 User Aggregate (`internal/domain/user/`)
 
 ### 3.2.1 User Entity
-- [ ] Define User struct with all required fields
-- [ ] Include ID as UUID type
-- [ ] Include Email as value object type
-- [ ] Include PasswordHash as string (not plain password)
-- [ ] Include FullName as string or Name value object
-- [ ] Include Status as enum type
-- [ ] Include CreatedAt as time.Time
-- [ ] Include UpdatedAt as time.Time
-- [ ] Include DeletedAt as *time.Time for soft delete (optional)
-- [ ] Embed AggregateRoot for domain events support
-- [ ] Implement NewUser constructor with required field validation
-- [ ] Validate email is not empty and properly formatted
-- [ ] Validate password meets minimum requirements before hashing
-- [ ] Validate full name is not empty and within length limits
-- [ ] Generate UUID for new user
-- [ ] Set default status to pending or active based on requirements
-- [ ] Set CreatedAt and UpdatedAt to current UTC time
-- [ ] Register UserCreated domain event in constructor
+
+- [x] Define User struct with all required fields
+- [x] Include ID as UUID type
+- [x] Include Email as value object type
+- [x] Include PasswordHash as string (not plain password)
+- [x] Include FullName as string or Name value object
+- [x] Include Status as enum type
+- [x] Include CreatedAt as time.Time
+- [x] Include UpdatedAt as time.Time
+- [x] Include DeletedAt as \*time.Time for soft delete (optional)
+- [x] Embed AggregateRoot for domain events support
+- [x] Implement NewUser constructor with required field validation
+- [x] Validate email is not empty and properly formatted
+- [x] Validate password meets minimum requirements before hashing
+- [x] Validate full name is not empty and within length limits
+- [x] Generate UUID for new user
+- [x] Set default status to pending or active based on requirements
+- [x] Set CreatedAt and UpdatedAt to current UTC time
+- [x] Register UserCreated domain event in constructor
 
 ### 3.2.2 User Business Methods
-- [ ] Implement Activate() method to change status to active
-- [ ] Add validation that user is not already active
-- [ ] Update UpdatedAt timestamp
-- [ ] Register UserActivated domain event
-- [ ] Implement Deactivate() method to change status to inactive
-- [ ] Add validation that user is not already inactive
-- [ ] Update UpdatedAt timestamp
-- [ ] Register UserDeactivated domain event
-- [ ] Implement Ban() method to change status to banned
-- [ ] Update UpdatedAt timestamp
-- [ ] Register UserBanned domain event
-- [ ] Implement ChangePassword() method
-- [ ] Accept hashed password (hashing done in application layer)
-- [ ] Update UpdatedAt timestamp
-- [ ] Register PasswordChanged domain event
-- [ ] Implement UpdateProfile() method for name and other editable fields
-- [ ] Validate new values meet requirements
-- [ ] Update UpdatedAt timestamp
-- [ ] Register ProfileUpdated domain event
-- [ ] Implement Delete() method for soft delete
-- [ ] Set DeletedAt to current timestamp
-- [ ] Register UserDeleted domain event
+
+- [x] Implement Activate() method to change status to active
+- [x] Add validation that user is not already active
+- [x] Update UpdatedAt timestamp
+- [x] Register UserActivated domain event
+- [x] Implement Deactivate() method to change status to inactive
+- [x] Add validation that user is not already inactive
+- [x] Update UpdatedAt timestamp
+- [x] Register UserDeactivated domain event
+- [x] Implement Ban() method to change status to banned
+- [x] Update UpdatedAt timestamp
+- [x] Register UserBanned domain event
+- [x] Implement ChangePassword() method
+- [x] Accept hashed password (hashing done in application layer)
+- [x] Update UpdatedAt timestamp
+- [x] Register PasswordChanged domain event
+- [x] Implement UpdateProfile() method for name and other editable fields
+- [x] Validate new values meet requirements
+- [x] Update UpdatedAt timestamp
+- [x] Register ProfileUpdated domain event
+- [x] Implement Delete() method for soft delete
+- [x] Set DeletedAt to current timestamp
+- [x] Register UserDeleted domain event
 
 ### 3.2.3 User Status Enum
-- [ ] Define UserStatus as string type
-- [ ] Define constants: StatusPending, StatusActive, StatusInactive, StatusBanned
-- [ ] Implement IsValid() method to check if status value is valid
-- [ ] Implement CanTransitionTo() method for status state machine validation
-- [ ] Define allowed transitions: Pending→Active, Active→Inactive, Active→Banned, etc.
+
+- [x] Define UserStatus as string type
+- [x] Define constants: StatusPending, StatusActive, StatusInactive, StatusBanned
+- [x] Implement IsValid() method to check if status value is valid
+- [x] Implement CanTransitionTo() method for status state machine validation
+- [x] Define allowed transitions: Pending→Active, Active→Inactive, Active→Banned, etc.
 
 ### 3.2.4 User Repository Interface
-- [ ] Define UserRepository interface in domain layer
-- [ ] Define Create(ctx, user) error method
-- [ ] Define Update(ctx, user) error method
-- [ ] Define Delete(ctx, id) error method
-- [ ] Define FindByID(ctx, id) (*User, error) method
-- [ ] Define FindByEmail(ctx, email) (*User, error) method
-- [ ] Define ExistsByEmail(ctx, email) (bool, error) method
-- [ ] Define List(ctx, filter, pagination) ([]*User, total, error) method
-- [ ] Define UserFilter struct for list filtering (status, search term, date range)
+
+- [x] Define UserRepository interface in domain layer
+- [x] Define Create(ctx, user) error method
+- [x] Define Update(ctx, user) error method
+- [x] Define Delete(ctx, id) error method
+- [x] Define FindByID(ctx, id) (\*User, error) method
+- [x] Define FindByEmail(ctx, email) (\*User, error) method
+- [x] Define ExistsByEmail(ctx, email) (bool, error) method
+- [x] Define List(ctx, filter, pagination) ([]\*User, total, error) method
+- [x] Define UserFilter struct for list filtering (status, search term, date range)
 - [ ] Document expected error types for each method in comments
 
 ### 3.2.5 User Domain Events
-- [ ] Define UserCreatedEvent with user ID, email, timestamp
-- [ ] Define UserActivatedEvent with user ID, timestamp
-- [ ] Define UserDeactivatedEvent with user ID, timestamp
-- [ ] Define UserBannedEvent with user ID, reason, timestamp
-- [ ] Define PasswordChangedEvent with user ID, timestamp
-- [ ] Define ProfileUpdatedEvent with user ID, changed fields, timestamp
-- [ ] Define UserDeletedEvent with user ID, timestamp
-- [ ] Implement EventType() method for each event returning unique string
-- [ ] Implement OccurredAt() method for each event
-- [ ] Implement AggregateID() method for each event
+
+- [x] Define UserCreatedEvent with user ID, email, timestamp
+- [x] Define UserActivatedEvent with user ID, timestamp
+- [x] Define UserDeactivatedEvent with user ID, timestamp
+- [x] Define UserBannedEvent with user ID, reason, timestamp
+- [x] Define PasswordChangedEvent with user ID, timestamp
+- [x] Define ProfileUpdatedEvent with user ID, changed fields, timestamp
+- [x] Define UserDeletedEvent with user ID, timestamp
+- [x] Implement EventType() method for each event returning unique string
+- [x] Implement OccurredAt() method for each event
+- [x] Implement AggregateID() method for each event
 
 ### 3.2.6 User Domain Errors
-- [ ] Define ErrUserNotFound as sentinel error
-- [ ] Define ErrEmailAlreadyExists as sentinel error
-- [ ] Define ErrInvalidEmail as sentinel error
-- [ ] Define ErrInvalidPassword as sentinel error
-- [ ] Define ErrInvalidStatus as sentinel error
-- [ ] Define ErrInvalidStatusTransition with current and target status
-- [ ] Define ErrUserAlreadyActive as sentinel error
-- [ ] Define ErrUserAlreadyInactive as sentinel error
+
+- [x] Define ErrUserNotFound as sentinel error
+- [x] Define ErrEmailAlreadyExists as sentinel error
+- [x] Define ErrInvalidEmail as sentinel error
+- [x] Define ErrInvalidPassword as sentinel error
+- [x] Define ErrInvalidStatus as sentinel error
+- [x] Define ErrInvalidStatusTransition with current and target status
+- [x] Define ErrUserAlreadyActive as sentinel error
+- [x] Define ErrUserAlreadyInactive as sentinel error
 
 ### 3.2.7 User Domain Tests
-- [ ] Write unit tests for NewUser constructor validation
-- [ ] Test successful user creation with valid inputs
-- [ ] Test failure with empty email
-- [ ] Test failure with invalid email format
-- [ ] Test failure with empty password
-- [ ] Test failure with weak password
-- [ ] Test failure with empty full name
-- [ ] Write unit tests for each business method
-- [ ] Test successful activation from pending status
-- [ ] Test failure when activating already active user
-- [ ] Test successful deactivation
-- [ ] Test successful ban
-- [ ] Test successful password change
-- [ ] Test domain event registration for each operation
-- [ ] Write unit tests for UserStatus transitions
-- [ ] Test all valid transitions succeed
-- [ ] Test all invalid transitions fail
+
+- [x] Write unit tests for NewUser constructor validation
+- [x] Test successful user creation with valid inputs
+- [x] Test failure with empty email
+- [x] Test failure with invalid email format
+- [x] Test failure with empty password
+- [x] Test failure with weak password
+- [x] Test failure with empty full name
+- [x] Write unit tests for each business method
+- [x] Test successful activation from pending status
+- [x] Test failure when activating already active user
+- [x] Test successful deactivation
+- [x] Test successful ban
+- [x] Test successful password change
+- [x] Test domain event registration for each operation
+- [x] Write unit tests for UserStatus transitions
+- [x] Test all valid transitions succeed
+- [x] Test all invalid transitions fail
 
 ---
 
@@ -264,6 +283,7 @@
 ## 4.1 Database Connection (`internal/infrastructure/persistence/postgres/`)
 
 ### 4.1.1 Connection Pool Setup
+
 - [ ] Define DB struct wrapping pgxpool.Pool
 - [ ] Implement NewDB constructor accepting config
 - [ ] Parse connection string from config
@@ -280,6 +300,7 @@
 - [ ] Write integration tests for connection management
 
 ### 4.1.2 Transaction Support
+
 - [ ] Define Transaction interface with Commit, Rollback methods
 - [ ] Implement BeginTx() method to start transaction
 - [ ] Accept context for cancellation
@@ -293,6 +314,7 @@
 - [ ] Create helper to inject transaction into context
 
 ### 4.1.3 Query Builder Helpers (Optional)
+
 - [ ] Implement helper for building dynamic WHERE clauses
 - [ ] Implement helper for building ORDER BY clauses
 - [ ] Implement helper for building pagination (LIMIT, OFFSET)
@@ -302,6 +324,7 @@
 ## 4.2 Database Migrations (`migrations/`)
 
 ### 4.2.1 Goose CLI Setup
+
 - [ ] Install goose CLI tool: `go install github.com/pressly/goose/v3/cmd/goose@latest`
 - [ ] Create `migrations/` directory in project root
 - [ ] Configure default database connection in environment variables
@@ -309,6 +332,7 @@
 - [ ] Document migration workflow in README
 
 ### 4.2.2 User Table Migration
+
 - [ ] Generate migration file: `goose -dir migrations create create_users_table sql`
 - [ ] Write UP migration: CREATE TABLE users
 - [ ] Define id column as UUID PRIMARY KEY
@@ -323,6 +347,7 @@
 - [ ] Test migration up and down in development environment
 
 ### 4.2.3 User Table Indexes Migration
+
 - [ ] Generate migration file: `goose -dir migrations create add_users_indexes sql`
 - [ ] Write UP migration: CREATE INDEX on email column
 - [ ] Write UP migration: CREATE INDEX on status column
@@ -333,6 +358,7 @@
 - [ ] Test migration up and down
 
 ### 4.2.4 Audit Trigger Migration (Optional)
+
 - [ ] Generate migration file: `goose -dir migrations create add_updated_at_trigger sql`
 - [ ] Write UP migration: CREATE FUNCTION to update updated_at column
 - [ ] Write UP migration: CREATE TRIGGER on users table BEFORE UPDATE
@@ -340,6 +366,7 @@
 - [ ] Test that updated_at automatically updates on row modification
 
 ### 4.2.5 Migration Testing
+
 - [ ] Test full migration sequence from empty database
 - [ ] Test rollback of each migration individually
 - [ ] Test rollback of all migrations
@@ -349,6 +376,7 @@
 ## 4.3 User Repository Implementation (`internal/infrastructure/persistence/postgres/`)
 
 ### 4.3.1 Repository Structure
+
 - [ ] Define UserRepository struct with DB pool dependency
 - [ ] Implement NewUserRepository constructor
 - [ ] Define SQL query constants as private package variables
@@ -357,6 +385,7 @@
 - [ ] Implement database row to domain entity mapping
 
 ### 4.3.2 Create Method Implementation
+
 - [ ] Implement Create(ctx, user) error
 - [ ] Extract transaction from context if present
 - [ ] Use INSERT query with all user fields
@@ -368,6 +397,7 @@
 - [ ] Write integration test for duplicate email handling
 
 ### 4.3.3 Update Method Implementation
+
 - [ ] Implement Update(ctx, user) error
 - [ ] Extract transaction from context if present
 - [ ] Use UPDATE query with all mutable fields
@@ -379,6 +409,7 @@
 - [ ] Write integration test for not found handling
 
 ### 4.3.4 Delete Method Implementation
+
 - [ ] Implement Delete(ctx, id) error for soft delete
 - [ ] Update deleted_at column to current timestamp
 - [ ] Check rows affected to detect not found
@@ -387,7 +418,8 @@
 - [ ] Write integration test for not found handling
 
 ### 4.3.5 FindByID Method Implementation
-- [ ] Implement FindByID(ctx, id) (*User, error)
+
+- [ ] Implement FindByID(ctx, id) (\*User, error)
 - [ ] Use SELECT query with WHERE id = $1
 - [ ] Add condition to exclude soft-deleted records
 - [ ] Map database row to domain User entity
@@ -399,7 +431,8 @@
 - [ ] Write integration test confirming soft-deleted excluded
 
 ### 4.3.6 FindByEmail Method Implementation
-- [ ] Implement FindByEmail(ctx, email) (*User, error)
+
+- [ ] Implement FindByEmail(ctx, email) (\*User, error)
 - [ ] Use SELECT query with WHERE email = $1
 - [ ] Add condition to exclude soft-deleted records
 - [ ] Case-insensitive comparison using LOWER()
@@ -408,6 +441,7 @@
 - [ ] Write integration test for case insensitivity
 
 ### 4.3.7 ExistsByEmail Method Implementation
+
 - [ ] Implement ExistsByEmail(ctx, email) (bool, error)
 - [ ] Use SELECT EXISTS query for efficiency
 - [ ] Add condition to exclude soft-deleted records
@@ -416,7 +450,8 @@
 - [ ] Write integration test for both cases
 
 ### 4.3.8 List Method Implementation
-- [ ] Implement List(ctx, filter, pagination) ([]*User, int64, error)
+
+- [ ] Implement List(ctx, filter, pagination) ([]\*User, int64, error)
 - [ ] Build dynamic WHERE clause based on filter
 - [ ] Support filtering by status
 - [ ] Support filtering by search term (email, name)
@@ -436,11 +471,13 @@
 ## 4.4 Unit of Work Pattern (`internal/infrastructure/persistence/postgres/`)
 
 ### 4.4.1 Unit of Work Interface
+
 - [ ] Define UnitOfWork interface in application layer
 - [ ] Define Begin(ctx) (UnitOfWorkContext, error) method
 - [ ] Define UnitOfWorkContext interface with Commit, Rollback, Context methods
 
 ### 4.4.2 Unit of Work Implementation
+
 - [ ] Implement PostgresUnitOfWork struct
 - [ ] Implement Begin() method starting database transaction
 - [ ] Implement Commit() method committing transaction
@@ -454,12 +491,14 @@
 ## 4.5 Event Bus Implementation (`internal/infrastructure/messaging/`)
 
 ### 4.5.1 Event Bus Interface
+
 - [ ] Define EventBus interface in domain or application layer
 - [ ] Define Publish(ctx, events ...DomainEvent) error method
 - [ ] Define Subscribe(eventType string, handler EventHandler) method
 - [ ] Define EventHandler function type
 
 ### 4.5.2 In-Memory Event Bus
+
 - [ ] Implement InMemoryEventBus struct
 - [ ] Use map to store handlers by event type
 - [ ] Use mutex for thread-safe handler registration
@@ -477,6 +516,7 @@
 - [ ] Write unit tests for multiple handlers
 
 ### 4.5.3 Async Event Handling (Optional)
+
 - [ ] Implement async event dispatch using goroutines
 - [ ] Use worker pool to limit concurrent handlers
 - [ ] Implement graceful shutdown waiting for handlers to complete
@@ -490,6 +530,7 @@
 ## 5.1 CQRS Infrastructure (`internal/application/`)
 
 ### 5.1.1 Command Infrastructure
+
 - [ ] Define Command marker interface (can be empty)
 - [ ] Define CommandHandler interface with Handle(ctx, cmd) error method
 - [ ] Define CommandBus interface with Dispatch(ctx, cmd) error method
@@ -501,6 +542,7 @@
 - [ ] Add logging for command dispatch
 
 ### 5.1.2 Query Infrastructure
+
 - [ ] Define Query marker interface (can be empty)
 - [ ] Define QueryHandler interface with Handle(ctx, query) (result, error) method
 - [ ] Use generics for type-safe query results if Go 1.18+
@@ -512,6 +554,7 @@
 - [ ] Return error if handler not found
 
 ### 5.1.3 Middleware Support (Optional)
+
 - [ ] Define CommandMiddleware function type
 - [ ] Define QueryMiddleware function type
 - [ ] Implement logging middleware for commands
@@ -523,6 +566,7 @@
 ## 5.2 DTOs (`internal/application/dto/`)
 
 ### 5.2.1 User DTOs
+
 - [ ] Define UserDTO struct for responses
 - [ ] Include ID as string (UUID string representation)
 - [ ] Include Email as string
@@ -532,10 +576,11 @@
 - [ ] Include UpdatedAt as time.Time or string
 - [ ] Exclude sensitive fields (password hash)
 - [ ] Add JSON tags for serialization
-- [ ] Implement ToDTO(user *domain.User) UserDTO mapper function
-- [ ] Implement ToDTOs(users []*domain.User) []UserDTO mapper function
+- [ ] Implement ToDTO(user \*domain.User) UserDTO mapper function
+- [ ] Implement ToDTOs(users []\*domain.User) []UserDTO mapper function
 
 ### 5.2.2 Pagination DTOs
+
 - [ ] Define PaginationRequest struct with Page, Limit fields
 - [ ] Add validation tags for minimum and maximum values
 - [ ] Implement Offset() method to calculate SQL offset
@@ -551,6 +596,7 @@
 ## 5.3 User Commands (`internal/application/command/`)
 
 ### 5.3.1 CreateUser Command
+
 - [ ] Define CreateUserCommand struct
 - [ ] Include Email field with validation tags
 - [ ] Include Password field with validation tags
@@ -577,6 +623,7 @@
 - [ ] Test password hashing integration
 
 ### 5.3.2 UpdateUser Command
+
 - [ ] Define UpdateUserCommand struct
 - [ ] Include UserID field (required)
 - [ ] Include FullName field (optional, pointer or wrapper type)
@@ -593,6 +640,7 @@
 - [ ] Write unit tests for update scenarios
 
 ### 5.3.3 DeleteUser Command
+
 - [ ] Define DeleteUserCommand struct with UserID field
 - [ ] Define DeleteUserHandler struct
 - [ ] Inject dependencies
@@ -606,6 +654,7 @@
 - [ ] Write unit tests for delete scenarios
 
 ### 5.3.4 ChangePassword Command
+
 - [ ] Define ChangePasswordCommand struct
 - [ ] Include UserID field
 - [ ] Include CurrentPassword field
@@ -624,6 +673,7 @@
 - [ ] Write unit tests including password verification
 
 ### 5.3.5 ActivateUser Command
+
 - [ ] Define ActivateUserCommand struct with UserID field
 - [ ] Define ActivateUserHandler struct
 - [ ] Inject dependencies
@@ -636,6 +686,7 @@
 - [ ] Write unit tests
 
 ### 5.3.6 DeactivateUser Command
+
 - [ ] Define DeactivateUserCommand struct with UserID field
 - [ ] Define DeactivateUserHandler struct
 - [ ] Implement Handle() method similar to ActivateUser
@@ -644,11 +695,12 @@
 ## 5.4 User Queries (`internal/application/query/`)
 
 ### 5.4.1 GetUser Query
+
 - [ ] Define GetUserQuery struct with UserID field
 - [ ] Define GetUserHandler struct
 - [ ] Inject UserRepository dependency (can use same repo or dedicated read repo)
 - [ ] Inject Logger dependency
-- [ ] Implement Handle(ctx, query) (*UserDTO, error) method
+- [ ] Implement Handle(ctx, query) (\*UserDTO, error) method
 - [ ] Validate query input
 - [ ] Fetch user from repository
 - [ ] Return ErrUserNotFound if not exists
@@ -657,13 +709,14 @@
 - [ ] Write unit tests with mocked repository
 
 ### 5.4.2 ListUsers Query
+
 - [ ] Define ListUsersQuery struct
 - [ ] Include pagination fields (Page, Limit)
 - [ ] Include filter fields (Status, Search)
 - [ ] Include sort fields (SortBy, SortOrder)
 - [ ] Define ListUsersHandler struct
 - [ ] Inject dependencies
-- [ ] Implement Handle(ctx, query) (*PaginatedResponse[UserDTO], error) method
+- [ ] Implement Handle(ctx, query) (\*PaginatedResponse[UserDTO], error) method
 - [ ] Validate query input
 - [ ] Apply default pagination if not specified
 - [ ] Build filter from query fields
@@ -674,12 +727,14 @@
 - [ ] Write unit tests for various filter combinations
 
 ### 5.4.3 GetUserByEmail Query
+
 - [ ] Define GetUserByEmailQuery struct with Email field
 - [ ] Define GetUserByEmailHandler struct
 - [ ] Implement Handle() method
 - [ ] Write unit tests
 
 ### 5.4.4 CheckEmailExists Query
+
 - [ ] Define CheckEmailExistsQuery struct with Email field
 - [ ] Define CheckEmailExistsHandler struct
 - [ ] Implement Handle(ctx, query) (bool, error) method
@@ -692,6 +747,7 @@
 ## 6.1 HTTP Infrastructure (`internal/interfaces/http/`)
 
 ### 6.1.1 Server Setup
+
 - [ ] Define Server struct with dependencies
 - [ ] Include HTTP server instance
 - [ ] Include router instance
@@ -706,6 +762,7 @@
 - [ ] Respect context deadline for shutdown timeout
 
 ### 6.1.2 Router Setup (`internal/interfaces/http/router/`)
+
 - [ ] Define NewRouter function
 - [ ] Accept handler dependencies
 - [ ] Create chi router instance
@@ -716,6 +773,7 @@
 - [ ] Return configured router
 
 ### 6.1.3 Response Helpers
+
 - [ ] Define standard success response structure
 - [ ] Include data field
 - [ ] Include optional message field
@@ -741,6 +799,7 @@
 ## 6.2 Middleware (`internal/interfaces/http/middleware/`)
 
 ### 6.2.1 Request ID Middleware
+
 - [ ] Implement middleware function
 - [ ] Extract X-Request-ID header if present
 - [ ] Generate new UUID if header not present
@@ -749,6 +808,7 @@
 - [ ] Write tests for middleware
 
 ### 6.2.2 Logging Middleware
+
 - [ ] Implement middleware function
 - [ ] Extract logger from context or use global
 - [ ] Extract request ID from context
@@ -760,6 +820,7 @@
 - [ ] Write tests for middleware
 
 ### 6.2.3 Recovery Middleware
+
 - [ ] Implement middleware function
 - [ ] Use defer to catch panics
 - [ ] Log panic with stack trace
@@ -769,6 +830,7 @@
 - [ ] Write tests for panic recovery
 
 ### 6.2.4 Timeout Middleware
+
 - [ ] Implement middleware function
 - [ ] Accept timeout duration as parameter
 - [ ] Create context with timeout
@@ -778,6 +840,7 @@
 - [ ] Write tests for timeout behavior
 
 ### 6.2.5 CORS Middleware
+
 - [ ] Configure allowed origins from config
 - [ ] Configure allowed methods
 - [ ] Configure allowed headers
@@ -788,6 +851,7 @@
 - [ ] Write tests for CORS behavior
 
 ### 6.2.6 Authentication Middleware (if required)
+
 - [ ] Implement middleware function
 - [ ] Extract Authorization header
 - [ ] Validate Bearer token format
@@ -798,6 +862,7 @@
 - [ ] Write tests for auth scenarios
 
 ### 6.2.7 Rate Limiting Middleware (optional)
+
 - [ ] Choose rate limiting strategy (token bucket, sliding window)
 - [ ] Configure limits from config
 - [ ] Implement per-IP rate limiting
@@ -809,6 +874,7 @@
 ## 6.3 HTTP DTOs (`internal/interfaces/http/dto/`)
 
 ### 6.3.1 Request DTOs
+
 - [ ] Define CreateUserRequest struct
 - [ ] Include Email field with json tag and validation tags
 - [ ] Include Password field with validation tags
@@ -826,12 +892,14 @@
 - [ ] Include sort_by, sort_order as query params
 
 ### 6.3.2 Response DTOs
+
 - [ ] Define UserResponse struct mirroring application DTO
 - [ ] Add JSON tags with appropriate naming (snake_case or camelCase)
 - [ ] Define PaginatedResponse struct for list endpoints
 - [ ] Define ErrorResponse struct matching standard error format
 
 ### 6.3.3 DTO Validation
+
 - [ ] Add validation tags to all request DTOs
 - [ ] Document validation rules in comments or OpenAPI spec
 - [ ] Create reusable validation error formatter
@@ -839,6 +907,7 @@
 ## 6.4 User Handlers (`internal/interfaces/http/handler/`)
 
 ### 6.4.1 Handler Structure
+
 - [ ] Define UserHandler struct
 - [ ] Inject CommandBus dependency
 - [ ] Inject QueryBus dependency
@@ -847,6 +916,7 @@
 - [ ] Implement NewUserHandler constructor
 
 ### 6.4.2 Create User Endpoint
+
 - [ ] Implement CreateUser handler for POST /users
 - [ ] Parse request body into CreateUserRequest DTO
 - [ ] Handle JSON parsing errors with 400 response
@@ -860,6 +930,7 @@
 - [ ] Write integration tests for endpoint
 
 ### 6.4.3 Get User Endpoint
+
 - [ ] Implement GetUser handler for GET /users/{id}
 - [ ] Extract user ID from URL path parameter
 - [ ] Validate UUID format
@@ -871,6 +942,7 @@
 - [ ] Write integration tests for endpoint
 
 ### 6.4.4 List Users Endpoint
+
 - [ ] Implement ListUsers handler for GET /users
 - [ ] Parse query parameters into ListUsersRequest
 - [ ] Apply default pagination if not specified
@@ -881,6 +953,7 @@
 - [ ] Write integration tests for endpoint
 
 ### 6.4.5 Update User Endpoint
+
 - [ ] Implement UpdateUser handler for PUT /users/{id}
 - [ ] Extract user ID from URL path
 - [ ] Parse request body
@@ -892,6 +965,7 @@
 - [ ] Write integration tests
 
 ### 6.4.6 Delete User Endpoint
+
 - [ ] Implement DeleteUser handler for DELETE /users/{id}
 - [ ] Extract user ID from URL path
 - [ ] Create DeleteUserCommand
@@ -901,6 +975,7 @@
 - [ ] Write integration tests
 
 ### 6.4.7 Change Password Endpoint
+
 - [ ] Implement ChangePassword handler for POST /users/{id}/password
 - [ ] Parse and validate request
 - [ ] Create ChangePasswordCommand
@@ -910,6 +985,7 @@
 - [ ] Write integration tests
 
 ### 6.4.8 Activate User Endpoint
+
 - [ ] Implement ActivateUser handler for POST /users/{id}/activate
 - [ ] Create ActivateUserCommand
 - [ ] Dispatch command
@@ -918,6 +994,7 @@
 - [ ] Write integration tests
 
 ### 6.4.9 Deactivate User Endpoint
+
 - [ ] Implement DeactivateUser handler for POST /users/{id}/deactivate
 - [ ] Similar implementation to activate
 - [ ] Write integration tests
@@ -925,12 +1002,14 @@
 ## 6.5 Health Check Endpoints (`internal/interfaces/http/handler/`)
 
 ### 6.5.1 Liveness Probe
+
 - [ ] Implement handler for GET /health/live
 - [ ] Return 200 OK if application is running
 - [ ] No dependency checks (just proves process is alive)
 - [ ] Return simple JSON response with status
 
 ### 6.5.2 Readiness Probe
+
 - [ ] Implement handler for GET /health/ready
 - [ ] Check database connection health
 - [ ] Check Redis connection health (if used)
@@ -946,6 +1025,7 @@
 ## 7.1 Main Function (`cmd/api/main.go`)
 
 ### 7.1.1 Initialization Sequence
+
 - [ ] Load configuration from environment and files
 - [ ] Handle configuration errors with clear message and exit
 - [ ] Initialize logger with configuration
@@ -959,6 +1039,7 @@
 - [ ] Verify connectivity with ping
 
 ### 7.1.2 Dependency Construction
+
 - [ ] Create repositories
 - [ ] Create UserRepository with database pool
 - [ ] Create services/utilities
@@ -977,6 +1058,7 @@
 - [ ] Create HTTP server with router
 
 ### 7.1.3 Server Startup
+
 - [ ] Start HTTP server in goroutine
 - [ ] Log server address and port
 - [ ] Set up OS signal handling
@@ -991,6 +1073,7 @@
 - [ ] Exit with appropriate code
 
 ### 7.1.4 Error Handling
+
 - [ ] Handle server start errors
 - [ ] Handle shutdown timeout
 - [ ] Log all errors with context
@@ -999,6 +1082,7 @@
 ## 7.2 Dependency Injection (Optional - using Wire)
 
 ### 7.2.1 Wire Setup
+
 - [ ] Install wire: `go install github.com/google/wire/cmd/wire@latest`
 - [ ] Create `wire.go` file with build tag `//go:build wireinject`
 - [ ] Define provider functions for each dependency
@@ -1014,6 +1098,7 @@
 ## 8.1 Unit Tests
 
 ### 8.1.1 Domain Layer Tests
+
 - [ ] Test all entity constructors with valid and invalid inputs
 - [ ] Test all entity business methods
 - [ ] Test all value object validation
@@ -1023,6 +1108,7 @@
 - [ ] Achieve minimum 90% coverage for domain layer
 
 ### 8.1.2 Application Layer Tests
+
 - [ ] Mock all repository interfaces
 - [ ] Mock all external service interfaces
 - [ ] Test command handlers with all scenarios
@@ -1034,6 +1120,7 @@
 - [ ] Achieve minimum 80% coverage for application layer
 
 ### 8.1.3 Interface Layer Tests
+
 - [ ] Test HTTP handlers with mocked buses
 - [ ] Test request parsing and validation
 - [ ] Test response formatting
@@ -1044,6 +1131,7 @@
 ## 8.2 Integration Tests
 
 ### 8.2.1 Test Infrastructure
+
 - [ ] Create `docker-compose.test.yml` for test dependencies
 - [ ] Configure test database with separate schema or database
 - [ ] Implement test database setup and teardown
@@ -1051,6 +1139,7 @@
 - [ ] Create helper functions for common test operations
 
 ### 8.2.2 Repository Integration Tests
+
 - [ ] Test repository methods against real database
 - [ ] Test transaction behavior
 - [ ] Test concurrent access scenarios
@@ -1058,6 +1147,7 @@
 - [ ] Clean up test data after each test
 
 ### 8.2.3 API Integration Tests
+
 - [ ] Test full request/response cycle
 - [ ] Test with real database
 - [ ] Test error scenarios
@@ -1068,12 +1158,14 @@
 ## 8.3 Test Configuration
 
 ### 8.3.1 Test Utilities
+
 - [ ] Create test helper package
 - [ ] Implement random data generators
 - [ ] Implement assertion helpers
 - [ ] Implement mock factories
 
 ### 8.3.2 CI Test Pipeline
+
 - [ ] Configure test job in CI
 - [ ] Start test dependencies (database)
 - [ ] Run migrations
@@ -1090,6 +1182,7 @@
 ## 9.1 Observability
 
 ### 9.1.1 Metrics (Prometheus)
+
 - [ ] Add prometheus client library
 - [ ] Create metrics registry
 - [ ] Define HTTP request metrics
@@ -1108,6 +1201,7 @@
 - [ ] Document available metrics
 
 ### 9.1.2 Tracing (OpenTelemetry)
+
 - [ ] Add OpenTelemetry dependencies
 - [ ] Configure trace exporter (Jaeger, Zipkin, OTLP)
 - [ ] Initialize tracer provider
@@ -1118,6 +1212,7 @@
 - [ ] Implement context propagation throughout codebase
 
 ### 9.1.3 Health Checks
+
 - [ ] Implement comprehensive readiness check
 - [ ] Add timeout for each dependency check
 - [ ] Return structured health status
@@ -1127,12 +1222,14 @@
 ## 9.2 Security
 
 ### 9.2.1 Input Validation
+
 - [ ] Validate all user input at API boundary
 - [ ] Sanitize strings to prevent XSS (if rendering HTML)
 - [ ] Limit request body size
 - [ ] Limit query parameter lengths
 
 ### 9.2.2 Authentication & Authorization
+
 - [ ] Implement secure password hashing (bcrypt with appropriate cost)
 - [ ] Implement JWT with short expiration
 - [ ] Implement refresh token mechanism
@@ -1142,6 +1239,7 @@
 - [ ] Implement account lockout after failed attempts
 
 ### 9.2.3 Security Headers
+
 - [ ] Add security headers middleware
 - [ ] X-Content-Type-Options: nosniff
 - [ ] X-Frame-Options: DENY
@@ -1150,6 +1248,7 @@
 - [ ] Strict-Transport-Security (for HTTPS)
 
 ### 9.2.4 Secrets Management
+
 - [ ] Never log sensitive data (passwords, tokens)
 - [ ] Never commit secrets to repository
 - [ ] Use environment variables for secrets
@@ -1159,18 +1258,21 @@
 ## 9.3 Error Handling & Resilience
 
 ### 9.3.1 Error Tracking
+
 - [ ] Integrate error tracking service (Sentry, Rollbar)
 - [ ] Configure error grouping
 - [ ] Include relevant context with errors
 - [ ] Set up alerting for error spikes
 
 ### 9.3.2 Circuit Breaker (optional)
+
 - [ ] Implement circuit breaker for external services
 - [ ] Configure failure threshold
 - [ ] Configure recovery timeout
 - [ ] Log circuit state changes
 
 ### 9.3.3 Retry Logic
+
 - [ ] Implement retry for transient failures
 - [ ] Use exponential backoff
 - [ ] Add jitter to prevent thundering herd
@@ -1180,6 +1282,7 @@
 ## 9.4 Performance
 
 ### 9.4.1 Database Optimization
+
 - [ ] Review and optimize slow queries
 - [ ] Add appropriate indexes
 - [ ] Configure connection pool size appropriately
@@ -1187,6 +1290,7 @@
 - [ ] Consider read replicas for read-heavy workloads
 
 ### 9.4.2 Caching Strategy
+
 - [ ] Identify cacheable data
 - [ ] Implement cache layer with Redis
 - [ ] Define cache invalidation strategy
@@ -1194,6 +1298,7 @@
 - [ ] Monitor cache hit rates
 
 ### 9.4.3 Response Optimization
+
 - [ ] Enable response compression (gzip)
 - [ ] Implement response caching where appropriate
 - [ ] Optimize JSON serialization
@@ -1205,6 +1310,7 @@
 ## 10.1 Docker
 
 ### 10.1.1 Dockerfile
+
 - [ ] Use multi-stage build
 - [ ] Stage 1: Build binary with Go image
 - [ ] Stage 2: Runtime with minimal base image (distroless or alpine)
@@ -1215,6 +1321,7 @@
 - [ ] Define ENTRYPOINT and CMD
 
 ### 10.1.2 Docker Compose
+
 - [ ] Define application service
 - [ ] Define database service with health check
 - [ ] Define Redis service (if used)
@@ -1223,6 +1330,7 @@
 - [ ] Create environment-specific compose files
 
 ### 10.1.3 Docker Optimization
+
 - [ ] Use .dockerignore to reduce context size
 - [ ] Order Dockerfile instructions for optimal caching
 - [ ] Pin base image versions
@@ -1231,6 +1339,7 @@
 ## 10.2 CI/CD Pipeline
 
 ### 10.2.1 CI Pipeline
+
 - [ ] Trigger on push and pull request
 - [ ] Lint stage
 - [ ] Run golangci-lint
@@ -1248,6 +1357,7 @@
 - [ ] Push to container registry
 
 ### 10.2.2 CD Pipeline
+
 - [ ] Deploy to staging on merge to develop
 - [ ] Run smoke tests against staging
 - [ ] Deploy to production on merge to main
@@ -1258,6 +1368,7 @@
 ## 10.3 Kubernetes (Optional)
 
 ### 10.3.1 Manifests
+
 - [ ] Create Deployment manifest
 - [ ] Define resource requests and limits
 - [ ] Configure liveness and readiness probes
@@ -1269,6 +1380,7 @@
 - [ ] Create HorizontalPodAutoscaler
 
 ### 10.3.2 Helm Chart (Optional)
+
 - [ ] Create Helm chart structure
 - [ ] Parameterize environment-specific values
 - [ ] Create values files for each environment
@@ -1277,6 +1389,7 @@
 ## 10.4 Documentation
 
 ### 10.4.1 API Documentation
+
 - [ ] Create OpenAPI/Swagger specification
 - [ ] Document all endpoints
 - [ ] Document request/response schemas
@@ -1285,6 +1398,7 @@
 - [ ] Set up Swagger UI endpoint
 
 ### 10.4.2 Project Documentation
+
 - [ ] Complete README with setup instructions
 - [ ] Document architecture decisions (ADRs)
 - [ ] Document configuration options
@@ -1293,6 +1407,7 @@
 - [ ] Document API versioning strategy
 
 ### 10.4.3 Code Documentation
+
 - [ ] Add package-level documentation (doc.go)
 - [ ] Document all exported types and functions
 - [ ] Include usage examples where helpful
