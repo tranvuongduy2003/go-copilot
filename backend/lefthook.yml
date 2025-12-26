@@ -1,0 +1,66 @@
+# =============================================================================
+# Lefthook - Git Hooks Manager
+# =============================================================================
+# Install: go install github.com/evilmartians/lefthook@latest
+# Setup:   lefthook install
+# Docs:    https://github.com/evilmartians/lefthook
+# =============================================================================
+
+# Pre-commit hooks
+pre-commit:
+  parallel: true
+  commands:
+    # Format Go code
+    go-fmt:
+      glob: "*.go"
+      run: gofmt -l -w {staged_files}
+      stage_fixed: true
+
+    # Run goimports
+    go-imports:
+      glob: "*.go"
+      run: goimports -w -local github.com/tranvuongduy2003/go-copilot {staged_files}
+      stage_fixed: true
+
+    # Run linter on staged Go files
+    go-lint:
+      glob: "*.go"
+      run: golangci-lint run --new-from-rev=HEAD~1 {staged_files}
+
+    # Check for credentials/secrets
+    detect-secrets:
+      glob: "*"
+      exclude: "*.md|*.sum|go.mod"
+      run: |
+        if grep -rn "password\s*=\s*['\"][^'\"]*['\"]" {staged_files} 2>/dev/null | grep -v "example\|test\|mock"; then
+          echo "Potential secret detected!"
+          exit 1
+        fi
+
+# Pre-push hooks
+pre-push:
+  parallel: true
+  commands:
+    # Run tests before pushing
+    go-test:
+      run: go test -v -short ./...
+
+    # Run full lint check
+    go-lint-full:
+      run: golangci-lint run ./...
+
+# Commit message validation
+commit-msg:
+  commands:
+    # Validate conventional commit format
+    conventional-commit:
+      run: |
+        commit_msg=$(cat {1})
+        pattern="^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .{1,}"
+        if ! echo "$commit_msg" | grep -qE "$pattern"; then
+          echo "Invalid commit message format!"
+          echo "Expected format: <type>(<scope>): <description>"
+          echo "Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert"
+          echo "Example: feat(user): add user registration endpoint"
+          exit 1
+        fi

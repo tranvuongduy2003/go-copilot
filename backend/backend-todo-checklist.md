@@ -6,62 +6,59 @@
 # Phase 1: Project Foundation
 
 ## 1.1 Repository Initialization
-- [ ] Initialize Go module with proper module path following organization naming convention
-- [ ] Create `.gitignore` with Go-specific patterns (binaries, IDE files, env files, vendor/)
-- [ ] Create `.editorconfig` for consistent coding style across team
-- [ ] Initialize git repository with initial commit
+- [x] Initialize Go module with proper module path following organization naming convention
+- [x] Create `.gitignore` with Go-specific patterns (binaries, IDE files, env files, vendor/)
+- [x] Create `.editorconfig` for consistent coding style across team
+- [x] Initialize git repository with initial commit
 - [ ] Set up branch protection rules (main/develop branches)
-- [ ] Create `README.md` with project overview, prerequisites, and quick start guide
+- [x] Create `README.md` with project overview, prerequisites, and quick start guide
 
 ## 1.2 Development Environment Setup
-- [ ] Create `docker-compose.yml` for local development services (PostgreSQL, Redis)
-- [ ] Define PostgreSQL container with volume persistence and health check
-- [ ] Define Redis container (if caching required) with health check
-- [ ] Create `.env.example` with all required environment variables documented
-- [ ] Add `docker-compose.override.yml` to `.gitignore` for local customizations
+- [x] Refer folder `../docker` for local development services
+- [x] Create `.env.example` with all required environment variables documented
 - [ ] Verify all team members can spin up environment with single command
 
 ## 1.3 Makefile Configuration
-- [ ] Define `help` target as default with all available commands documented
-- [ ] Add `setup` target for first-time project setup (install tools, copy env files)
-- [ ] Add `dev` target to start docker-compose services
-- [ ] Add `run` target to start application in development mode
-- [ ] Add `build` target with proper ldflags for version injection
-- [ ] Add `test` target with coverage reporting
-- [ ] Add `test-integration` target for integration tests with test database
-- [ ] Add `lint` target using golangci-lint
-- [ ] Add `fmt` target for code formatting (gofmt + goimports)
-- [ ] Add `migrate-*` targets for database migration commands
-- [ ] Add `generate` target for code generation (mocks, wire, etc.)
-- [ ] Add `clean` target to remove build artifacts
+- [x] Define `help` target as default with all available commands documented
+- [x] Add `setup` target for first-time project setup (install tools, copy env files)
+- [x] Add `dev` target to start docker-compose services
+- [x] Add `run` target to start application in development mode
+- [x] Add `build` target with proper ldflags for version injection
+- [x] Add `test` target with coverage reporting
+- [x] Add `test-integration` target for integration tests with test database
+- [x] Add `lint` target using golangci-lint
+- [x] Add `fmt` target for code formatting (gofmt + goimports)
+- [x] Add `migrate-*` targets for database migration commands
+- [x] Add `generate` target for code generation (mocks, wire, etc.)
+- [x] Add `clean` target to remove build artifacts
 
 ## 1.4 Dependency Management
-- [ ] Review and correct Go version in `go.mod` (should be stable release, e.g., 1.22 or 1.23)
-- [ ] Add chi/v5 for HTTP routing (already present)
-- [ ] Add pgx/v5 for PostgreSQL driver (already present)
-- [ ] Add goose/v3 for database migrations (CLI tool)
-- [ ] Add validator/v10 for struct validation
-- [ ] Add viper for configuration management
-- [ ] Add zap for structured logging
-- [ ] Add uuid for UUID generation
-- [ ] Add testify for testing assertions and mocks
-- [ ] Add bcrypt or argon2 for password hashing
-- [ ] Add jwt/v5 for JWT token handling (if authentication required)
+- [x] Review and correct Go version in `go.mod` (should be stable release)
+- [x] Add chi/v5 for HTTP routing (already present)
+- [x] Add pgx/v5 for PostgreSQL driver (already present)
+- [x] Add goose/v3 for database migrations (CLI tool)
+- [x] Add validator/v10 for struct validation
+- [x] Add viper for configuration management
+- [x] Add zap for structured logging
+- [x] Add uuid for UUID generation
+- [x] Add testify for testing assertions and mocks
+- [x] Add bcrypt or argon2 for password hashing
+- [x] Add jwt/v5 for JWT token handling (if authentication required)
 - [ ] Add otel packages for OpenTelemetry tracing (optional, production)
-- [ ] Run `go mod tidy` to clean up dependencies
-- [ ] Run `go mod verify` to verify dependency integrity
+- [x] Run `go mod tidy` to clean up dependencies
+- [x] Run `go mod verify` to verify dependency integrity
 
 ## 1.5 Code Quality Tools Setup
-- [ ] Install golangci-lint locally and add to CI pipeline
-- [ ] Create `.golangci.yml` configuration file
-- [ ] Enable essential linters: gofmt, goimports, govet, errcheck, staticcheck
-- [ ] Enable security linter: gosec
-- [ ] Enable style linters: misspell, unconvert, gocritic
-- [ ] Configure local-prefixes for goimports to group internal imports
-- [ ] Set up pre-commit hooks using pre-commit framework or lefthook
-- [ ] Add hook for running `go fmt` on staged files
-- [ ] Add hook for running `golangci-lint` on staged files
-- [ ] Add hook for checking commit message format (conventional commits)
+- [x] Install golangci-lint locally and add to CI pipeline
+- [x] Create `.golangci.yml` configuration file
+- [x] Enable essential linters: gofmt, goimports, govet, errcheck, staticcheck
+- [x] Enable security linter: gosec
+- [x] Enable style linters: misspell, unconvert, gocritic
+- [x] Configure local-prefixes for goimports to group internal imports
+- [x] Set up pre-commit hooks using pre-commit framework or lefthook
+- [x] Add hook for running `go fmt` on staged files
+- [x] Add hook for running `golangci-lint` on staged files
+- [x] Add hook for checking commit message format (conventional commits)
 
 ---
 

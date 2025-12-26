@@ -1,0 +1,193 @@
+# =============================================================================
+# golangci-lint Configuration
+# =============================================================================
+# Run: golangci-lint run ./...
+# Docs: https://golangci-lint.run/usage/configuration/
+# =============================================================================
+
+run:
+  # Timeout for analysis
+  timeout: 5m
+
+  # Include test files
+  tests: true
+
+  # Skip vendor directory
+  skip-dirs:
+    - vendor
+    - mocks
+    - docs
+
+  # Go version to target
+  go: "1.23"
+
+output:
+  # Output format
+  formats:
+    - format: colored-line-number
+
+  # Print lines of code with issue
+  print-issued-lines: true
+
+  # Print linter name in the end of issue text
+  print-linter-name: true
+
+  # Sort results by file, line, column
+  sort-results: true
+
+linters:
+  # Disable all linters by default
+  disable-all: true
+
+  # Enable specific linters
+  enable:
+    # Default linters
+    - errcheck      # Check for unchecked errors
+    - gosimple      # Simplify code
+    - govet         # Report suspicious constructs
+    - ineffassign   # Detect ineffectual assignments
+    - staticcheck   # Static analysis checks
+    - unused        # Check for unused constants, variables, functions and types
+
+    # Code style
+    - gofmt         # Check if code is gofmt-ed
+    - goimports     # Check import statements are formatted
+    - misspell      # Find commonly misspelled English words
+    - unconvert     # Remove unnecessary type conversions
+    - gocritic      # Opinionated Go source code linter
+
+    # Bug detection
+    - bodyclose     # Check HTTP response body is closed
+    - noctx         # Find HTTP requests without context.Context
+    - rowserrcheck  # Check sql.Rows.Err is checked
+    - sqlclosecheck # Check sql.Rows and sql.Stmt are closed
+
+    # Security
+    - gosec         # Security problems
+
+    # Performance
+    - prealloc      # Find slice declarations that could potentially be preallocated
+
+    # Code complexity
+    - gocyclo       # Check cyclomatic complexity
+    - nestif        # Check deeply nested if statements
+
+    # Error handling
+    - errorlint     # Find code that will cause problems with error wrapping
+
+    # Style
+    - revive        # Fast, configurable, extensible linter
+    - whitespace    # Check for unnecessary whitespace
+
+linters-settings:
+  # gofmt settings
+  gofmt:
+    simplify: true
+
+  # goimports settings
+  goimports:
+    local-prefixes: github.com/tranvuongduy2003/go-copilot
+
+  # gocyclo settings
+  gocyclo:
+    min-complexity: 15
+
+  # nestif settings
+  nestif:
+    min-complexity: 5
+
+  # gocritic settings
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+    disabled-checks:
+      - hugeParam
+      - rangeValCopy
+
+  # gosec settings
+  gosec:
+    excludes:
+      - G104 # Audit errors not checked (covered by errcheck)
+      - G304 # File path provided as taint input
+
+  # revive settings
+  revive:
+    ignore-generated-header: true
+    severity: warning
+    rules:
+      - name: blank-imports
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: exported
+      - name: if-return
+      - name: increment-decrement
+      - name: var-naming
+      - name: var-declaration
+      - name: package-comments
+      - name: range
+      - name: receiver-naming
+      - name: time-naming
+      - name: unexported-return
+      - name: indent-error-flow
+      - name: errorf
+      - name: empty-block
+      - name: superfluous-else
+      - name: unused-parameter
+      - name: unreachable-code
+      - name: redefines-builtin-id
+
+  # errorlint settings
+  errorlint:
+    errorf: true
+    asserts: true
+    comparison: true
+
+  # misspell settings
+  misspell:
+    locale: US
+
+issues:
+  # Maximum issues count per one linter
+  max-issues-per-linter: 50
+
+  # Maximum count of issues with the same text
+  max-same-issues: 3
+
+  # Exclude some linter issues
+  exclude-rules:
+    # Exclude some linters from running on tests files
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - gosec
+        - nestif
+
+    # Exclude known issues in generated files
+    - path: wire_gen\.go
+      linters:
+        - all
+
+    # Exclude mocks
+    - path: mocks/
+      linters:
+        - all
+
+  # Show only new issues
+  new: false
+
+  # Fix found issues (if supported by the linter)
+  fix: false
+
+severity:
+  # Default severity for issues
+  default-severity: warning
+
+  # Treat issues as errors
+  case-sensitive: false
