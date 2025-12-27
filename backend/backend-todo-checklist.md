@@ -492,36 +492,36 @@
 
 ### 4.5.1 Event Bus Interface
 
-- [ ] Define EventBus interface in domain or application layer
-- [ ] Define Publish(ctx, events ...DomainEvent) error method
-- [ ] Define Subscribe(eventType string, handler EventHandler) method
-- [ ] Define EventHandler function type
+- [x] Define EventBus interface in domain or application layer
+- [x] Define Publish(ctx, events ...DomainEvent) error method
+- [x] Define Subscribe(eventType string, handler EventHandler) method
+- [x] Define EventHandler function type
 
 ### 4.5.2 In-Memory Event Bus
 
-- [ ] Implement InMemoryEventBus struct
-- [ ] Use map to store handlers by event type
-- [ ] Use mutex for thread-safe handler registration
-- [ ] Implement Publish() method
-- [ ] Iterate through events
-- [ ] Find handlers for each event type
-- [ ] Execute handlers (sync or async based on requirements)
-- [ ] Handle handler panics gracefully
-- [ ] Log handler errors without failing publish
-- [ ] Implement Subscribe() method
-- [ ] Store handler in map by event type
-- [ ] Support multiple handlers per event type
-- [ ] Write unit tests for publishing events
-- [ ] Write unit tests for subscribing handlers
-- [ ] Write unit tests for multiple handlers
+- [x] Implement InMemoryEventBus struct
+- [x] Use map to store handlers by event type
+- [x] Use mutex for thread-safe handler registration
+- [x] Implement Publish() method
+- [x] Iterate through events
+- [x] Find handlers for each event type
+- [x] Execute handlers (sync or async based on requirements)
+- [x] Handle handler panics gracefully
+- [x] Log handler errors without failing publish
+- [x] Implement Subscribe() method
+- [x] Store handler in map by event type
+- [x] Support multiple handlers per event type
+- [x] Write unit tests for publishing events
+- [x] Write unit tests for subscribing handlers
+- [x] Write unit tests for multiple handlers
 
 ### 4.5.3 Async Event Handling (Optional)
 
-- [ ] Implement async event dispatch using goroutines
-- [ ] Use worker pool to limit concurrent handlers
-- [ ] Implement graceful shutdown waiting for handlers to complete
-- [ ] Add timeout for handler execution
-- [ ] Write tests for async behavior
+- [x] Implement async event dispatch using goroutines
+- [x] Use worker pool to limit concurrent handlers
+- [x] Implement graceful shutdown waiting for handlers to complete
+- [x] Add timeout for handler execution
+- [x] Write tests for async behavior
 
 ---
 
