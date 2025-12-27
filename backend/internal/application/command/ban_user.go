@@ -12,39 +12,37 @@ import (
 	"github.com/tranvuongduy2003/go-copilot/pkg/logger"
 )
 
-type UpdateUserCommand struct {
-	UserID   uuid.UUID
-	FullName *string
+type BanUserCommand struct {
+	UserID uuid.UUID
+	Reason string
 }
 
-type UpdateUserHandler struct {
+type BanUserHandler struct {
 	userRepository user.Repository
 	eventBus       shared.EventBus
 	logger         logger.Logger
 }
 
-func NewUpdateUserHandler(
+func NewBanUserHandler(
 	userRepository user.Repository,
 	eventBus shared.EventBus,
 	logger logger.Logger,
-) *UpdateUserHandler {
-	return &UpdateUserHandler{
+) *BanUserHandler {
+	return &BanUserHandler{
 		userRepository: userRepository,
 		eventBus:       eventBus,
 		logger:         logger,
 	}
 }
 
-func (handler *UpdateUserHandler) Handle(context context.Context, command UpdateUserCommand) (*dto.UserDTO, error) {
+func (handler *BanUserHandler) Handle(context context.Context, command BanUserCommand) (*dto.UserDTO, error) {
 	existingUser, err := handler.userRepository.FindByID(context, command.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("find user: %w", err)
 	}
 
-	if command.FullName != nil {
-		if err := existingUser.UpdateProfile(*command.FullName); err != nil {
-			return nil, fmt.Errorf("update profile: %w", err)
-		}
+	if err := existingUser.Ban(command.Reason); err != nil {
+		return nil, fmt.Errorf("ban user: %w", err)
 	}
 
 	if err := handler.userRepository.Update(context, existingUser); err != nil {
@@ -61,8 +59,9 @@ func (handler *UpdateUserHandler) Handle(context context.Context, command Update
 		existingUser.ClearDomainEvents()
 	}
 
-	handler.logger.Info("user updated successfully",
+	handler.logger.Info("user banned successfully",
 		logger.String("user_id", existingUser.ID().String()),
+		logger.String("reason", command.Reason),
 	)
 
 	return dto.UserFromDomain(existingUser), nil

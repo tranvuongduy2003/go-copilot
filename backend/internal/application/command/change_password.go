@@ -9,38 +9,57 @@ import (
 	"github.com/tranvuongduy2003/go-copilot/internal/domain/shared"
 	"github.com/tranvuongduy2003/go-copilot/internal/domain/user"
 	"github.com/tranvuongduy2003/go-copilot/pkg/logger"
+	"github.com/tranvuongduy2003/go-copilot/pkg/security"
 )
 
-type DeleteUserCommand struct {
-	UserID uuid.UUID
+type ChangePasswordCommand struct {
+	UserID          uuid.UUID
+	CurrentPassword string
+	NewPassword     string
 }
 
-type DeleteUserHandler struct {
+type ChangePasswordHandler struct {
 	userRepository user.Repository
+	passwordHasher security.PasswordHasher
 	eventBus       shared.EventBus
 	logger         logger.Logger
 }
 
-func NewDeleteUserHandler(
+func NewChangePasswordHandler(
 	userRepository user.Repository,
+	passwordHasher security.PasswordHasher,
 	eventBus shared.EventBus,
 	logger logger.Logger,
-) *DeleteUserHandler {
-	return &DeleteUserHandler{
+) *ChangePasswordHandler {
+	return &ChangePasswordHandler{
 		userRepository: userRepository,
+		passwordHasher: passwordHasher,
 		eventBus:       eventBus,
 		logger:         logger,
 	}
 }
 
-func (handler *DeleteUserHandler) Handle(context context.Context, command DeleteUserCommand) error {
+func (handler *ChangePasswordHandler) Handle(context context.Context, command ChangePasswordCommand) error {
 	existingUser, err := handler.userRepository.FindByID(context, command.UserID)
 	if err != nil {
 		return fmt.Errorf("find user: %w", err)
 	}
 
-	if err := existingUser.Delete(); err != nil {
-		return fmt.Errorf("delete user: %w", err)
+	if err := handler.passwordHasher.Compare(existingUser.PasswordHash().String(), command.CurrentPassword); err != nil {
+		return user.ErrInvalidPassword
+	}
+
+	if err := shared.ValidatePassword(command.NewPassword); err != nil {
+		return err
+	}
+
+	newHashedPassword, err := handler.passwordHasher.Hash(command.NewPassword)
+	if err != nil {
+		return fmt.Errorf("hash password: %w", err)
+	}
+
+	if err := existingUser.ChangePassword(newHashedPassword); err != nil {
+		return fmt.Errorf("change password: %w", err)
 	}
 
 	if err := handler.userRepository.Update(context, existingUser); err != nil {
@@ -57,7 +76,7 @@ func (handler *DeleteUserHandler) Handle(context context.Context, command Delete
 		existingUser.ClearDomainEvents()
 	}
 
-	handler.logger.Info("user deleted successfully",
+	handler.logger.Info("password changed successfully",
 		logger.String("user_id", existingUser.ID().String()),
 	)
 

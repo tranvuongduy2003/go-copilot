@@ -532,27 +532,27 @@
 
 ### 5.1.1 Command Infrastructure
 
-- [ ] Define Command marker interface (can be empty)
-- [ ] Define CommandHandler interface with Handle(ctx, cmd) error method
-- [ ] Define CommandBus interface with Dispatch(ctx, cmd) error method
-- [ ] Implement InMemoryCommandBus
-- [ ] Store handlers by command type
-- [ ] Implement Register() method to register handlers
-- [ ] Implement Dispatch() method to find and execute handler
-- [ ] Return error if handler not found for command type
-- [ ] Add logging for command dispatch
+- [x] Define Command marker interface (can be empty)
+- [x] Define CommandHandler interface with Handle(ctx, cmd) error method
+- [x] Define CommandBus interface with Dispatch(ctx, cmd) error method
+- [x] Implement InMemoryCommandBus
+- [x] Store handlers by command type
+- [x] Implement Register() method to register handlers
+- [x] Implement Dispatch() method to find and execute handler
+- [x] Return error if handler not found for command type
+- [x] Add logging for command dispatch
 
 ### 5.1.2 Query Infrastructure
 
-- [ ] Define Query marker interface (can be empty)
-- [ ] Define QueryHandler interface with Handle(ctx, query) (result, error) method
-- [ ] Use generics for type-safe query results if Go 1.18+
-- [ ] Define QueryBus interface with Dispatch(ctx, query) (result, error) method
-- [ ] Implement InMemoryQueryBus
-- [ ] Store handlers by query type
-- [ ] Implement Register() method
-- [ ] Implement Dispatch() method
-- [ ] Return error if handler not found
+- [x] Define Query marker interface (can be empty)
+- [x] Define QueryHandler interface with Handle(ctx, query) (result, error) method
+- [x] Use generics for type-safe query results if Go 1.18+
+- [x] Define QueryBus interface with Dispatch(ctx, query) (result, error) method
+- [x] Implement InMemoryQueryBus
+- [x] Store handlers by query type
+- [x] Implement Register() method
+- [x] Implement Dispatch() method
+- [x] Return error if handler not found
 
 ### 5.1.3 Middleware Support (Optional)
 
@@ -749,275 +749,275 @@
 
 ### 6.1.1 Server Setup
 
-- [ ] Define Server struct with dependencies
-- [ ] Include HTTP server instance
-- [ ] Include router instance
-- [ ] Include logger instance
-- [ ] Include configuration
-- [ ] Implement NewServer constructor
-- [ ] Accept all dependencies via constructor injection
-- [ ] Configure server timeouts from config (read, write, idle)
-- [ ] Implement Start() method to start HTTP server
-- [ ] Implement Shutdown(ctx) method for graceful shutdown
-- [ ] Wait for in-flight requests to complete
-- [ ] Respect context deadline for shutdown timeout
+- [x] Define Server struct with dependencies
+- [x] Include HTTP server instance
+- [x] Include router instance
+- [x] Include logger instance
+- [x] Include configuration
+- [x] Implement NewServer constructor
+- [x] Accept all dependencies via constructor injection
+- [x] Configure server timeouts from config (read, write, idle)
+- [x] Implement Start() method to start HTTP server
+- [x] Implement Shutdown(ctx) method for graceful shutdown
+- [x] Wait for in-flight requests to complete
+- [x] Respect context deadline for shutdown timeout
 
 ### 6.1.2 Router Setup (`internal/interfaces/http/router/`)
 
-- [ ] Define NewRouter function
-- [ ] Accept handler dependencies
-- [ ] Create chi router instance
-- [ ] Apply global middleware in correct order
-- [ ] Define route groups with version prefix (/api/v1)
-- [ ] Register user routes
-- [ ] Register health check routes
-- [ ] Return configured router
+- [x] Define NewRouter function
+- [x] Accept handler dependencies
+- [x] Create chi router instance
+- [x] Apply global middleware in correct order
+- [x] Define route groups with version prefix (/api/v1)
+- [x] Register user routes
+- [x] Register health check routes
+- [x] Return configured router
 
 ### 6.1.3 Response Helpers
 
-- [ ] Define standard success response structure
-- [ ] Include data field
-- [ ] Include optional message field
-- [ ] Include optional metadata field
-- [ ] Define standard error response structure
-- [ ] Include error code field
-- [ ] Include message field
-- [ ] Include details field (for validation errors)
-- [ ] Include request ID field
-- [ ] Implement JSON response helper function
-- [ ] Set Content-Type header
-- [ ] Set status code
-- [ ] Encode response body
-- [ ] Implement error response helper function
-- [ ] Map domain errors to HTTP status codes
-- [ ] NotFoundError → 404
-- [ ] ValidationError → 400
-- [ ] ConflictError → 409
-- [ ] AuthorizationError → 403
-- [ ] Unknown errors → 500
-- [ ] Log errors appropriately (5xx with stack, 4xx without)
+- [x] Define standard success response structure
+- [x] Include data field
+- [x] Include optional message field
+- [x] Include optional metadata field
+- [x] Define standard error response structure
+- [x] Include error code field
+- [x] Include message field
+- [x] Include details field (for validation errors)
+- [x] Include request ID field
+- [x] Implement JSON response helper function
+- [x] Set Content-Type header
+- [x] Set status code
+- [x] Encode response body
+- [x] Implement error response helper function
+- [x] Map domain errors to HTTP status codes
+- [x] NotFoundError → 404
+- [x] ValidationError → 400
+- [x] ConflictError → 409
+- [x] AuthorizationError → 403
+- [x] Unknown errors → 500
+- [x] Log errors appropriately (5xx with stack, 4xx without)
 
 ## 6.2 Middleware (`internal/interfaces/http/middleware/`)
 
 ### 6.2.1 Request ID Middleware
 
-- [ ] Implement middleware function
-- [ ] Extract X-Request-ID header if present
-- [ ] Generate new UUID if header not present
-- [ ] Inject request ID into request context
-- [ ] Set X-Request-ID response header
-- [ ] Write tests for middleware
+- [x] Implement middleware function
+- [x] Extract X-Request-ID header if present
+- [x] Generate new UUID if header not present
+- [x] Inject request ID into request context
+- [x] Set X-Request-ID response header
+- [x] Write tests for middleware
 
 ### 6.2.2 Logging Middleware
 
-- [ ] Implement middleware function
-- [ ] Extract logger from context or use global
-- [ ] Extract request ID from context
-- [ ] Log request start with method, path, request ID
-- [ ] Wrap response writer to capture status code
-- [ ] Log request completion with duration and status
-- [ ] Include additional fields: remote addr, user agent
-- [ ] Skip logging for health check endpoints (optional)
-- [ ] Write tests for middleware
+- [x] Implement middleware function
+- [x] Extract logger from context or use global
+- [x] Extract request ID from context
+- [x] Log request start with method, path, request ID
+- [x] Wrap response writer to capture status code
+- [x] Log request completion with duration and status
+- [x] Include additional fields: remote addr, user agent
+- [x] Skip logging for health check endpoints (optional)
+- [x] Write tests for middleware
 
 ### 6.2.3 Recovery Middleware
 
-- [ ] Implement middleware function
-- [ ] Use defer to catch panics
-- [ ] Log panic with stack trace
-- [ ] Return 500 error response to client
-- [ ] Include request ID in error response
-- [ ] Do not expose stack trace to client in production
-- [ ] Write tests for panic recovery
+- [x] Implement middleware function
+- [x] Use defer to catch panics
+- [x] Log panic with stack trace
+- [x] Return 500 error response to client
+- [x] Include request ID in error response
+- [x] Do not expose stack trace to client in production
+- [x] Write tests for panic recovery
 
 ### 6.2.4 Timeout Middleware
 
-- [ ] Implement middleware function
-- [ ] Accept timeout duration as parameter
-- [ ] Create context with timeout
-- [ ] Pass timeout context to next handler
-- [ ] Handle context deadline exceeded
-- [ ] Return 504 Gateway Timeout on deadline
-- [ ] Write tests for timeout behavior
+- [x] Implement middleware function
+- [x] Accept timeout duration as parameter
+- [x] Create context with timeout
+- [x] Pass timeout context to next handler
+- [x] Handle context deadline exceeded
+- [x] Return 504 Gateway Timeout on deadline
+- [x] Write tests for timeout behavior
 
 ### 6.2.5 CORS Middleware
 
-- [ ] Configure allowed origins from config
-- [ ] Configure allowed methods
-- [ ] Configure allowed headers
-- [ ] Configure exposed headers
-- [ ] Configure credentials support
-- [ ] Configure max age for preflight cache
-- [ ] Handle preflight OPTIONS requests
-- [ ] Write tests for CORS behavior
+- [x] Configure allowed origins from config
+- [x] Configure allowed methods
+- [x] Configure allowed headers
+- [x] Configure exposed headers
+- [x] Configure credentials support
+- [x] Configure max age for preflight cache
+- [x] Handle preflight OPTIONS requests
+- [x] Write tests for CORS behavior
 
 ### 6.2.6 Authentication Middleware (if required)
 
-- [ ] Implement middleware function
-- [ ] Extract Authorization header
-- [ ] Validate Bearer token format
+- [x] Implement middleware function
+- [x] Extract Authorization header
+- [x] Validate Bearer token format
 - [ ] Parse and validate JWT token
 - [ ] Extract user claims from token
-- [ ] Inject user info into request context
-- [ ] Return 401 for missing or invalid token
+- [x] Inject user info into request context
+- [x] Return 401 for missing or invalid token
 - [ ] Write tests for auth scenarios
 
 ### 6.2.7 Rate Limiting Middleware (optional)
 
-- [ ] Choose rate limiting strategy (token bucket, sliding window)
-- [ ] Configure limits from config
-- [ ] Implement per-IP rate limiting
-- [ ] Implement per-user rate limiting (if authenticated)
-- [ ] Return 429 Too Many Requests when limited
-- [ ] Include Retry-After header
-- [ ] Write tests for rate limiting
+- [x] Choose rate limiting strategy (token bucket, sliding window)
+- [x] Configure limits from config
+- [x] Implement per-IP rate limiting
+- [x] Implement per-user rate limiting (if authenticated)
+- [x] Return 429 Too Many Requests when limited
+- [x] Include Retry-After header
+- [x] Write tests for rate limiting
 
 ## 6.3 HTTP DTOs (`internal/interfaces/http/dto/`)
 
 ### 6.3.1 Request DTOs
 
-- [ ] Define CreateUserRequest struct
-- [ ] Include Email field with json tag and validation tags
-- [ ] Include Password field with validation tags
-- [ ] Include FullName field with validation tags
-- [ ] Define UpdateUserRequest struct
-- [ ] Include optional fields with pointer types or omitempty
-- [ ] Define ChangePasswordRequest struct
-- [ ] Include CurrentPassword field
-- [ ] Include NewPassword field with validation
+- [x] Define CreateUserRequest struct
+- [x] Include Email field with json tag and validation tags
+- [x] Include Password field with validation tags
+- [x] Include FullName field with validation tags
+- [x] Define UpdateUserRequest struct
+- [x] Include optional fields with pointer types or omitempty
+- [x] Define ChangePasswordRequest struct
+- [x] Include CurrentPassword field
+- [x] Include NewPassword field with validation
 - [ ] Include ConfirmPassword field (optional, for UI validation)
-- [ ] Define ListUsersRequest struct for query parameters
-- [ ] Include page, limit as query params
-- [ ] Include status filter as query param
-- [ ] Include search as query param
-- [ ] Include sort_by, sort_order as query params
+- [x] Define ListUsersRequest struct for query parameters
+- [x] Include page, limit as query params
+- [x] Include status filter as query param
+- [x] Include search as query param
+- [x] Include sort_by, sort_order as query params
 
 ### 6.3.2 Response DTOs
 
-- [ ] Define UserResponse struct mirroring application DTO
-- [ ] Add JSON tags with appropriate naming (snake_case or camelCase)
-- [ ] Define PaginatedResponse struct for list endpoints
-- [ ] Define ErrorResponse struct matching standard error format
+- [x] Define UserResponse struct mirroring application DTO
+- [x] Add JSON tags with appropriate naming (snake_case or camelCase)
+- [x] Define PaginatedResponse struct for list endpoints
+- [x] Define ErrorResponse struct matching standard error format
 
 ### 6.3.3 DTO Validation
 
-- [ ] Add validation tags to all request DTOs
+- [x] Add validation tags to all request DTOs
 - [ ] Document validation rules in comments or OpenAPI spec
-- [ ] Create reusable validation error formatter
+- [x] Create reusable validation error formatter
 
 ## 6.4 User Handlers (`internal/interfaces/http/handler/`)
 
 ### 6.4.1 Handler Structure
 
-- [ ] Define UserHandler struct
-- [ ] Inject CommandBus dependency
-- [ ] Inject QueryBus dependency
-- [ ] Inject Validator dependency
-- [ ] Inject Logger dependency
-- [ ] Implement NewUserHandler constructor
+- [x] Define UserHandler struct
+- [x] Inject CommandBus dependency
+- [x] Inject QueryBus dependency
+- [x] Inject Validator dependency
+- [x] Inject Logger dependency
+- [x] Implement NewUserHandler constructor
 
 ### 6.4.2 Create User Endpoint
 
-- [ ] Implement CreateUser handler for POST /users
-- [ ] Parse request body into CreateUserRequest DTO
-- [ ] Handle JSON parsing errors with 400 response
-- [ ] Validate request using validator
-- [ ] Return 400 with validation details on failure
-- [ ] Map HTTP DTO to CreateUserCommand
-- [ ] Dispatch command via CommandBus
-- [ ] Handle domain errors and map to HTTP responses
-- [ ] Return 201 Created with user ID on success
-- [ ] Include Location header with resource URL
+- [x] Implement CreateUser handler for POST /users
+- [x] Parse request body into CreateUserRequest DTO
+- [x] Handle JSON parsing errors with 400 response
+- [x] Validate request using validator
+- [x] Return 400 with validation details on failure
+- [x] Map HTTP DTO to CreateUserCommand
+- [x] Dispatch command via CommandBus
+- [x] Handle domain errors and map to HTTP responses
+- [x] Return 201 Created with user ID on success
+- [x] Include Location header with resource URL
 - [ ] Write integration tests for endpoint
 
 ### 6.4.3 Get User Endpoint
 
-- [ ] Implement GetUser handler for GET /users/{id}
-- [ ] Extract user ID from URL path parameter
-- [ ] Validate UUID format
-- [ ] Return 400 for invalid UUID
-- [ ] Create GetUserQuery
-- [ ] Dispatch query via QueryBus
-- [ ] Handle not found error with 404 response
-- [ ] Return 200 with user data on success
+- [x] Implement GetUser handler for GET /users/{id}
+- [x] Extract user ID from URL path parameter
+- [x] Validate UUID format
+- [x] Return 400 for invalid UUID
+- [x] Create GetUserQuery
+- [x] Dispatch query via QueryBus
+- [x] Handle not found error with 404 response
+- [x] Return 200 with user data on success
 - [ ] Write integration tests for endpoint
 
 ### 6.4.4 List Users Endpoint
 
-- [ ] Implement ListUsers handler for GET /users
-- [ ] Parse query parameters into ListUsersRequest
-- [ ] Apply default pagination if not specified
-- [ ] Validate query parameters
-- [ ] Create ListUsersQuery
-- [ ] Dispatch query via QueryBus
-- [ ] Return 200 with paginated response
+- [x] Implement ListUsers handler for GET /users
+- [x] Parse query parameters into ListUsersRequest
+- [x] Apply default pagination if not specified
+- [x] Validate query parameters
+- [x] Create ListUsersQuery
+- [x] Dispatch query via QueryBus
+- [x] Return 200 with paginated response
 - [ ] Write integration tests for endpoint
 
 ### 6.4.5 Update User Endpoint
 
-- [ ] Implement UpdateUser handler for PUT /users/{id}
-- [ ] Extract user ID from URL path
-- [ ] Parse request body
-- [ ] Validate request
-- [ ] Create UpdateUserCommand
-- [ ] Dispatch command
-- [ ] Handle not found and other errors
-- [ ] Return 200 on success
+- [x] Implement UpdateUser handler for PUT /users/{id}
+- [x] Extract user ID from URL path
+- [x] Parse request body
+- [x] Validate request
+- [x] Create UpdateUserCommand
+- [x] Dispatch command
+- [x] Handle not found and other errors
+- [x] Return 200 on success
 - [ ] Write integration tests
 
 ### 6.4.6 Delete User Endpoint
 
-- [ ] Implement DeleteUser handler for DELETE /users/{id}
-- [ ] Extract user ID from URL path
-- [ ] Create DeleteUserCommand
-- [ ] Dispatch command
-- [ ] Handle not found error
-- [ ] Return 204 No Content on success
+- [x] Implement DeleteUser handler for DELETE /users/{id}
+- [x] Extract user ID from URL path
+- [x] Create DeleteUserCommand
+- [x] Dispatch command
+- [x] Handle not found error
+- [x] Return 204 No Content on success
 - [ ] Write integration tests
 
 ### 6.4.7 Change Password Endpoint
 
-- [ ] Implement ChangePassword handler for POST /users/{id}/password
-- [ ] Parse and validate request
-- [ ] Create ChangePasswordCommand
-- [ ] Dispatch command
-- [ ] Handle invalid password error with 400
-- [ ] Return 200 on success
+- [x] Implement ChangePassword handler for POST /users/{id}/password
+- [x] Parse and validate request
+- [x] Create ChangePasswordCommand
+- [x] Dispatch command
+- [x] Handle invalid password error with 400
+- [x] Return 200 on success
 - [ ] Write integration tests
 
 ### 6.4.8 Activate User Endpoint
 
-- [ ] Implement ActivateUser handler for POST /users/{id}/activate
-- [ ] Create ActivateUserCommand
-- [ ] Dispatch command
-- [ ] Handle status transition errors
-- [ ] Return 200 on success
+- [x] Implement ActivateUser handler for POST /users/{id}/activate
+- [x] Create ActivateUserCommand
+- [x] Dispatch command
+- [x] Handle status transition errors
+- [x] Return 200 on success
 - [ ] Write integration tests
 
 ### 6.4.9 Deactivate User Endpoint
 
-- [ ] Implement DeactivateUser handler for POST /users/{id}/deactivate
-- [ ] Similar implementation to activate
+- [x] Implement DeactivateUser handler for POST /users/{id}/deactivate
+- [x] Similar implementation to activate
 - [ ] Write integration tests
 
 ## 6.5 Health Check Endpoints (`internal/interfaces/http/handler/`)
 
 ### 6.5.1 Liveness Probe
 
-- [ ] Implement handler for GET /health/live
-- [ ] Return 200 OK if application is running
-- [ ] No dependency checks (just proves process is alive)
-- [ ] Return simple JSON response with status
+- [x] Implement handler for GET /health/live
+- [x] Return 200 OK if application is running
+- [x] No dependency checks (just proves process is alive)
+- [x] Return simple JSON response with status
 
 ### 6.5.2 Readiness Probe
 
-- [ ] Implement handler for GET /health/ready
-- [ ] Check database connection health
-- [ ] Check Redis connection health (if used)
-- [ ] Check other critical dependencies
-- [ ] Return 200 OK if all dependencies healthy
-- [ ] Return 503 Service Unavailable if any dependency unhealthy
-- [ ] Include details of which checks failed
+- [x] Implement handler for GET /health/ready
+- [x] Check database connection health
+- [x] Check Redis connection health (if used)
+- [x] Check other critical dependencies
+- [x] Return 200 OK if all dependencies healthy
+- [x] Return 503 Service Unavailable if any dependency unhealthy
+- [x] Include details of which checks failed
 
 ---
 

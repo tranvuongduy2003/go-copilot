@@ -12,39 +12,36 @@ import (
 	"github.com/tranvuongduy2003/go-copilot/pkg/logger"
 )
 
-type UpdateUserCommand struct {
-	UserID   uuid.UUID
-	FullName *string
+type DeactivateUserCommand struct {
+	UserID uuid.UUID
 }
 
-type UpdateUserHandler struct {
+type DeactivateUserHandler struct {
 	userRepository user.Repository
 	eventBus       shared.EventBus
 	logger         logger.Logger
 }
 
-func NewUpdateUserHandler(
+func NewDeactivateUserHandler(
 	userRepository user.Repository,
 	eventBus shared.EventBus,
 	logger logger.Logger,
-) *UpdateUserHandler {
-	return &UpdateUserHandler{
+) *DeactivateUserHandler {
+	return &DeactivateUserHandler{
 		userRepository: userRepository,
 		eventBus:       eventBus,
 		logger:         logger,
 	}
 }
 
-func (handler *UpdateUserHandler) Handle(context context.Context, command UpdateUserCommand) (*dto.UserDTO, error) {
+func (handler *DeactivateUserHandler) Handle(context context.Context, command DeactivateUserCommand) (*dto.UserDTO, error) {
 	existingUser, err := handler.userRepository.FindByID(context, command.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("find user: %w", err)
 	}
 
-	if command.FullName != nil {
-		if err := existingUser.UpdateProfile(*command.FullName); err != nil {
-			return nil, fmt.Errorf("update profile: %w", err)
-		}
+	if err := existingUser.Deactivate(); err != nil {
+		return nil, fmt.Errorf("deactivate user: %w", err)
 	}
 
 	if err := handler.userRepository.Update(context, existingUser); err != nil {
@@ -61,7 +58,7 @@ func (handler *UpdateUserHandler) Handle(context context.Context, command Update
 		existingUser.ClearDomainEvents()
 	}
 
-	handler.logger.Info("user updated successfully",
+	handler.logger.Info("user deactivated successfully",
 		logger.String("user_id", existingUser.ID().String()),
 	)
 
