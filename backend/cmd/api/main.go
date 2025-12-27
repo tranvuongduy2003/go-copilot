@@ -1,8 +1,16 @@
 package main
 
 import (
+	"context"
+	"errors"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
+	"github.com/tranvuongduy2003/go-copilot/internal/infrastructure/cache/redis"
+	"github.com/tranvuongduy2003/go-copilot/internal/infrastructure/persistence/postgres"
 	"github.com/tranvuongduy2003/go-copilot/pkg/config"
 	"github.com/tranvuongduy2003/go-copilot/pkg/logger"
 )
@@ -14,24 +22,95 @@ var (
 )
 
 func main() {
-	cfg, err := config.LoadFromEnv()
+	exitCode := run()
+	os.Exit(exitCode)
+}
+
+func run() int {
+	configuration, err := config.LoadFromEnv()
 	if err != nil {
-		logger.Fatal("failed to load config", logger.Err(err))
+		logger.Fatal("failed to load configuration", logger.Err(err))
+		return 1
 	}
 
-	if err := logger.Init(cfg.Log, cfg.IsProduction()); err != nil {
+	if err := logger.Init(configuration.Log, configuration.IsProduction()); err != nil {
 		logger.Fatal("failed to initialize logger", logger.Err(err))
+		return 1
 	}
 	defer logger.Sync()
 
-	logger.Info("starting server",
-		logger.String("app", cfg.App.Name),
+	logger.Info("starting application",
+		logger.String("app", configuration.App.Name),
 		logger.String("version", Version),
 		logger.String("build_time", BuildTime),
 		logger.String("go_version", GoVersion),
-		logger.String("env", cfg.App.Env),
+		logger.String("environment", configuration.App.Env),
 	)
 
-	logger.Info("TODO: implement server startup")
-	os.Exit(0)
+	applicationContext, cancelApplication := context.WithCancel(context.Background())
+	defer cancelApplication()
+
+	database := postgres.NewDB(&configuration.Database, logger.L())
+	if err := database.Connect(applicationContext); err != nil {
+		logger.Fatal("failed to connect to database", logger.Err(err))
+		return 1
+	}
+	logger.Info("database connection established")
+
+	var redisClient *redis.Client
+	if configuration.Redis.Host != "" {
+		redisClient = redis.NewClient(configuration.Redis, logger.L())
+		if err := redisClient.Connect(applicationContext); err != nil {
+			logger.Warn("failed to connect to redis, continuing without redis",
+				logger.Err(err),
+			)
+			redisClient = nil
+		} else {
+			logger.Info("redis connection established")
+		}
+	}
+
+	application, err := InitializeApplication(configuration, database, redisClient)
+	if err != nil {
+		logger.Fatal("failed to initialize application", logger.Err(err))
+		return 1
+	}
+	defer application.Close()
+
+	serverErrorChannel := make(chan error, 1)
+	go func() {
+		if err := application.Start(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			serverErrorChannel <- err
+		}
+		close(serverErrorChannel)
+	}()
+
+	logger.Info("server started",
+		logger.String("address", application.Address()),
+	)
+
+	shutdownSignal := make(chan os.Signal, 1)
+	signal.Notify(shutdownSignal, syscall.SIGINT, syscall.SIGTERM)
+
+	select {
+	case err := <-serverErrorChannel:
+		logger.Error("server error", logger.Err(err))
+		return 1
+	case sig := <-shutdownSignal:
+		logger.Info("shutdown signal received", logger.String("signal", sig.String()))
+	}
+
+	logger.Info("initiating graceful shutdown")
+
+	shutdownTimeout := 30 * time.Second
+	shutdownContext, cancelShutdown := context.WithTimeout(context.Background(), shutdownTimeout)
+	defer cancelShutdown()
+
+	if err := application.Shutdown(shutdownContext); err != nil {
+		logger.Error("server shutdown error", logger.Err(err))
+		return 1
+	}
+
+	logger.Info("application shutdown complete")
+	return 0
 }

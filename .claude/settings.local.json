@@ -26,7 +26,9 @@
       "Bash(git branch:*)",
       "Bash(cat:*)",
       "Bash(del \"c:\\\\Users\\\\tvduy\\\\Desktop\\\\copilot\\\\backend\\\\internal\\\\application\\\\query\\\\search_users.go\")",
-      "Bash(go vet:*)"
+      "Bash(go vet:*)",
+      "Bash(go install:*)",
+      "Bash(wire:*)"
     ]
   }
 }
