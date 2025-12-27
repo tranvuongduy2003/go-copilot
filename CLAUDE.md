@@ -79,6 +79,81 @@ docker-compose down
 
 ---
 
+## Coding Standards
+
+### Naming Conventions
+
+**CRITICAL: Use meaningful, descriptive names instead of comments.**
+
+- **No abbreviations** in function names, variable names, parameters, or type names
+- Names should be self-documenting and reveal intent
+- If you need a comment to explain what code does, rename it instead
+
+```go
+// BAD - Abbreviations
+func GetUsrByID(ctx context.Context, id uuid.UUID) (*Usr, error)
+func (r *repo) FindAll(ctx context.Context, opts ListOpts) ([]*User, int, error)
+var usrRepo UserRepository
+var cfg *Config
+
+// GOOD - Full words
+func GetUserByID(ctx context.Context, id uuid.UUID) (*User, error)
+func (repository *userRepository) FindAll(ctx context.Context, options ListOptions) ([]*User, int, error)
+var userRepository UserRepository
+var configuration *Configuration
+```
+
+```tsx
+// BAD - Abbreviations
+const [usr, setUsr] = useState<User | null>(null);
+const handleBtnClick = () => { ... };
+interface Props { ... }
+function Btn({ ...props }) { ... }
+
+// GOOD - Full words
+const [user, setUser] = useState<User | null>(null);
+const handleButtonClick = () => { ... };
+interface UserCardProps { ... }
+function Button({ ...props }) { ... }
+```
+
+### Comments Policy
+
+**CRITICAL: Do NOT write comments unless absolutely necessary.**
+
+- Code should be self-explanatory through meaningful names
+- Only add comments for:
+  - Complex algorithms that cannot be simplified
+  - Legal/license requirements
+  - TODO/FIXME with ticket references
+  - Public API documentation (godoc, JSDoc) when required
+- Delete comments that explain "what" - the code should show that
+- If code needs explanation, refactor it to be clearer
+
+```go
+// BAD - Unnecessary comments
+// GetUserByID retrieves a user by their ID
+func GetUserByID(ctx context.Context, id uuid.UUID) (*User, error) {
+    // Find the user in the repository
+    user, err := repository.FindByID(ctx, id)
+    if err != nil {
+        return nil, err // Return error if not found
+    }
+    return user, nil // Return the user
+}
+
+// GOOD - Self-documenting code, no comments needed
+func GetUserByID(ctx context.Context, id uuid.UUID) (*User, error) {
+    user, err := repository.FindByID(ctx, id)
+    if err != nil {
+        return nil, err
+    }
+    return user, nil
+}
+```
+
+---
+
 ## Architecture Boundaries
 
 ### Always Do
@@ -110,6 +185,11 @@ docker-compose down
 - When multiple valid implementation approaches exist
 
 ### Never Do
+
+**Naming & Comments**
+- Never use abbreviations in names (`usr`, `repo`, `cfg`, `opts`, `btn`, `msg`)
+- Never write comments that explain "what" - make code self-documenting
+- Never add comments to obvious code - delete unnecessary comments
 
 **Backend**
 - Never put business logic in HTTP handlers (use application layer)
@@ -275,9 +355,11 @@ export function useUsers() {
 
 ---
 
-## Custom Commands
+## Custom Commands (Agents)
 
-Claude Code custom commands are available in `.claude/commands/`. Use them with:
+Claude Code custom commands are available in `.claude/commands/`. These act as specialized agents for different tasks:
+
+### Core Development
 
 | Command | Description |
 |---------|-------------|
@@ -287,9 +369,51 @@ Claude Code custom commands are available in `.claude/commands/`. Use them with:
 | `/project:api` | Create new API endpoints |
 | `/project:migrate` | Database migration operations |
 | `/project:test` | Testing patterns and generation |
+
+### Operations & Quality
+
+| Command | Description |
+|---------|-------------|
 | `/project:review` | Code review checklist |
 | `/project:plan` | Technical planning and design |
 | `/project:devops` | Infrastructure and CI/CD |
+| `/project:security` | Security auditing (OWASP Top 10) |
+| `/project:sre` | Site Reliability Engineering |
+| `/project:docs` | Documentation generation |
+
+---
+
+## Skills
+
+Skills are reusable templates in `.claude/skills/` that generate code following project patterns:
+
+### Code Generation
+
+| Skill | Usage | Description |
+|-------|-------|-------------|
+| **Go API Builder** | `/project:skill:go-api <resource>` | Generate complete REST API endpoints with DDD + CQRS |
+| **React Component** | `/project:skill:react-component <name>` | Generate React components with design system |
+| **Testing Patterns** | `/project:skill:testing <file>` | Generate test suites for Go and React |
+
+### Infrastructure
+
+| Skill | Usage | Description |
+|-------|-------|-------------|
+| **Database Migration** | `/project:skill:migration <operation>` | Generate golang-migrate migrations |
+| **Dockerfile Builder** | `/project:skill:dockerfile <type>` | Generate optimized Dockerfiles |
+| **Kubernetes Manifest** | `/project:skill:k8s <resource>` | Generate Kubernetes manifests |
+
+### Skill Files Location
+
+```
+.claude/skills/
+├── go-api-builder.md          # REST API generation
+├── react-component-builder.md # React component generation
+├── testing-patterns.md        # Test suite generation
+├── database-migration.md      # Migration templates
+├── dockerfile-builder.md      # Docker configurations
+└── kubernetes-manifest.md     # K8s manifests
+```
 
 ---
 
@@ -311,7 +435,15 @@ Examples:
 
 ## Related Documentation
 
-- **GitHub Copilot Agents**: `.github/agents/` - Specialized agent configurations
+### Claude Code
+
+- **Commands (Agents)**: `.claude/commands/` - Specialized command configurations
+- **Skills**: `.claude/skills/` - Reusable code generation templates
+- **Settings**: `.claude/settings.local.json` - Local permissions and configuration
+
+### GitHub Copilot
+
+- **Agents**: `.github/agents/` - Specialized agent configurations
 - **Instructions**: `.github/instructions/` - Context-aware instructions
 - **Prompts**: `.github/prompts/` - Reusable prompt templates
 - **Skills**: `.github/skills/` - Custom AI skills

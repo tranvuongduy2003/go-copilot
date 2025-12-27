@@ -325,7 +325,8 @@
 
 ### 4.2.1 golang-migrate CLI Setup
 
-- [x] Install golang-migrate CLI: `go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest`
+- [x] Install golang-migrate CLI:
+      `go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest`
 - [x] Create `migrations/` directory in project root
 - [x] Configure default database connection in environment variables
 - [x] Document migration commands in Makefile
@@ -1228,7 +1229,7 @@
 - [ ] Limit request body size
 - [ ] Limit query parameter lengths
 
-### 9.2.2 Authentication & Authorization
+### 9.2.2 Authentication & Authorization (don't implement)
 
 - [ ] Implement secure password hashing (bcrypt with appropriate cost)
 - [ ] Implement JWT with short expiration

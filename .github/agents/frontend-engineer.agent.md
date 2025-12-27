@@ -45,6 +45,8 @@ cd frontend && npx shadcn@latest add <component>
 - Use React Hook Form + Zod for form validation
 - Use `forwardRef` for components that accept refs
 - Ensure WCAG 2.1 AA accessibility compliance
+- **Use full, descriptive names** - no abbreviations (`button` not `btn`, `message` not `msg`)
+- **Write self-documenting code** - meaningful names instead of comments
 
 ### Ask First
 
@@ -56,6 +58,8 @@ cd frontend && npx shadcn@latest add <component>
 
 ### Never Do
 
+- Never use abbreviations (`btn`, `msg`, `usr`, `cfg`, `opts`, `val`, `err`, `res`, `req`)
+- Never write comments unless absolutely necessary (complex algorithms, legal requirements)
 - Never use arbitrary colors: `bg-[#7c3aed]`, `text-purple-500`
 - Never use arbitrary spacing: `p-[13px]`, `mt-[7px]`
 - Never use inline styles for colors or spacing

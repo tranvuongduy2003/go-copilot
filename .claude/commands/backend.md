@@ -115,15 +115,15 @@ type Repository interface {
 
 ```go
 type CreateUserHandler struct {
-    repo user.Repository
+    repository user.Repository
 }
 
-func (h *CreateUserHandler) Handle(ctx context.Context, cmd CreateUserCommand) (*dto.UserDTO, error) {
-    user, err := user.NewUser(cmd.Email, cmd.Name)
+func (handler *CreateUserHandler) Handle(context context.Context, command CreateUserCommand) (*dto.UserDTO, error) {
+    user, err := user.NewUser(command.Email, command.Name)
     if err != nil {
         return nil, fmt.Errorf("invalid user: %w", err)
     }
-    if err := h.repo.Save(ctx, user); err != nil {
+    if err := handler.repository.Save(context, user); err != nil {
         return nil, fmt.Errorf("save user: %w", err)
     }
     return dto.UserFromDomain(user), nil
@@ -134,11 +134,11 @@ func (h *CreateUserHandler) Handle(ctx context.Context, cmd CreateUserCommand) (
 
 ```go
 type GetUserHandler struct {
-    repo user.Repository
+    repository user.Repository
 }
 
-func (h *GetUserHandler) Handle(ctx context.Context, q GetUserQuery) (*dto.UserDTO, error) {
-    user, err := h.repo.FindByID(ctx, q.ID)
+func (handler *GetUserHandler) Handle(context context.Context, query GetUserQuery) (*dto.UserDTO, error) {
+    user, err := handler.repository.FindByID(context, query.ID)
     if err != nil {
         return nil, err
     }
@@ -158,6 +158,8 @@ func (h *GetUserHandler) Handle(ctx context.Context, q GetUserQuery) (*dto.UserD
 - Wrap errors with context: `fmt.Errorf("operation failed: %w", err)`
 - Use parameterized queries exclusively
 - Write table-driven tests with testify
+- **Use full, descriptive names** - no abbreviations (`repository` not `repo`, `configuration` not `cfg`)
+- **Write self-documenting code** - meaningful names instead of comments
 
 ### Ask First
 
@@ -168,6 +170,8 @@ func (h *GetUserHandler) Handle(ctx context.Context, q GetUserQuery) (*dto.UserD
 
 ### Never Do
 
+- Never use abbreviations (`repo`, `cfg`, `opts`, `ctx` as variable name, `usr`, `msg`, `btn`)
+- Never write comments unless absolutely necessary (complex algorithms, legal requirements)
 - Never put business logic in handlers
 - Never import infrastructure packages in domain layer
 - Never expose domain entities directly in API responses (use DTOs)

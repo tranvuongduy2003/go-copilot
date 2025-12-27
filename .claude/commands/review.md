@@ -15,16 +15,23 @@ Perform comprehensive code review for quality, security, performance, and design
 - [ ] No business logic in HTTP handlers
 - [ ] DTOs used for API responses (not domain entities)
 
-### 2. Code Quality
+### 2. Naming & Comments
+
+- [ ] **No abbreviations** in function names, variable names, parameters, type names
+- [ ] **No unnecessary comments** - code should be self-documenting
+- [ ] Names are descriptive and reveal intent (`userRepository` not `repo`, `configuration` not `cfg`)
+- [ ] Only essential comments exist (complex algorithms, legal requirements)
+- [ ] No comments explaining "what" - the code should show that
+
+### 3. Code Quality
 
 - [ ] Functions are small and focused (single responsibility)
 - [ ] Variable and function names are descriptive
 - [ ] No magic numbers or strings (use constants)
 - [ ] Error messages are clear and actionable
-- [ ] Comments explain "why", not "what"
 - [ ] No dead code or unused imports
 
-### 3. Error Handling
+### 4. Error Handling
 
 **Backend (Go)**
 - [ ] All errors are handled explicitly
@@ -39,7 +46,7 @@ Perform comprehensive code review for quality, security, performance, and design
 - [ ] User-friendly error messages
 - [ ] Error boundaries for component errors
 
-### 4. Security
+### 5. Security
 
 - [ ] No hardcoded secrets or credentials
 - [ ] Parameterized queries only (no SQL string concatenation)
@@ -50,7 +57,7 @@ Perform comprehensive code review for quality, security, performance, and design
 - [ ] No CSRF vulnerabilities
 - [ ] Secure cookie settings
 
-### 5. Performance
+### 6. Performance
 
 **Backend**
 - [ ] Database queries are optimized (indexes, pagination)
@@ -66,7 +73,7 @@ Perform comprehensive code review for quality, security, performance, and design
 - [ ] Code splitting for large components
 - [ ] Memoization where appropriate
 
-### 6. Design System Compliance (Frontend)
+### 7. Design System Compliance (Frontend)
 
 - [ ] Uses design system colors only (no arbitrary colors)
 - [ ] Uses spacing scale (no arbitrary spacing like p-[13px])
@@ -74,7 +81,7 @@ Perform comprehensive code review for quality, security, performance, and design
 - [ ] Consistent typography
 - [ ] Accessible (proper labels, ARIA attributes, keyboard navigation)
 
-### 7. Testing
+### 8. Testing
 
 - [ ] Unit tests for domain logic
 - [ ] Tests for command/query handlers
@@ -83,7 +90,7 @@ Perform comprehensive code review for quality, security, performance, and design
 - [ ] Error paths tested
 - [ ] Mocks used appropriately
 
-### 8. TypeScript (Frontend)
+### 9. TypeScript (Frontend)
 
 - [ ] No `any` types
 - [ ] Proper interface definitions
@@ -95,6 +102,26 @@ Perform comprehensive code review for quality, security, performance, and design
 ### Backend
 
 ```go
+// BAD: Abbreviations
+func (r *repo) FindByID(ctx context.Context, id uuid.UUID) (*User, error)
+var usrRepo UserRepository
+var cfg *Config
+type ListOpts struct { ... }
+
+// GOOD: Full words
+func (repository *userRepository) FindByID(context context.Context, id uuid.UUID) (*User, error)
+var userRepository UserRepository
+var configuration *Configuration
+type ListOptions struct { ... }
+
+// BAD: Unnecessary comments
+// GetUserByID retrieves a user by their ID
+func GetUserByID(ctx context.Context, id uuid.UUID) (*User, error) {
+    // Find the user in the repository
+    user, err := repository.FindByID(ctx, id)
+    ...
+}
+
 // BAD: Business logic in handler
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
     if user.Age < 18 {  // Business logic should be in domain
@@ -118,6 +145,18 @@ import "github.com/jackc/pgx/v5"  // In domain layer
 ### Frontend
 
 ```tsx
+// BAD: Abbreviations
+const [usr, setUsr] = useState<User | null>(null);
+const handleBtnClick = () => { ... };
+const errMsg = 'Something went wrong';
+interface Props { ... }  // Should be UserCardProps
+
+// GOOD: Full words
+const [user, setUser] = useState<User | null>(null);
+const handleButtonClick = () => { ... };
+const errorMessage = 'Something went wrong';
+interface UserCardProps { ... }
+
 // BAD: Arbitrary color
 <button className="bg-purple-500">  // Should use bg-primary
 

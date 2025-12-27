@@ -97,6 +97,67 @@ docker-compose logs -f api
 
 ## Coding Standards
 
+### Naming Conventions (CRITICAL)
+
+**Use meaningful, descriptive names instead of comments. No abbreviations allowed.**
+
+```go
+// BAD - Abbreviations
+func GetUsrByID(ctx context.Context, id uuid.UUID) (*Usr, error)
+func (r *repo) FindAll(ctx context.Context, opts ListOpts) ([]*User, int, error)
+var usrRepo UserRepository
+var cfg *Config
+
+// GOOD - Full words
+func GetUserByID(ctx context.Context, id uuid.UUID) (*User, error)
+func (repository *userRepository) FindAll(ctx context.Context, options ListOptions) ([]*User, int, error)
+var userRepository UserRepository
+var configuration *Configuration
+```
+
+```tsx
+// BAD - Abbreviations
+const [usr, setUsr] = useState<User | null>(null);
+const handleBtnClick = () => { ... };
+interface Props { ... }
+
+// GOOD - Full words
+const [user, setUser] = useState<User | null>(null);
+const handleButtonClick = () => { ... };
+interface UserCardProps { ... }
+```
+
+### Comments Policy (CRITICAL)
+
+**Do NOT write comments unless absolutely necessary. Code should be self-documenting.**
+
+Only add comments for:
+- Complex algorithms that cannot be simplified
+- Legal/license requirements
+- TODO/FIXME with ticket references
+
+```go
+// BAD - Unnecessary comments
+// GetUserByID retrieves a user by their ID
+func GetUserByID(ctx context.Context, id uuid.UUID) (*User, error) {
+    // Find the user in the repository
+    user, err := repository.FindByID(ctx, id)
+    if err != nil {
+        return nil, err // Return error if not found
+    }
+    return user, nil // Return the user
+}
+
+// GOOD - Self-documenting code, no comments needed
+func GetUserByID(ctx context.Context, id uuid.UUID) (*User, error) {
+    user, err := repository.FindByID(ctx, id)
+    if err != nil {
+        return nil, err
+    }
+    return user, nil
+}
+```
+
 ### Go Coding Standards
 
 1. **Package Naming**: Use short, lowercase names without underscores
@@ -105,31 +166,31 @@ docker-compose logs -f api
 4. **Context**: Pass `context.Context` as the first parameter
 5. **Interfaces**: Define interfaces where they are used, not where they are implemented
 6. **Structs**: Use pointer receivers for methods that modify state
-7. **Comments**: Write godoc comments for all exported types, functions, and methods
+7. **No Abbreviations**: Use full words (`repository` not `repo`, `configuration` not `cfg`)
 
 ```go
-// Good: Error handling
+// Good: Error handling with full names
 result, err := service.DoSomething(ctx, input)
 if err != nil {
     return fmt.Errorf("failed to do something: %w", err)
 }
 
-// Good: Context as first parameter
-func (s *Service) GetUser(ctx context.Context, id string) (*User, error)
+// Good: Context as first parameter, full names
+func (service *UserService) GetUser(ctx context.Context, id string) (*User, error)
 ```
 
 ### TypeScript/React Coding Standards
 
 1. **File Naming**: Use `kebab-case.tsx` for components, `camelCase.ts` for utilities
 2. **Component Naming**: Use PascalCase for component names
-3. **Props**: Define explicit interfaces for all component props
+3. **Props**: Define explicit interfaces for all component props (with descriptive names)
 4. **Hooks**: Prefix custom hooks with `use`
 5. **Types**: Prefer `interface` over `type` for object shapes
 6. **Imports**: Use absolute imports from `@/` alias
-7. **Exports**: Use named exports for components
+7. **No Abbreviations**: Use full words (`button` not `btn`, `message` not `msg`)
 
 ```tsx
-// Good: Component with typed props
+// Good: Component with typed props, full names
 interface ButtonProps {
   variant?: 'primary' | 'secondary' | 'ghost';
   size?: 'sm' | 'md' | 'lg';

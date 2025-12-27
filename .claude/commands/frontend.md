@@ -207,6 +207,8 @@ export function LoginForm() {
 - Handle loading, error, and empty states
 - Use TanStack Query for server state
 - Use Zustand for client state
+- **Use full, descriptive names** - no abbreviations (`button` not `btn`, `message` not `msg`)
+- **Write self-documenting code** - meaningful names instead of comments
 
 ### Ask First
 
@@ -217,6 +219,8 @@ export function LoginForm() {
 
 ### Never Do
 
+- Never use abbreviations (`btn`, `msg`, `usr`, `cfg`, `opts`, `val`, `err`, `res`, `req`)
+- Never write comments unless absolutely necessary (complex algorithms, legal requirements)
 - Never use arbitrary colors (bg-[#7c3aed], bg-purple-500)
 - Never use arbitrary spacing (p-[13px], mt-[7px])
 - Never use `any` type

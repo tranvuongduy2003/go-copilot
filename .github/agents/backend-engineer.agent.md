@@ -48,6 +48,8 @@ migrate -path backend/migrations -database "$DATABASE_URL" down 1
 - Use parameterized queries exclusively (never string concatenation)
 - Write table-driven tests with `testify`
 - Use `slog` for structured logging
+- **Use full, descriptive names** - no abbreviations (`repository` not `repo`, `configuration` not `cfg`)
+- **Write self-documenting code** - meaningful names instead of comments
 
 ### Ask First
 
@@ -59,6 +61,8 @@ migrate -path backend/migrations -database "$DATABASE_URL" down 1
 
 ### Never Do
 
+- Never use abbreviations (`repo`, `cfg`, `opts`, `ctx` as variable name, `usr`, `msg`)
+- Never write comments unless absolutely necessary (complex algorithms, legal requirements)
 - Never put business logic in handlers (belongs in domain/application layer)
 - Never import infrastructure packages in domain layer
 - Never expose domain entities directly in API responses (use DTOs)

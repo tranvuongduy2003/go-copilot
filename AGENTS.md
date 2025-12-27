@@ -100,6 +100,45 @@ docker-compose logs -f api
 
 ---
 
+## Coding Standards
+
+### Naming Conventions (CRITICAL)
+
+**Use meaningful, descriptive names instead of comments. No abbreviations allowed.**
+
+```go
+// BAD - Abbreviations
+func (r *repo) FindAll(ctx context.Context, opts ListOpts) ([]*User, int, error)
+var usrRepo UserRepository
+var cfg *Config
+
+// GOOD - Full words
+func (repository *userRepository) FindAll(ctx context.Context, options ListOptions) ([]*User, int, error)
+var userRepository UserRepository
+var configuration *Configuration
+```
+
+```tsx
+// BAD - Abbreviations
+const [usr, setUsr] = useState<User | null>(null);
+const handleBtnClick = () => { ... };
+
+// GOOD - Full words
+const [user, setUser] = useState<User | null>(null);
+const handleButtonClick = () => { ... };
+```
+
+### Comments Policy (CRITICAL)
+
+**Do NOT write comments unless absolutely necessary. Code should be self-documenting.**
+
+Only add comments for:
+- Complex algorithms that cannot be simplified
+- Legal/license requirements
+- TODO/FIXME with ticket references
+
+---
+
 ## Architecture Boundaries
 
 ### Always Do
@@ -112,6 +151,8 @@ docker-compose logs -f api
 - Pass `context.Context` as first parameter to all functions
 - Wrap errors with context: `fmt.Errorf("failed to do X: %w", err)`
 - Use value objects for domain concepts (Email, Role, etc.)
+- **Use full, descriptive names** - no abbreviations (`repository` not `repo`)
+- **Write self-documenting code** - meaningful names instead of comments
 
 **Frontend (React + Design System)**
 - Use design system colors: `bg-primary`, `text-foreground`, `bg-destructive`
@@ -120,6 +161,8 @@ docker-compose logs -f api
 - Create TypeScript types that match Go domain models
 - Use React Query for server state, Zustand for client state
 - Handle loading, error, and empty states in all components
+- **Use full, descriptive names** - no abbreviations (`button` not `btn`)
+- **Write self-documenting code** - meaningful names instead of comments
 
 ### Ask First
 
@@ -131,6 +174,11 @@ docker-compose logs -f api
 - When multiple valid implementation approaches exist
 
 ### Never Do
+
+**Naming & Comments**
+- Never use abbreviations in names (`usr`, `repo`, `cfg`, `opts`, `btn`, `msg`)
+- Never write comments that explain "what" - make code self-documenting
+- Never add comments to obvious code - delete unnecessary comments
 
 **Backend**
 - Never put business logic in HTTP handlers (use application layer)
