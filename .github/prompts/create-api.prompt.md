@@ -55,7 +55,7 @@ Create query handlers in `backend/internal/application/query/`:
 
 ### 4. Infrastructure Layer
 
-Create `backend/internal/infrastructure/persistence/postgres/{{resourceName}}_repository.go`:
+Create `backend/internal/infrastructure/persistence/repository/{{resourceName}}_repository.go`:
 - Implement the domain repository interface
 - Use parameterized queries
 - Handle errors properly (ErrNotFound, etc.)
@@ -113,7 +113,7 @@ if errors.Is(err, domain.ErrNotFound) {
 ## Validation
 
 After implementation:
-1. Run migrations: `goose -dir backend/migrations/sql postgres "$DATABASE_URL" up`
+1. Run migrations: `migrate -path backend/migrations -database "$DATABASE_URL" up`
 2. Run tests: `cd backend && go test ./...`
 3. Run linter: `cd backend && golangci-lint run`
 4. Test manually with curl or API client

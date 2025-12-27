@@ -164,7 +164,7 @@ project/
 ## Tech Stack
 
 This project uses:
-- **Backend**: Go 1.25+ with Chi router, PostgreSQL 16, Goose migrations
+- **Backend**: Go 1.25+ with Chi router, PostgreSQL 16, golang-migrate migrations
 - **Frontend**: React 19, TypeScript 5, Tailwind CSS v4, shadcn/ui
 - **Architecture**: Clean Architecture + DDD + CQRS
 - **Package Manager**: pnpm

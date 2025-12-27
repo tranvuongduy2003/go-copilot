@@ -9,7 +9,7 @@ Production-ready, AI-driven full-stack development environment following **Clean
 | **Backend** | Go | 1.25+ |
 | **Router** | Chi | v5 |
 | **Database** | PostgreSQL | 16+ |
-| **Migrations** | Goose | v3 |
+| **Migrations** | golang-migrate | v4 |
 | **Cache** | Redis | 7+ |
 | **Frontend** | React | 19 |
 | **Styling** | Tailwind CSS | v4 |
@@ -185,23 +185,23 @@ make db-reset
 make db-studio
 ```
 
-### Goose CLI (Direct)
+### golang-migrate CLI (Direct)
 
 ```bash
-# Install goose
-go install github.com/pressly/goose/v3/cmd/goose@latest
+# Install golang-migrate
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
-# Create migration
-goose -dir backend/migrations/sql create <name> sql
+# Create migration (creates .up.sql and .down.sql files)
+migrate create -ext sql -dir backend/migrations -seq <name>
 
 # Apply migrations
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" up
+migrate -path backend/migrations -database "$DATABASE_URL" up
 
-# Rollback
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" down
+# Rollback last migration
+migrate -path backend/migrations -database "$DATABASE_URL" down 1
 
-# Status
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" status
+# Check version
+migrate -path backend/migrations -database "$DATABASE_URL" version
 ```
 
 ## Kubernetes
@@ -360,7 +360,7 @@ backend/
 │   ├── application/            # Application layer (commands, queries, DTOs)
 │   ├── infrastructure/         # Infrastructure layer (DB, cache implementations)
 │   └── interfaces/             # Interface adapters (HTTP handlers, middleware)
-├── migrations/sql/             # Goose SQL migrations
+├── migrations/                 # golang-migrate SQL migrations
 └── pkg/                        # Shared packages
 ```
 

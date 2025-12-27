@@ -110,10 +110,13 @@ backend/
 │   │
 │   ├── infrastructure/                # Infrastructure Layer (adapters)
 │   │   ├── persistence/               # Database implementations
-│   │   │   └── postgres/
-│   │   │       ├── user_repository.go # Implements domain.UserRepository
-│   │   │       ├── unit_of_work.go    # Transaction management
-│   │   │       └── connection.go
+│   │   │   ├── postgres/              # Database utilities
+│   │   │   │   ├── connection.go      # Connection pool management
+│   │   │   │   ├── unit_of_work.go    # Transaction management
+│   │   │   │   ├── query_builder.go   # SQL query helpers
+│   │   │   │   └── errors.go          # Database error types
+│   │   │   └── repository/            # Repository implementations
+│   │   │       └── user_repository.go # Implements domain.UserRepository
 │   │   ├── cache/                     # Cache implementations
 │   │   │   └── redis/
 │   │   │       └── cache.go
@@ -139,10 +142,11 @@ backend/
 │   ├── logger/                        # Logging utilities
 │   └── validator/                     # Validation helpers
 │
-└── migrations/                        # Goose database migrations
-    └── sql/
-        ├── 00001_create_users.sql
-        └── 00002_create_orders.sql
+└── migrations/                        # golang-migrate database migrations
+    ├── 000001_create_users_table.up.sql
+    ├── 000001_create_users_table.down.sql
+    ├── 000002_create_orders_table.up.sql
+    └── 000002_create_orders_table.down.sql
 ```
 
 ## Domain Layer (DDD)
@@ -816,36 +820,38 @@ func main() {
 }
 ```
 
-## Database Migrations (Goose)
+## Database Migrations (golang-migrate)
 
-We use Goose CLI for database migrations.
+We use golang-migrate CLI for database migrations.
 
 ### Migration Commands
 
 ```bash
-# Install goose
-go install github.com/pressly/goose/v3/cmd/goose@latest
+# Install golang-migrate
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
-# Create a new migration
-goose -dir migrations/sql create create_users sql
+# Create a new migration (creates .up.sql and .down.sql files)
+migrate create -ext sql -dir backend/migrations -seq create_users_table
 
 # Apply all pending migrations
-goose -dir migrations/sql postgres "$DATABASE_URL" up
+migrate -path backend/migrations -database "$DATABASE_URL" up
 
 # Rollback the last migration
-goose -dir migrations/sql postgres "$DATABASE_URL" down
+migrate -path backend/migrations -database "$DATABASE_URL" down 1
 
-# Check migration status
-goose -dir migrations/sql postgres "$DATABASE_URL" status
+# Check migration version
+migrate -path backend/migrations -database "$DATABASE_URL" version
+
+# Force set version (for fixing dirty state)
+migrate -path backend/migrations -database "$DATABASE_URL" force 1
 ```
 
 ### Migration Example
 
+**Up Migration:**
 ```sql
--- migrations/sql/00001_create_users.sql
+-- migrations/000001_create_users_table.up.sql
 
--- +goose Up
--- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) NOT NULL,
@@ -862,12 +868,13 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE INDEX idx_users_email ON users(email) WHERE deleted_at IS NULL;
 CREATE INDEX idx_users_role ON users(role) WHERE deleted_at IS NULL;
--- +goose StatementEnd
+```
 
--- +goose Down
--- +goose StatementBegin
+**Down Migration:**
+```sql
+-- migrations/000001_create_users_table.down.sql
+
 DROP TABLE IF EXISTS users;
--- +goose StatementEnd
 ```
 
 ## Frontend Architecture (React)
@@ -1062,6 +1069,6 @@ export const useAuthStore = create<AuthState>()(
 - [Clean Architecture by Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Three Dots Labs - DDD, CQRS, Clean Architecture](https://threedots.tech/post/ddd-cqrs-clean-architecture-combined/)
 - [Wild Workouts Go DDD Example](https://github.com/ThreeDotsLabs/wild-workouts-go-ddd-example)
-- [Goose Migrations](https://github.com/pressly/goose)
+- [golang-migrate](https://github.com/golang-migrate/migrate)
 - [shadcn/ui](https://ui.shadcn.com/)
 - [Tailwind CSS v4](https://tailwindcss.com/docs/v4-beta)

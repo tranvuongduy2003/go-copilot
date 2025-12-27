@@ -1,6 +1,6 @@
-# AI Agent Instructions
+# Claude Code Project Instructions
 
-This document provides global instructions for AI coding assistants (GitHub Copilot, Claude, Cursor) working on this codebase.
+> This document provides global instructions for Claude Code (Anthropic's AI coding assistant) working on this codebase. These instructions complement the existing GitHub Copilot configuration in `.github/`.
 
 ## Project Overview
 
@@ -34,9 +34,6 @@ cd backend && go test ./...
 # Run tests with coverage
 cd backend && go test -cover ./...
 
-# Run linter
-cd backend && golangci-lint run
-
 # Build binary
 cd backend && go build -o bin/api cmd/api/main.go
 ```
@@ -44,10 +41,7 @@ cd backend && go build -o bin/api cmd/api/main.go
 ### Database Migrations (golang-migrate CLI)
 
 ```bash
-# Install golang-migrate
-go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-
-# Create new migration (creates .up.sql and .down.sql files)
+# Create new migration
 migrate create -ext sql -dir backend/migrations -seq <name>
 
 # Apply all migrations
@@ -56,22 +50,13 @@ migrate -path backend/migrations -database "$DATABASE_URL" up
 # Rollback last migration
 migrate -path backend/migrations -database "$DATABASE_URL" down 1
 
-# Rollback all migrations
-migrate -path backend/migrations -database "$DATABASE_URL" down
-
-# Check current version
+# Check version
 migrate -path backend/migrations -database "$DATABASE_URL" version
-
-# Force set version (for fixing dirty state)
-migrate -path backend/migrations -database "$DATABASE_URL" force <version>
 ```
 
 ### Frontend
 
 ```bash
-# Install dependencies
-cd frontend && npm install
-
 # Start dev server
 cd frontend && npm run dev
 
@@ -80,9 +65,6 @@ cd frontend && npm test
 
 # Build for production
 cd frontend && npm run build
-
-# Run linter
-cd frontend && npm run lint
 ```
 
 ### Docker
@@ -93,9 +75,6 @@ docker-compose up -d
 
 # Stop all services
 docker-compose down
-
-# View logs
-docker-compose logs -f api
 ```
 
 ---
@@ -159,89 +138,54 @@ docker-compose logs -f api
 
 ```
 backend/
-├── cmd/
-│   └── api/
-│       └── main.go                    # Entry point, dependency wiring
+├── cmd/api/main.go                    # Entry point, dependency wiring
 ├── internal/
-│   ├── domain/                        # Domain Layer (innermost, pure business logic)
+│   ├── domain/                        # Domain Layer (pure business logic)
 │   │   ├── user/                      # User aggregate
 │   │   │   ├── user.go                # Entity with private fields + getters
 │   │   │   ├── repository.go          # Repository interface (port)
 │   │   │   ├── errors.go              # Domain-specific errors
 │   │   │   └── events.go              # Domain events
 │   │   └── shared/                    # Shared domain concepts
+│   │       ├── entity.go
 │   │       ├── errors.go
+│   │       ├── event_bus.go
 │   │       └── valueobjects.go
 │   │
 │   ├── application/                   # Application Layer (CQRS)
 │   │   ├── command/                   # Commands (write operations)
-│   │   │   ├── create_user.go
-│   │   │   └── update_user.go
 │   │   ├── query/                     # Queries (read operations)
-│   │   │   ├── get_user.go
-│   │   │   └── list_users.go
 │   │   └── dto/                       # Data Transfer Objects
-│   │       └── user_dto.go
 │   │
 │   ├── infrastructure/                # Infrastructure Layer (adapters)
 │   │   ├── persistence/
-│   │   │   ├── postgres/              # Database utilities
-│   │   │   │   ├── connection.go      # Connection pool management
-│   │   │   │   ├── unit_of_work.go    # Transaction support
-│   │   │   │   ├── query_builder.go   # SQL query helpers
-│   │   │   │   └── errors.go          # Database error types
-│   │   │   └── repository/            # Repository implementations
-│   │   │       └── user_repository.go # Implements domain.UserRepository
+│   │   │   ├── postgres/
+│   │   │   └── repository/
 │   │   ├── messaging/
-│   │   │   └── memory/
-│   │   │       └── event_bus.go       # In-memory event bus
 │   │   └── cache/
-│   │       └── redis/
 │   │
-│   └── interfaces/                    # Interface Adapters Layer
-│       └── http/
-│           ├── handler/
-│           │   └── user_handler.go
-│           ├── middleware/
-│           └── router/
+│   └── interfaces/http/               # Interface Adapters Layer
+│       ├── handler/
+│       ├── middleware/
+│       └── router/
 │
-├── migrations/                            # golang-migrate migrations
-│   ├── 000001_create_users_table.up.sql
-│   ├── 000001_create_users_table.down.sql
-│   ├── 000002_add_users_indexes.up.sql
-│   └── 000002_add_users_indexes.down.sql
-└── pkg/
-    ├── config/
-    ├── logger/
-    └── validator/
+├── migrations/                        # golang-migrate migrations
+└── pkg/                               # Shared packages
 ```
 
 ### Frontend (React)
 
 ```
-frontend/
-├── src/
-│   ├── components/
-│   │   ├── ui/               # shadcn/ui components
-│   │   │   ├── button.tsx
-│   │   │   └── card.tsx
-│   │   └── features/         # Feature-specific components
-│   │       └── user-profile/
-│   │           ├── user-profile.tsx
-│   │           └── user-avatar.tsx
-│   ├── hooks/
-│   │   └── use-user.ts
-│   ├── lib/
-│   │   ├── api.ts
-│   │   └── utils.ts
-│   ├── pages/
-│   │   └── dashboard.tsx
-│   ├── stores/
-│   │   └── auth-store.ts
-│   ├── styles/
-│   │   └── globals.css
-│   └── types/
-│       └── user.ts
+frontend/src/
+├── components/
+│   ├── ui/                # shadcn/ui components
+│   ├── features/          # Feature-specific components
+│   └── layout/            # Layout components
+├── hooks/                 # Custom hooks
+├── lib/                   # Utilities
+├── pages/                 # Page components
+├── stores/                # Zustand stores
+└── types/                 # TypeScript types
 ```
 
 ---
@@ -253,20 +197,11 @@ frontend/
 | Token | Usage |
 |-------|-------|
 | `primary` | Primary actions, links, focus states (violet hue 290) |
-| `primary-dark` | Primary hover states, gradients |
 | `secondary` | Secondary actions, accents (cyan hue 220) |
 | `destructive` | Error states, destructive actions |
 | `muted` | Subtle backgrounds, secondary text |
 | `success` | Success states, confirmations |
 | `warning` | Warning states, cautions |
-
-```tsx
-// CORRECT: Using design system colors
-<button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-
-// WRONG: Using arbitrary colors
-<button className="bg-purple-500 hover:bg-purple-600 text-white">
-```
 
 ### Spacing Scale (4px base)
 
@@ -274,47 +209,17 @@ frontend/
 |-------|-------|-------|
 | `1` | 4px | Tight padding |
 | `2` | 8px | Inline elements |
-| `3` | 12px | Medium-small |
 | `4` | 16px | Default component padding |
 | `6` | 24px | Card spacing |
 | `8` | 32px | Section padding |
-| `12` | 48px | Page sections |
-
-```tsx
-// CORRECT: Using spacing scale
-<div className="p-4 gap-6 mt-8">
-
-// WRONG: Using arbitrary spacing
-<div className="p-[13px] gap-[7px] mt-[15px]">
-```
-
-### Border Radius
-
-| Token | Value | Usage |
-|-------|-------|-------|
-| `sm` | 4px | Badges, chips |
-| `md` | 8px | Buttons, inputs (default) |
-| `lg` | 12px | Cards, dialogs |
-| `xl` | 16px | Large cards, modals |
-| `full` | 9999px | Pills, avatars |
 
 ---
 
 ## Code Patterns
 
-### Go Error Handling
-
-```go
-result, err := service.DoSomething(ctx, input)
-if err != nil {
-    return fmt.Errorf("failed to do something: %w", err)
-}
-```
-
 ### Go Domain Entity
 
 ```go
-// Entity with private fields and getters
 type User struct {
     id        uuid.UUID
     email     Email     // Value Object
@@ -326,7 +231,16 @@ func (u *User) ID() uuid.UUID { return u.id }
 func (u *User) Email() Email  { return u.email }
 ```
 
-### React Component with Props
+### Go Error Handling
+
+```go
+result, err := service.DoSomething(ctx, input)
+if err != nil {
+    return fmt.Errorf("failed to do something: %w", err)
+}
+```
+
+### React Component
 
 ```tsx
 interface UserCardProps {
@@ -357,32 +271,25 @@ export function useUsers() {
     queryFn: () => api.get<User[]>('/users'),
   });
 }
-
-export function useCreateUser() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (input: CreateUserInput) => api.post<User>('/users', input),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-    },
-  });
-}
 ```
 
 ---
 
-## Available Agents
+## Custom Commands
 
-| Agent | Description |
-|-------|-------------|
-| `backend-engineer` | Go backend with Clean Architecture + DDD + CQRS |
-| `frontend-engineer` | React 19 + Tailwind CSS v4 + shadcn/ui |
-| `fullstack-engineer` | End-to-end feature development |
-| `test-agent` | Comprehensive test suites (Go + React) |
-| `code-reviewer` | Code review for quality, security, design system |
-| `security-auditor` | OWASP Top 10 vulnerability auditing |
-| `documentation-writer` | Technical documentation |
-| `technical-planner` | Feature planning and technical designs |
+Claude Code custom commands are available in `.claude/commands/`. Use them with:
+
+| Command | Description |
+|---------|-------------|
+| `/project:backend` | Backend engineering with Go + DDD + CQRS |
+| `/project:frontend` | Frontend engineering with React + shadcn/ui |
+| `/project:fullstack` | End-to-end feature development |
+| `/project:api` | Create new API endpoints |
+| `/project:migrate` | Database migration operations |
+| `/project:test` | Testing patterns and generation |
+| `/project:review` | Code review checklist |
+| `/project:plan` | Technical planning and design |
+| `/project:devops` | Infrastructure and CI/CD |
 
 ---
 
@@ -392,10 +299,6 @@ Follow Conventional Commits:
 
 ```
 <type>(<scope>): <description>
-
-[optional body]
-
-[optional footer]
 ```
 
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `perf`
@@ -403,7 +306,15 @@ Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `perf`
 Examples:
 - `feat(api): add user registration endpoint`
 - `fix(ui): resolve button focus state in dark mode`
-- `docs(readme): update installation instructions`
+
+---
+
+## Related Documentation
+
+- **GitHub Copilot Agents**: `.github/agents/` - Specialized agent configurations
+- **Instructions**: `.github/instructions/` - Context-aware instructions
+- **Prompts**: `.github/prompts/` - Reusable prompt templates
+- **Skills**: `.github/skills/` - Custom AI skills
 
 ---
 
@@ -411,6 +322,5 @@ Examples:
 
 - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [DDD + CQRS in Go](https://threedots.tech/post/ddd-cqrs-clean-architecture-combined/)
-- [W3C Design Tokens](https://tr.designtokens.org/format/)
 - [shadcn/ui](https://ui.shadcn.com/)
 - [Tailwind CSS v4](https://tailwindcss.com/docs/v4-beta)

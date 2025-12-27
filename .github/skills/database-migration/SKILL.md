@@ -5,7 +5,7 @@ description: Create database migrations safely. Use when modifying database sche
 
 # Database Migration Skill
 
-This skill guides you through creating safe, reversible database migrations for PostgreSQL.
+This skill guides you through creating safe, reversible database migrations for PostgreSQL using golang-migrate.
 
 ## When to Use This Skill
 
@@ -15,27 +15,30 @@ This skill guides you through creating safe, reversible database migrations for 
 - Adding constraints
 - Modifying relationships
 
-## Migration File Naming (Goose)
+## Migration File Naming (golang-migrate)
+
+golang-migrate uses separate `.up.sql` and `.down.sql` files:
 
 ```
-backend/migrations/sql/
-├── 00001_create_users.sql
-├── 00002_add_user_roles.sql
-├── 00003_create_posts.sql
+backend/migrations/
+├── 000001_create_users_table.up.sql
+├── 000001_create_users_table.down.sql
+├── 000002_add_user_roles.up.sql
+├── 000002_add_user_roles.down.sql
+├── 000003_create_posts_table.up.sql
+└── 000003_create_posts_table.down.sql
 ```
 
-Format: `{5-digit-sequence}_{description}.sql`
-
-**Note**: Goose uses a single file with `-- +goose Up` and `-- +goose Down` annotations.
+Format: `{6-digit-sequence}_{description}.up.sql` and `{6-digit-sequence}_{description}.down.sql`
 
 ## Migration Templates
 
 ### Template 1: Create Table
 
+**Up Migration:**
 ```sql
--- backend/migrations/sql/00001_create_users.sql
+-- backend/migrations/000001_create_users_table.up.sql
 
--- +goose Up
 -- Users table stores application user accounts
 CREATE TABLE IF NOT EXISTS users (
     -- Primary key
@@ -72,17 +75,21 @@ CREATE INDEX idx_users_created_at ON users(created_at DESC);
 COMMENT ON TABLE users IS 'Application user accounts';
 COMMENT ON COLUMN users.password_hash IS 'bcrypt hashed password';
 COMMENT ON COLUMN users.deleted_at IS 'Soft delete timestamp - NULL means active';
+```
 
--- +goose Down
+**Down Migration:**
+```sql
+-- backend/migrations/000001_create_users_table.down.sql
+
 DROP TABLE IF EXISTS users;
 ```
 
 ### Template 2: Create Table with Foreign Key
 
+**Up Migration:**
 ```sql
--- backend/migrations/sql/00002_create_posts.sql
+-- backend/migrations/000002_create_posts_table.up.sql
 
--- +goose Up
 CREATE TABLE IF NOT EXISTS posts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
@@ -128,17 +135,21 @@ CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
 
 -- Full text search index
 CREATE INDEX idx_posts_search ON posts USING gin(to_tsvector('english', title || ' ' || COALESCE(content, '')));
+```
 
--- +goose Down
+**Down Migration:**
+```sql
+-- backend/migrations/000002_create_posts_table.down.sql
+
 DROP TABLE IF EXISTS posts;
 ```
 
 ### Template 3: Add Column
 
+**Up Migration:**
 ```sql
--- backend/migrations/sql/00003_add_user_avatar.sql
+-- backend/migrations/000003_add_user_avatar.up.sql
 
--- +goose Up
 -- Add avatar URL column to users
 ALTER TABLE users
 ADD COLUMN avatar_url TEXT;
@@ -152,8 +163,12 @@ ADD COLUMN location VARCHAR(100);
 -- Comment on new columns
 COMMENT ON COLUMN users.avatar_url IS 'URL to user avatar image';
 COMMENT ON COLUMN users.bio IS 'User biography/description';
+```
 
--- +goose Down
+**Down Migration:**
+```sql
+-- backend/migrations/000003_add_user_avatar.down.sql
+
 ALTER TABLE users
 DROP COLUMN IF EXISTS avatar_url,
 DROP COLUMN IF EXISTS bio,
@@ -163,10 +178,10 @@ DROP COLUMN IF EXISTS location;
 
 ### Template 4: Add Column with Default (Safe for Large Tables)
 
+**Up Migration:**
 ```sql
--- backend/migrations/sql/00004_add_user_settings.sql
+-- backend/migrations/000004_add_user_settings.up.sql
 
--- +goose Up
 -- For large tables, add column without default first
 ALTER TABLE users
 ADD COLUMN settings JSONB;
@@ -178,18 +193,22 @@ UPDATE users SET settings = '{}' WHERE settings IS NULL;
 ALTER TABLE users
 ALTER COLUMN settings SET DEFAULT '{}',
 ALTER COLUMN settings SET NOT NULL;
+```
 
--- +goose Down
+**Down Migration:**
+```sql
+-- backend/migrations/000004_add_user_settings.down.sql
+
 ALTER TABLE users
 DROP COLUMN IF EXISTS settings;
 ```
 
 ### Template 5: Create Junction Table (Many-to-Many)
 
+**Up Migration:**
 ```sql
--- backend/migrations/sql/00005_create_post_tags.sql
+-- backend/migrations/000005_create_post_tags.up.sql
 
--- +goose Up
 -- Tags table
 CREATE TABLE IF NOT EXISTS tags (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -223,76 +242,62 @@ CREATE TABLE IF NOT EXISTS post_tags (
 -- Indexes for junction table
 CREATE INDEX idx_post_tags_post_id ON post_tags(post_id);
 CREATE INDEX idx_post_tags_tag_id ON post_tags(tag_id);
+```
 
--- +goose Down
+**Down Migration:**
+```sql
+-- backend/migrations/000005_create_post_tags.down.sql
+
 DROP TABLE IF EXISTS post_tags;
 DROP TABLE IF EXISTS tags;
 ```
 
-### Template 6: Add Index
+### Template 6: Add Concurrent Index
 
+For large tables, use `CREATE INDEX CONCURRENTLY` to avoid locking. Note: These cannot run inside a transaction, so use separate migration files.
+
+**Up Migration:**
 ```sql
--- backend/migrations/sql/00006_add_performance_indexes.sql
+-- backend/migrations/000006_add_performance_indexes.up.sql
 
--- +goose Up
--- +goose StatementBegin
 -- Composite index for common query pattern
 CREATE INDEX CONCURRENTLY idx_posts_user_status
 ON posts(user_id, status)
 WHERE deleted_at IS NULL;
--- +goose StatementEnd
-
--- +goose StatementBegin
--- Partial index for active users
-CREATE INDEX CONCURRENTLY idx_users_active_email
-ON users(email)
-WHERE status = 'active' AND deleted_at IS NULL;
--- +goose StatementEnd
-
--- +goose StatementBegin
--- Index for sorting
-CREATE INDEX CONCURRENTLY idx_posts_hot
-ON posts(published_at DESC, id)
-WHERE status = 'published';
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-DROP INDEX CONCURRENTLY IF EXISTS idx_posts_user_status;
--- +goose StatementEnd
-
--- +goose StatementBegin
-DROP INDEX CONCURRENTLY IF EXISTS idx_users_active_email;
--- +goose StatementEnd
-
--- +goose StatementBegin
-DROP INDEX CONCURRENTLY IF EXISTS idx_posts_hot;
--- +goose StatementEnd
 ```
 
-**Note**: Use `-- +goose StatementBegin` and `-- +goose StatementEnd` for `CONCURRENTLY` operations since they cannot run inside a transaction.
+**Down Migration:**
+```sql
+-- backend/migrations/000006_add_performance_indexes.down.sql
+
+DROP INDEX CONCURRENTLY IF EXISTS idx_posts_user_status;
+```
 
 ### Template 7: Modify Column (Safe Rename)
 
+**Up Migration:**
 ```sql
--- backend/migrations/sql/00007_rename_column.sql
+-- backend/migrations/000007_rename_column.up.sql
 
--- +goose Up
 -- Rename column (PostgreSQL 9.4+)
 ALTER TABLE users
 RENAME COLUMN name TO full_name;
+```
 
--- +goose Down
+**Down Migration:**
+```sql
+-- backend/migrations/000007_rename_column.down.sql
+
 ALTER TABLE users
 RENAME COLUMN full_name TO name;
 ```
 
 ### Template 8: Add Enum Type
 
+**Up Migration:**
 ```sql
--- backend/migrations/sql/00008_add_priority_enum.sql
+-- backend/migrations/000008_add_priority_enum.up.sql
 
--- +goose Up
 -- Create enum type
 CREATE TYPE priority_level AS ENUM ('low', 'medium', 'high', 'urgent');
 
@@ -301,59 +306,63 @@ ALTER TABLE posts
 ADD COLUMN priority priority_level DEFAULT 'medium';
 
 CREATE INDEX idx_posts_priority ON posts(priority) WHERE deleted_at IS NULL;
+```
 
--- +goose Down
+**Down Migration:**
+```sql
+-- backend/migrations/000008_add_priority_enum.down.sql
+
 ALTER TABLE posts
 DROP COLUMN IF EXISTS priority;
 
 DROP TYPE IF EXISTS priority_level;
 ```
 
-## Migration Commands (Goose CLI)
+## Migration Commands (golang-migrate CLI)
 
 ```bash
-# Install goose
-go install github.com/pressly/goose/v3/cmd/goose@latest
+# Install golang-migrate
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
-# Create new migration
-goose -dir backend/migrations/sql create create_orders sql
+# Create new migration (creates .up.sql and .down.sql files)
+migrate create -ext sql -dir backend/migrations -seq create_orders_table
 
-# Run all pending migrations
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" up
+# Apply all pending migrations
+migrate -path backend/migrations -database "$DATABASE_URL" up
 
-# Run specific number of migrations
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" up-by-one
+# Apply only N migrations
+migrate -path backend/migrations -database "$DATABASE_URL" up 2
 
 # Rollback last migration
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" down
+migrate -path backend/migrations -database "$DATABASE_URL" down 1
 
 # Rollback all migrations
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" reset
+migrate -path backend/migrations -database "$DATABASE_URL" down
 
 # Check current version
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" version
+migrate -path backend/migrations -database "$DATABASE_URL" version
 
-# Check migration status
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" status
+# Force set version (for fixing dirty state)
+migrate -path backend/migrations -database "$DATABASE_URL" force 1
 
-# Redo last migration (down then up)
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" redo
+# Go to a specific version
+migrate -path backend/migrations -database "$DATABASE_URL" goto 3
 ```
 
 ## Best Practices
 
 ### 1. Always Provide Reversible Migrations
+Every `.up.sql` file needs a corresponding `.down.sql` file:
 ```sql
--- Every -- +goose Up needs a corresponding -- +goose Down
--- +goose Up
+-- 000001_create_users_table.up.sql
 CREATE TABLE users (...);
 
--- +goose Down
+-- 000001_create_users_table.down.sql
 DROP TABLE users;
 ```
 
-### 2. Goose Handles Transactions Automatically
-Goose wraps each migration in a transaction by default. Use `-- +goose NO TRANSACTION` at the top of your file for operations that can't run in a transaction (like `CREATE INDEX CONCURRENTLY`).
+### 2. Transactions
+golang-migrate runs each migration in a transaction by default. For operations that cannot run in a transaction (like `CREATE INDEX CONCURRENTLY`), use separate migration files.
 
 ### 3. Use CONCURRENTLY for Indexes on Large Tables
 ```sql
@@ -386,7 +395,7 @@ COMMENT ON COLUMN users.deleted_at IS 'Soft delete timestamp';
 
 ## Migration Checklist
 
-- [ ] Migration file follows naming convention
+- [ ] Migration file follows naming convention (`000XXX_description.up.sql` and `.down.sql`)
 - [ ] Up migration creates/modifies schema
 - [ ] Down migration reverses changes completely
 - [ ] Indexes added for foreign keys

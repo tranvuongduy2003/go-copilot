@@ -12,7 +12,18 @@
       "Bash(go run:*)",
       "Bash(tree:*)",
       "Bash(findstr:*)",
-      "Bash(goose:*)"
+      "Bash(migrate:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(kubectl:*)",
+      "Bash(terraform:*)",
+      "Bash(golangci-lint:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)"
     ]
   }
 }

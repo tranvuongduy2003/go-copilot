@@ -194,7 +194,7 @@ Break features into small, deliverable tasks:
 #### Tasks:
 1. **Backend: Database**
    - Create users table migration
-   - Files: `migrations/sql/001_create_users.sql` (Goose migration)
+   - Files: `migrations/000001_create_users_table.up.sql`, `migrations/000001_create_users_table.down.sql` (golang-migrate)
 
 2. **Backend: Domain Layer**
    - Define User aggregate with private fields + getters
@@ -210,7 +210,7 @@ Break features into small, deliverable tasks:
 
 4. **Backend: Infrastructure Layer**
    - Implement PostgreSQL repository (adapter)
-   - Files: `internal/infrastructure/persistence/postgres/user_repository.go`
+   - Files: `internal/infrastructure/persistence/repository/user_repository.go`
 
 5. **Backend: Interface Layer**
    - Implement HTTP handler using command/query handlers

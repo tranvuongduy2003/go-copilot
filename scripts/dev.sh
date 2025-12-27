@@ -141,10 +141,10 @@ start_backend() {
     if [ -f "go.mod" ]; then
         log_info "Detected Go backend"
 
-        # Run migrations if goose is available
-        if command -v goose &> /dev/null; then
+        # Run migrations if migrate is available
+        if command -v migrate &> /dev/null; then
             log_info "Running database migrations..."
-            goose -dir migrations/sql postgres "${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/app_dev}" up || true
+            migrate -path migrations -database "${DATABASE_URL:-postgres://postgres:postgres@localhost:5432/app_dev?sslmode=disable}" up || true
         fi
 
         # Start with air for hot reload if available, otherwise use go run

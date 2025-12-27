@@ -25,14 +25,14 @@ cd backend && go build -o bin/api cmd/api/main.go
 # Run server
 cd backend && go run cmd/api/main.go
 
-# Create migration
-goose -dir backend/migrations/sql create <name> sql
+# Create migration (creates .up.sql and .down.sql files)
+migrate create -ext sql -dir backend/migrations -seq <name>
 
 # Apply migrations
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" up
+migrate -path backend/migrations -database "$DATABASE_URL" up
 
-# Rollback migration
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" down
+# Rollback last migration
+migrate -path backend/migrations -database "$DATABASE_URL" down 1
 ```
 
 ## Boundaries
@@ -114,9 +114,9 @@ backend/
 │           │   └── recovery.go
 │           └── router/
 │
-├── migrations/
-│   └── sql/                           # Goose SQL migrations
-│       └── 00001_create_users.sql
+├── migrations/                         # golang-migrate migrations
+│   ├── 000001_create_users_table.up.sql
+│   └── 000001_create_users_table.down.sql
 └── pkg/
     ├── config/
     ├── logger/

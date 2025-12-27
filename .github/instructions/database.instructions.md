@@ -4,125 +4,109 @@ applyTo: "backend/migrations/**/*.sql,backend/internal/infrastructure/persistenc
 
 # Database Development Instructions
 
-These instructions cover database migrations using Goose CLI and repository implementations.
+These instructions cover database migrations using golang-migrate CLI and repository implementations.
 
-## Goose CLI Setup
+## golang-migrate CLI Setup
 
 ### Installation
 
 ```bash
-# Install goose CLI
-go install github.com/pressly/goose/v3/cmd/goose@latest
+# Install golang-migrate CLI
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
 # Verify installation
-goose --version
+migrate -version
 ```
 
 ### Environment Configuration
 
-Create a `.env` file or set environment variables:
+Set the DATABASE_URL environment variable:
 
 ```bash
-# Environment variables for goose
-export GOOSE_DRIVER=postgres
-export GOOSE_DBSTRING="postgres://user:password@localhost:5432/dbname?sslmode=disable"
-export GOOSE_MIGRATION_DIR=./migrations/sql
+export DATABASE_URL="postgres://user:password@localhost:5432/dbname?sslmode=disable"
 ```
 
 Or use a `.env` file:
 
 ```env
-GOOSE_DRIVER=postgres
-GOOSE_DBSTRING=postgres://user:password@localhost:5432/dbname?sslmode=disable
-GOOSE_MIGRATION_DIR=./migrations/sql
+DATABASE_URL=postgres://user:password@localhost:5432/dbname?sslmode=disable
 ```
 
 ## Migration File Structure
 
+golang-migrate uses separate `.up.sql` and `.down.sql` files:
+
 ```
 backend/
 └── migrations/
-    └── sql/
-        ├── 00001_create_users.sql
-        ├── 00002_add_user_roles.sql
-        ├── 00003_create_posts.sql
-        └── 00004_add_posts_indexes.sql
+    ├── 000001_create_users_table.up.sql
+    ├── 000001_create_users_table.down.sql
+    ├── 000002_add_users_indexes.up.sql
+    ├── 000002_add_users_indexes.down.sql
+    ├── 000003_create_posts_table.up.sql
+    └── 000003_create_posts_table.down.sql
 ```
 
-## Goose CLI Commands
+## golang-migrate CLI Commands
 
 ### Create New Migration
 
 ```bash
-# Create a new SQL migration
-goose -dir migrations/sql create create_users sql
+# Create a new migration (creates .up.sql and .down.sql files)
+migrate create -ext sql -dir backend/migrations -seq create_users_table
 
-# Creates: migrations/sql/20241225120000_create_users.sql
+# Creates:
+# - backend/migrations/000001_create_users_table.up.sql
+# - backend/migrations/000001_create_users_table.down.sql
 ```
 
 ### Run Migrations
 
 ```bash
 # Apply all pending migrations
-goose -dir migrations/sql postgres "postgres://..." up
+migrate -path backend/migrations -database "$DATABASE_URL" up
 
-# With environment variables
-goose up
-
-# Apply only one migration
-goose up-by-one
-
-# Apply up to a specific version
-goose up-to 20241225120000
+# Apply only N migrations
+migrate -path backend/migrations -database "$DATABASE_URL" up 2
 ```
 
 ### Rollback Migrations
 
 ```bash
 # Rollback the last migration
-goose down
-
-# Rollback to a specific version
-goose down-to 20241225100000
+migrate -path backend/migrations -database "$DATABASE_URL" down 1
 
 # Rollback all migrations (DANGER!)
-goose reset
+migrate -path backend/migrations -database "$DATABASE_URL" down
 ```
 
 ### Check Status
 
 ```bash
-# Show migration status
-goose status
+# Show current version
+migrate -path backend/migrations -database "$DATABASE_URL" version
 
-# Output:
-#     Applied At                  Migration
-#     =======================================
-#     Mon Jan 01 00:00:00 2024    00001_create_users.sql
-#     Mon Jan 01 00:00:01 2024    00002_add_user_roles.sql
-#     Pending                     00003_create_posts.sql
+# Force set version (for fixing dirty state)
+migrate -path backend/migrations -database "$DATABASE_URL" force 1
 ```
 
 ### Other Commands
 
 ```bash
-# Show current version
-goose version
+# Go to a specific version
+migrate -path backend/migrations -database "$DATABASE_URL" goto 3
 
-# Redo the last migration (down then up)
-goose redo
-
-# Validate migration files
-goose validate
+# Drop everything (DANGER!)
+migrate -path backend/migrations -database "$DATABASE_URL" drop -f
 ```
 
 ## Migration Template
 
-### Standard Migration
+### Standard Migration (Up)
 
 ```sql
--- +goose Up
--- +goose StatementBegin
+-- backend/migrations/000001_create_users_table.up.sql
+
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) NOT NULL,
@@ -145,33 +129,35 @@ CREATE INDEX idx_users_created_at ON users(created_at DESC);
 -- Add comments
 COMMENT ON TABLE users IS 'Application users';
 COMMENT ON COLUMN users.deleted_at IS 'Soft delete timestamp';
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-DROP TABLE IF EXISTS users;
--- +goose StatementEnd
 ```
 
-### No Transaction Migration
-
-Some statements cannot run inside a transaction (e.g., `CREATE INDEX CONCURRENTLY`):
+### Standard Migration (Down)
 
 ```sql
--- +goose NO TRANSACTION
+-- backend/migrations/000001_create_users_table.down.sql
 
--- +goose Up
+DROP TABLE IF EXISTS users;
+```
+
+### Concurrent Index Migration
+
+Some statements cannot run inside a transaction (e.g., `CREATE INDEX CONCURRENTLY`). Use separate migration files:
+
+```sql
+-- backend/migrations/000002_add_search_index.up.sql
 CREATE INDEX CONCURRENTLY idx_posts_title_search ON posts USING gin(to_tsvector('english', title));
+```
 
--- +goose Down
+```sql
+-- backend/migrations/000002_add_search_index.down.sql
 DROP INDEX CONCURRENTLY IF EXISTS idx_posts_title_search;
 ```
 
 ### Data Migration
 
 ```sql
--- +goose Up
--- +goose StatementBegin
+-- backend/migrations/000003_add_user_status.up.sql
+
 -- Add new column
 ALTER TABLE users ADD COLUMN status VARCHAR(50);
 
@@ -182,12 +168,12 @@ UPDATE users SET status = 'deleted' WHERE deleted_at IS NOT NULL;
 -- Make column NOT NULL after backfill
 ALTER TABLE users ALTER COLUMN status SET NOT NULL;
 ALTER TABLE users ALTER COLUMN status SET DEFAULT 'active';
--- +goose StatementEnd
+```
 
--- +goose Down
--- +goose StatementBegin
+```sql
+-- backend/migrations/000003_add_user_status.down.sql
+
 ALTER TABLE users DROP COLUMN status;
--- +goose StatementEnd
 ```
 
 ## Migration Best Practices
@@ -196,36 +182,31 @@ ALTER TABLE users DROP COLUMN status;
 
 ```sql
 -- GOOD: Single responsibility
--- 00001_create_users.sql - Only creates users table
--- 00002_create_posts.sql - Only creates posts table
--- 00003_add_posts_user_fk.sql - Only adds foreign key
+-- 000001_create_users_table.up.sql - Only creates users table
+-- 000002_create_posts_table.up.sql - Only creates posts table
+-- 000003_add_posts_user_fk.up.sql - Only adds foreign key
 
 -- BAD: Too many changes in one migration
--- 00001_initial_schema.sql - Creates 10 tables, all indexes, all constraints
+-- 000001_initial_schema.up.sql - Creates 10 tables, all indexes, all constraints
 ```
 
 ### 2. Always Provide Reversible Down Migrations
 
-```sql
--- +goose Up
-ALTER TABLE users ADD COLUMN avatar_url TEXT;
+Each `.up.sql` file needs a corresponding `.down.sql` file:
 
--- +goose Down
+```sql
+-- 000004_add_avatar_url.up.sql
+ALTER TABLE users ADD COLUMN avatar_url TEXT;
+```
+
+```sql
+-- 000004_add_avatar_url.down.sql
 ALTER TABLE users DROP COLUMN avatar_url;
 ```
 
-### 3. Use Transactions (Default Behavior)
+### 3. Transactions
 
-Goose runs each migration in a transaction by default. This ensures atomicity.
-
-```sql
--- +goose Up
--- +goose StatementBegin
--- All statements here run in a single transaction
-CREATE TABLE posts (...);
-CREATE INDEX idx_posts_user ON posts(user_id);
--- +goose StatementEnd
-```
+golang-migrate runs each migration in a transaction by default. For statements that can't run in a transaction (like `CREATE INDEX CONCURRENTLY`), they should be in separate migration files.
 
 ### 4. Use Partial Indexes for Soft Deletes
 
@@ -267,28 +248,24 @@ Add these targets to your Makefile:
 
 ```makefile
 # Database migration commands
-.PHONY: migrate-up migrate-down migrate-status migrate-create
-
-GOOSE_FLAGS = -dir migrations/sql
+.PHONY: migrate-up migrate-down migrate-version migrate-create
 
 migrate-up:
-	goose $(GOOSE_FLAGS) postgres "$(DATABASE_URL)" up
+	migrate -path backend/migrations -database "$(DATABASE_URL)" up
 
 migrate-down:
-	goose $(GOOSE_FLAGS) postgres "$(DATABASE_URL)" down
+	migrate -path backend/migrations -database "$(DATABASE_URL)" down 1
 
-migrate-status:
-	goose $(GOOSE_FLAGS) postgres "$(DATABASE_URL)" status
+migrate-version:
+	migrate -path backend/migrations -database "$(DATABASE_URL)" version
 
 migrate-create:
 	@read -p "Migration name: " name; \
-	goose $(GOOSE_FLAGS) create $$name sql
+	migrate create -ext sql -dir backend/migrations -seq $$name
 
-migrate-reset:
-	goose $(GOOSE_FLAGS) postgres "$(DATABASE_URL)" reset
-
-migrate-redo:
-	goose $(GOOSE_FLAGS) postgres "$(DATABASE_URL)" redo
+migrate-force:
+	@read -p "Version: " version; \
+	migrate -path backend/migrations -database "$(DATABASE_URL)" force $$version
 ```
 
 Usage:
@@ -296,46 +273,23 @@ Usage:
 ```bash
 make migrate-up
 make migrate-down
-make migrate-status
+make migrate-version
 make migrate-create  # Prompts for migration name
 ```
 
-## Programmatic Migration (Embedded)
+## Persistence Layer Structure
 
-For running migrations from Go code:
+The persistence layer is organized into two packages:
 
-```go
-package main
-
-import (
-    "database/sql"
-    "embed"
-    "log"
-
-    "github.com/pressly/goose/v3"
-    _ "github.com/lib/pq"
-)
-
-//go:embed migrations/sql/*.sql
-var embedMigrations embed.FS
-
-func main() {
-    db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer db.Close()
-
-    goose.SetBaseFS(embedMigrations)
-
-    if err := goose.SetDialect("postgres"); err != nil {
-        log.Fatal(err)
-    }
-
-    if err := goose.Up(db, "migrations/sql"); err != nil {
-        log.Fatal(err)
-    }
-}
+```
+backend/internal/infrastructure/persistence/
+├── postgres/              # Database utilities
+│   ├── connection.go      # Connection pool management
+│   ├── unit_of_work.go    # Transaction support
+│   ├── query_builder.go   # SQL query helpers
+│   └── errors.go          # Database error types
+└── repository/            # Repository implementations
+    └── user_repository.go # Implements domain.UserRepository
 ```
 
 ## Repository Implementation (DDD Style)
@@ -370,8 +324,8 @@ type ReadRepository interface {
 ### PostgreSQL Implementation
 
 ```go
-// internal/infrastructure/persistence/postgres/user_repository.go
-package postgres
+// internal/infrastructure/persistence/repository/user_repository.go
+package repository
 
 import (
     "context"
@@ -381,16 +335,16 @@ import (
 
     "github.com/google/uuid"
     "github.com/jackc/pgx/v5"
-    "github.com/jackc/pgx/v5/pgxpool"
     "github.com/yourorg/app/internal/domain/user"
+    "github.com/yourorg/app/internal/infrastructure/persistence/postgres"
 )
 
 type UserRepository struct {
-    db *pgxpool.Pool
+    pool postgres.ConnectionPool
 }
 
-func NewUserRepository(db *pgxpool.Pool) *UserRepository {
-    return &UserRepository{db: db}
+func NewUserRepository(pool postgres.ConnectionPool) *UserRepository {
+    return &UserRepository{pool: pool}
 }
 
 func (r *UserRepository) FindByID(ctx context.Context, id uuid.UUID) (*user.User, error) {
@@ -399,6 +353,8 @@ func (r *UserRepository) FindByID(ctx context.Context, id uuid.UUID) (*user.User
         FROM users
         WHERE id = $1 AND deleted_at IS NULL
     `
+
+    querier := postgres.GetQuerier(ctx, r.pool)
 
     var (
         dbID      uuid.UUID
@@ -409,7 +365,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id uuid.UUID) (*user.User
         updatedAt time.Time
     )
 
-    err := r.db.QueryRow(ctx, query, id).Scan(
+    err := querier.QueryRow(ctx, query, id).Scan(
         &dbID, &email, &name, &role, &createdAt, &updatedAt,
     )
 
@@ -417,7 +373,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id uuid.UUID) (*user.User
         return nil, user.ErrUserNotFound
     }
     if err != nil {
-        return nil, fmt.Errorf("find user by id: %w", err)
+        return nil, postgres.NewDBError("find user by id", err)
     }
 
     // Reconstitute domain entity
@@ -432,6 +388,8 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email user.Email) (*us
         WHERE LOWER(email) = LOWER($1) AND deleted_at IS NULL
     `
 
+    querier := postgres.GetQuerier(ctx, r.pool)
+
     var (
         dbID      uuid.UUID
         dbEmail   string
@@ -441,7 +399,7 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email user.Email) (*us
         updatedAt time.Time
     )
 
-    err := r.db.QueryRow(ctx, query, email.String()).Scan(
+    err := querier.QueryRow(ctx, query, email.String()).Scan(
         &dbID, &dbEmail, &name, &role, &createdAt, &updatedAt,
     )
 
@@ -449,7 +407,7 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email user.Email) (*us
         return nil, user.ErrUserNotFound
     }
     if err != nil {
-        return nil, fmt.Errorf("find user by email: %w", err)
+        return nil, postgres.NewDBError("find user by email", err)
     }
 
     emailVO, _ := user.NewEmail(dbEmail)
@@ -466,7 +424,9 @@ func (r *UserRepository) Save(ctx context.Context, u *user.User) error {
             updated_at = EXCLUDED.updated_at
     `
 
-    _, err := r.db.Exec(ctx, query,
+    querier := postgres.GetQuerier(ctx, r.pool)
+
+    _, err := querier.Exec(ctx, query,
         u.ID(),
         u.Email().String(),
         u.Name(),
@@ -476,10 +436,11 @@ func (r *UserRepository) Save(ctx context.Context, u *user.User) error {
     )
 
     if err != nil {
-        if isUniqueViolation(err) {
+        dbErr := postgres.NewDBError("save user", err)
+        if dbErr.IsUniqueViolation() {
             return user.ErrEmailAlreadyExists
         }
-        return fmt.Errorf("save user: %w", err)
+        return dbErr
     }
 
     return nil
@@ -492,10 +453,12 @@ func (r *UserRepository) Delete(ctx context.Context, id uuid.UUID) error {
         WHERE id = $1 AND deleted_at IS NULL
     `
 
+    querier := postgres.GetQuerier(ctx, r.pool)
     now := time.Now().UTC()
-    result, err := r.db.Exec(ctx, query, id, now)
+
+    result, err := querier.Exec(ctx, query, id, now)
     if err != nil {
-        return fmt.Errorf("delete user: %w", err)
+        return postgres.NewDBError("delete user", err)
     }
 
     if result.RowsAffected() == 0 {
@@ -635,6 +598,6 @@ func (r *Repository) CreateMany(ctx context.Context, users []*user.User) error {
 
 ## References
 
-- [Goose Documentation](https://github.com/pressly/goose)
-- [Goose Go Package](https://pkg.go.dev/github.com/pressly/goose/v3)
+- [golang-migrate Documentation](https://github.com/golang-migrate/migrate)
+- [golang-migrate CLI Usage](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
 - [PostgreSQL Best Practices](https://wiki.postgresql.org/wiki/Don't_Do_This)

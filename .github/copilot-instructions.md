@@ -13,7 +13,7 @@ This is a production-ready full-stack application for building modern web servic
 | **Backend** | Go | 1.25+ | Clean Architecture + DDD + CQRS |
 | **Router** | Chi | v5 | Lightweight, idiomatic |
 | **Database** | PostgreSQL | 16+ | With pgx v5 driver |
-| **Migrations** | Goose | v3 | CLI-based migrations |
+| **Migrations** | golang-migrate | v4 | CLI-based migrations |
 | **Frontend** | React | 19 | With TypeScript 5.x strict |
 | **Styling** | Tailwind CSS | v4 | CSS-first configuration |
 | **Components** | shadcn/ui | Latest | new-york style |
@@ -42,23 +42,23 @@ cd backend && golangci-lint run
 cd backend && go build -o bin/api cmd/api/main.go
 ```
 
-### Database Migrations (Goose CLI)
+### Database Migrations (golang-migrate CLI)
 
 ```bash
-# Install goose
-go install github.com/pressly/goose/v3/cmd/goose@latest
+# Install golang-migrate
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
-# Create new migration
-goose -dir backend/migrations/sql create <name> sql
+# Create new migration (creates .up.sql and .down.sql files)
+migrate create -ext sql -dir backend/migrations -seq <name>
 
 # Apply all migrations
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" up
+migrate -path backend/migrations -database "$DATABASE_URL" up
 
 # Rollback last migration
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" down
+migrate -path backend/migrations -database "$DATABASE_URL" down 1
 
-# Check status
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" status
+# Check version
+migrate -path backend/migrations -database "$DATABASE_URL" version
 ```
 
 ### Frontend Commands
@@ -260,9 +260,13 @@ backend/
 │   │
 │   ├── infrastructure/                # Infrastructure Layer (adapters)
 │   │   ├── persistence/
-│   │   │   └── postgres/
-│   │   │       ├── user_repository.go # Implements domain.UserRepository
-│   │   │       └── unit_of_work.go
+│   │   │   ├── postgres/              # Database utilities
+│   │   │   │   ├── connection.go
+│   │   │   │   ├── unit_of_work.go
+│   │   │   │   ├── query_builder.go
+│   │   │   │   └── errors.go
+│   │   │   └── repository/            # Repository implementations
+│   │   │       └── user_repository.go # Implements domain.UserRepository
 │   │   └── cache/
 │   │       └── redis/
 │   │
@@ -273,9 +277,9 @@ backend/
 │           ├── middleware/
 │           └── router/
 │
-├── migrations/
-│   └── sql/
-│       └── 00001_create_users.sql     # Goose migrations
+├── migrations/                        # golang-migrate migrations
+│   ├── 000001_create_users_table.up.sql
+│   └── 000001_create_users_table.down.sql
 └── pkg/
     ├── config/
     ├── logger/

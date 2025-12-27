@@ -23,7 +23,9 @@ internal/
 │   ├── query/                # Read operations (Get, List)
 │   └── dto/                  # Data Transfer Objects
 ├── infrastructure/
-│   └── persistence/postgres/ # Repository implementation
+│   └── persistence/
+│       ├── postgres/         # Database utilities (connection, unit_of_work, errors)
+│       └── repository/       # Repository implementations
 └── interfaces/http/handler/  # HTTP handlers
 ```
 
@@ -120,14 +122,14 @@ func Reconstitute(id uuid.UUID, name, description, category string, price, stock
 }
 ```
 
-### Step 2: Create the Database Migration (Goose)
+### Step 2: Create the Database Migration (golang-migrate)
 
-Create migration file in `backend/migrations/sql/`.
+Create migration files in `backend/migrations/`.
 
+**Up Migration:**
 ```sql
--- backend/migrations/sql/00001_create_products.sql
+-- backend/migrations/000001_create_products_table.up.sql
 
--- +goose Up
 CREATE TABLE IF NOT EXISTS products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
@@ -142,12 +144,16 @@ CREATE TABLE IF NOT EXISTS products (
 
 CREATE INDEX idx_products_category ON products(category) WHERE deleted_at IS NULL;
 CREATE INDEX idx_products_created_at ON products(created_at DESC);
+```
 
--- +goose Down
+**Down Migration:**
+```sql
+-- backend/migrations/000001_create_products_table.down.sql
+
 DROP TABLE IF EXISTS products;
 ```
 
-Run migration: `goose -dir backend/migrations/sql postgres "$DATABASE_URL" up`
+Run migration: `migrate -path backend/migrations -database "$DATABASE_URL" up`
 
 ### Step 3: Define Repository Interface (Domain Layer)
 
@@ -184,28 +190,27 @@ type ListOptions struct {
 The repository adapter uses `Reconstitute` to create domain entities from database rows and getter methods to extract values for persistence.
 
 ```go
-// internal/infrastructure/persistence/postgres/product_repository.go
-package postgres
+// internal/infrastructure/persistence/repository/product_repository.go
+package repository
 
 import (
     "context"
     "errors"
-    "fmt"
     "time"
 
     "github.com/google/uuid"
     "github.com/jackc/pgx/v5"
-    "github.com/jackc/pgx/v5/pgxpool"
     "github.com/yourorg/app/internal/domain/product"
+    "github.com/yourorg/app/internal/infrastructure/persistence/postgres"
 )
 
 type productRepository struct {
-    db *pgxpool.Pool
+    pool postgres.ConnectionPool
 }
 
 // NewProductRepository creates a new PostgreSQL product repository (adapter).
-func NewProductRepository(db *pgxpool.Pool) product.Repository {
-    return &productRepository{db: db}
+func NewProductRepository(pool postgres.ConnectionPool) product.Repository {
+    return &productRepository{pool: pool}
 }
 
 func (r *productRepository) FindByID(ctx context.Context, id uuid.UUID) (*product.Product, error) {
@@ -215,6 +220,8 @@ func (r *productRepository) FindByID(ctx context.Context, id uuid.UUID) (*produc
         WHERE id = $1 AND deleted_at IS NULL
     `
 
+    querier := postgres.GetQuerier(ctx, r.pool)
+
     var (
         dbID                      uuid.UUID
         name, description, category string
@@ -222,14 +229,14 @@ func (r *productRepository) FindByID(ctx context.Context, id uuid.UUID) (*produc
         createdAt, updatedAt      time.Time
     )
 
-    err := r.db.QueryRow(ctx, query, id).Scan(
+    err := querier.QueryRow(ctx, query, id).Scan(
         &dbID, &name, &description, &price, &category, &stock, &createdAt, &updatedAt,
     )
     if errors.Is(err, pgx.ErrNoRows) {
         return nil, product.ErrNotFound
     }
     if err != nil {
-        return nil, fmt.Errorf("query product: %w", err)
+        return nil, postgres.NewDBError("query product", err)
     }
 
     // Use Reconstitute to create domain entity from DB values
@@ -237,11 +244,13 @@ func (r *productRepository) FindByID(ctx context.Context, id uuid.UUID) (*produc
 }
 
 func (r *productRepository) FindAll(ctx context.Context, opts product.ListOptions) ([]*product.Product, int, error) {
+    querier := postgres.GetQuerier(ctx, r.pool)
+
     // Count total
     var total int
     countQuery := `SELECT COUNT(*) FROM products WHERE deleted_at IS NULL`
-    if err := r.db.QueryRow(ctx, countQuery).Scan(&total); err != nil {
-        return nil, 0, fmt.Errorf("count products: %w", err)
+    if err := querier.QueryRow(ctx, countQuery).Scan(&total); err != nil {
+        return nil, 0, postgres.NewDBError("count products", err)
     }
 
     // Fetch products
@@ -254,9 +263,9 @@ func (r *productRepository) FindAll(ctx context.Context, opts product.ListOption
         LIMIT $1 OFFSET $2
     `
 
-    rows, err := r.db.Query(ctx, query, opts.PerPage, offset)
+    rows, err := querier.Query(ctx, query, opts.PerPage, offset)
     if err != nil {
-        return nil, 0, fmt.Errorf("query products: %w", err)
+        return nil, 0, postgres.NewDBError("query products", err)
     }
     defer rows.Close()
 
@@ -269,7 +278,7 @@ func (r *productRepository) FindAll(ctx context.Context, opts product.ListOption
             createdAt, updatedAt      time.Time
         )
         if err := rows.Scan(&id, &name, &description, &price, &category, &stock, &createdAt, &updatedAt); err != nil {
-            return nil, 0, fmt.Errorf("scan product: %w", err)
+            return nil, 0, postgres.NewDBError("scan product", err)
         }
         products = append(products, product.Reconstitute(id, name, description, category, price, stock, createdAt, updatedAt))
     }
@@ -290,13 +299,15 @@ func (r *productRepository) Save(ctx context.Context, p *product.Product) error 
             updated_at = EXCLUDED.updated_at
     `
 
+    querier := postgres.GetQuerier(ctx, r.pool)
+
     // Use getter methods to extract values from domain entity
-    _, err := r.db.Exec(ctx, query,
+    _, err := querier.Exec(ctx, query,
         p.ID(), p.Name(), p.Description(), p.Price(),
         p.Category(), p.Stock(), p.CreatedAt(), p.UpdatedAt(),
     )
     if err != nil {
-        return fmt.Errorf("save product: %w", err)
+        return postgres.NewDBError("save product", err)
     }
 
     return nil
@@ -305,9 +316,11 @@ func (r *productRepository) Save(ctx context.Context, p *product.Product) error 
 func (r *productRepository) Delete(ctx context.Context, id uuid.UUID) error {
     query := `UPDATE products SET deleted_at = $2 WHERE id = $1 AND deleted_at IS NULL`
 
-    result, err := r.db.Exec(ctx, query, id, time.Now().UTC())
+    querier := postgres.GetQuerier(ctx, r.pool)
+
+    result, err := querier.Exec(ctx, query, id, time.Now().UTC())
     if err != nil {
-        return fmt.Errorf("delete product: %w", err)
+        return postgres.NewDBError("delete product", err)
     }
 
     if result.RowsAffected() == 0 {
@@ -1046,9 +1059,9 @@ func TestProductHandler_Create(t *testing.T) {
 ## Checklist
 
 - [ ] Domain entity with private fields + getters (DDD)
-- [ ] Migration created with Goose (up and down in single file)
+- [ ] Migration created with golang-migrate (.up.sql and .down.sql files)
 - [ ] Repository interface (port) in domain layer
-- [ ] PostgreSQL repository (adapter) with Reconstitute
+- [ ] Repository implementation (adapter) in repository/ package with Reconstitute
 - [ ] Command handlers (Create, Update, Delete)
 - [ ] Query handlers (Get, List)
 - [ ] DTOs for API responses

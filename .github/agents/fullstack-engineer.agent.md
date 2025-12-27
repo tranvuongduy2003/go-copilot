@@ -16,8 +16,8 @@ cd backend && go test ./...            # Run tests
 cd backend && golangci-lint run        # Lint code
 
 # Database migrations
-goose -dir backend/migrations/sql create <name> sql  # Create migration
-goose -dir backend/migrations/sql postgres "$DATABASE_URL" up  # Apply migrations
+migrate create -ext sql -dir backend/migrations -seq <name>  # Create migration
+migrate -path backend/migrations -database "$DATABASE_URL" up  # Apply migrations
 
 # Frontend
 cd frontend && npm run dev             # Start dev server

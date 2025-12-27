@@ -32,7 +32,7 @@ Create a detailed implementation plan including:
 ### Phase 3: Implementation
 
 #### Backend (if applicable)
-1. Create database migration using Goose in `backend/migrations/sql/`
+1. Create database migration using golang-migrate in `backend/migrations/`
 2. Define domain aggregate in `backend/internal/domain/{aggregate}/`
    - Entity with private fields + getters
    - Repository interface (port)
@@ -41,7 +41,7 @@ Create a detailed implementation plan including:
    - Command handlers in `command/`
    - Query handlers in `query/`
    - DTOs in `dto/`
-4. Implement repository adapter in `backend/internal/infrastructure/persistence/postgres/`
+4. Implement repository adapter in `backend/internal/infrastructure/persistence/repository/`
 5. Create HTTP handler in `backend/internal/interfaces/http/handler/`
 6. Register routes
 

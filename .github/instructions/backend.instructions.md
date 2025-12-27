@@ -35,13 +35,18 @@ backend/
 │   │
 │   ├── infrastructure/                # Infrastructure Layer (adapters)
 │   │   ├── persistence/               # Database implementations
-│   │   │   └── postgres/
-│   │   │       ├── user_repository.go
-│   │   │       └── queries/           # SQLC generated (optional)
+│   │   │   ├── postgres/              # Database utilities
+│   │   │   │   ├── connection.go      # Connection pool management
+│   │   │   │   ├── unit_of_work.go    # Transaction support
+│   │   │   │   ├── query_builder.go   # SQL query helpers
+│   │   │   │   └── errors.go          # Database error types
+│   │   │   └── repository/            # Repository implementations
+│   │   │       └── user_repository.go # Implements domain.UserRepository
 │   │   ├── cache/                     # Cache implementations
 │   │   │   └── redis/
 │   │   └── messaging/                 # Event bus implementations
 │   │       └── memory/
+│   │           └── event_bus.go       # In-memory event bus
 │   │
 │   └── interfaces/                    # Interface Adapters Layer
 │       └── http/
@@ -56,8 +61,9 @@ backend/
 │   ├── logger/
 │   └── validator/
 │
-└── migrations/                        # Goose migrations
-    └── sql/
+└── migrations/                        # golang-migrate migrations
+    ├── 000001_create_users_table.up.sql
+    └── 000001_create_users_table.down.sql
 ```
 
 ## Dependency Rule
