@@ -13,10 +13,11 @@ import (
 )
 
 type RouterDependencies struct {
-	UserHandler   *handler.UserHandler
-	HealthHandler *handler.HealthHandler
-	Logger        logger.Logger
-	Config        *config.Config
+	UserHandler    *handler.UserHandler
+	HealthHandler  *handler.HealthHandler
+	MetricsHandler *handler.MetricsHandler
+	Logger         logger.Logger
+	Config         *config.Config
 }
 
 func NewRouter(dependencies RouterDependencies) http.Handler {
@@ -26,13 +27,21 @@ func NewRouter(dependencies RouterDependencies) http.Handler {
 	router.Use(middleware.Logging(dependencies.Logger))
 	router.Use(middleware.Recovery(dependencies.Logger))
 	router.Use(middleware.CORS(dependencies.Config.CORS))
+	router.Use(middleware.BodyLimitDefault)
 	router.Use(middleware.Timeout(30 * time.Second))
+	router.Use(middleware.SecureHeaders)
+	router.Use(middleware.Metrics)
+	router.Use(middleware.GzipCompress)
 
 	router.Route("/health", func(healthRouter chi.Router) {
 		healthRouter.Get("/", dependencies.HealthHandler.Readiness)
 		healthRouter.Get("/live", dependencies.HealthHandler.Liveness)
 		healthRouter.Get("/ready", dependencies.HealthHandler.Readiness)
 	})
+
+	if dependencies.MetricsHandler != nil {
+		router.Handle("/metrics", dependencies.MetricsHandler.Metrics())
+	}
 
 	router.Route("/api/v1", func(apiRouter chi.Router) {
 		apiRouter.Route("/users", func(userRouter chi.Router) {

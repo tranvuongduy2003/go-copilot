@@ -24,6 +24,7 @@ type Field = zap.Field
 
 var (
 	String   = zap.String
+	Strings  = zap.Strings
 	Int      = zap.Int
 	Int64    = zap.Int64
 	Float64  = zap.Float64

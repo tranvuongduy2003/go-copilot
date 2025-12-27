@@ -48,17 +48,23 @@ func provideHealthHandler(database *postgres.DB, redisClient *redis.Client) *han
 	return handler.NewHealthHandler(database, redisClient)
 }
 
+func provideMetricsHandler() *handler.MetricsHandler {
+	return handler.NewMetricsHandler()
+}
+
 func provideRouter(
 	userHandler *handler.UserHandler,
 	healthHandler *handler.HealthHandler,
+	metricsHandler *handler.MetricsHandler,
 	log logger.Logger,
 	cfg *config.Config,
 ) http.Handler {
 	return router.NewRouter(router.RouterDependencies{
-		UserHandler:   userHandler,
-		HealthHandler: healthHandler,
-		Logger:        log,
-		Config:        cfg,
+		UserHandler:    userHandler,
+		HealthHandler:  healthHandler,
+		MetricsHandler: metricsHandler,
+		Logger:         log,
+		Config:         cfg,
 	})
 }
 
@@ -93,6 +99,7 @@ var QueryHandlerSet = wire.NewSet(
 var HandlerSet = wire.NewSet(
 	handler.NewUserHandler,
 	provideHealthHandler,
+	provideMetricsHandler,
 )
 
 var RouterSet = wire.NewSet(
