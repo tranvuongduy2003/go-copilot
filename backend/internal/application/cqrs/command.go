@@ -18,19 +18,28 @@ type CommandHandler[C Command, R any] interface {
 type CommandBus interface {
 	Dispatch(ctx context.Context, command Command) (interface{}, error)
 	Register(commandType Command, handler interface{})
+	Use(middleware ...CommandMiddleware)
 }
 
 type InMemoryCommandBus struct {
-	handlers map[reflect.Type]interface{}
-	mutex    sync.RWMutex
-	logger   logger.Logger
+	handlers    map[reflect.Type]interface{}
+	mutex       sync.RWMutex
+	logger      logger.Logger
+	middlewares []CommandMiddleware
 }
 
 func NewInMemoryCommandBus(log logger.Logger) *InMemoryCommandBus {
 	return &InMemoryCommandBus{
-		handlers: make(map[reflect.Type]interface{}),
-		logger:   log,
+		handlers:    make(map[reflect.Type]interface{}),
+		logger:      log,
+		middlewares: make([]CommandMiddleware, 0),
 	}
+}
+
+func (bus *InMemoryCommandBus) Use(middlewares ...CommandMiddleware) {
+	bus.mutex.Lock()
+	defer bus.mutex.Unlock()
+	bus.middlewares = append(bus.middlewares, middlewares...)
 }
 
 func (bus *InMemoryCommandBus) Register(commandType Command, handler interface{}) {
@@ -46,6 +55,20 @@ func (bus *InMemoryCommandBus) Register(commandType Command, handler interface{}
 }
 
 func (bus *InMemoryCommandBus) Dispatch(ctx context.Context, command Command) (interface{}, error) {
+	coreDispatcher := func(dispatchContext context.Context, dispatchCommand Command) (interface{}, error) {
+		return bus.executeHandler(dispatchContext, dispatchCommand)
+	}
+
+	bus.mutex.RLock()
+	middlewareChain := make([]CommandMiddleware, len(bus.middlewares))
+	copy(middlewareChain, bus.middlewares)
+	bus.mutex.RUnlock()
+
+	finalDispatcher := ChainCommandMiddleware(middlewareChain...)(coreDispatcher)
+	return finalDispatcher(ctx, command)
+}
+
+func (bus *InMemoryCommandBus) executeHandler(ctx context.Context, command Command) (interface{}, error) {
 	bus.mutex.RLock()
 	cmdType := reflect.TypeOf(command)
 	handler, exists := bus.handlers[cmdType]
@@ -75,12 +98,16 @@ func (bus *InMemoryCommandBus) Dispatch(ctx context.Context, command Command) (i
 
 	if len(results) == 2 {
 		var result interface{}
-		if !results[0].IsNil() {
+		if canBeNil(results[0]) {
+			if !results[0].IsNil() {
+				result = results[0].Interface()
+			}
+		} else {
 			result = results[0].Interface()
 		}
 
 		var err error
-		if !results[1].IsNil() {
+		if canBeNil(results[1]) && !results[1].IsNil() {
 			err = results[1].Interface().(error)
 		}
 
@@ -88,7 +115,7 @@ func (bus *InMemoryCommandBus) Dispatch(ctx context.Context, command Command) (i
 	}
 
 	if len(results) == 1 {
-		if results[0].IsNil() {
+		if canBeNil(results[0]) && results[0].IsNil() {
 			return nil, nil
 		}
 		if errVal, ok := results[0].Interface().(error); ok {
@@ -103,4 +130,13 @@ func (bus *InMemoryCommandBus) Dispatch(ctx context.Context, command Command) (i
 func RegisterCommandHandler[C Command, R any](bus *InMemoryCommandBus, handler CommandHandler[C, R]) {
 	var cmd C
 	bus.Register(cmd, handler)
+}
+
+func canBeNil(value reflect.Value) bool {
+	switch value.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice:
+		return true
+	default:
+		return false
+	}
 }

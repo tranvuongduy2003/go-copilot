@@ -1,0 +1,1401 @@
+openapi: 3.0.3
+info:
+  title: Go Copilot API
+  description: |
+    Authentication and Role-Based Access Control (RBAC) API.
+
+    ## Authentication
+    This API uses JWT Bearer tokens for authentication. Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <access_token>
+    ```
+
+    ## Rate Limiting
+    Sensitive endpoints are rate-limited. When limits are exceeded, a 429 response is returned with a Retry-After header.
+
+    ## Permissions
+    Access to resources is controlled via RBAC. Users are assigned roles, which contain permissions.
+    Permission format: `resource:action` (e.g., `users:read`, `roles:create`)
+
+    ## Common Flow Examples
+
+    ### 1. User Registration and Login
+    ```bash
+    # Register a new user
+    curl -X POST http://localhost:8080/api/v1/auth/register \
+      -H "Content-Type: application/json" \
+      -d '{"email": "user@example.com", "password": "SecurePass123!", "full_name": "John Doe"}'
+
+    # Login to get tokens
+    curl -X POST http://localhost:8080/api/v1/auth/login \
+      -H "Content-Type: application/json" \
+      -d '{"email": "user@example.com", "password": "SecurePass123!"}'
+    ```
+
+    ### 2. Making Authenticated Requests
+    ```bash
+    # Get current user profile
+    curl -X GET http://localhost:8080/api/v1/auth/me \
+      -H "Authorization: Bearer <access_token>"
+
+    # List users (requires users:list permission)
+    curl -X GET http://localhost:8080/api/v1/users \
+      -H "Authorization: Bearer <access_token>"
+    ```
+
+    ### 3. Refreshing Tokens
+    ```bash
+    # Refresh expired access token
+    curl -X POST http://localhost:8080/api/v1/auth/refresh \
+      -H "Content-Type: application/json" \
+      -d '{"refresh_token": "<refresh_token>"}'
+    ```
+
+    ### 4. Password Reset Flow
+    ```bash
+    # Request password reset
+    curl -X POST http://localhost:8080/api/v1/auth/forgot-password \
+      -H "Content-Type: application/json" \
+      -d '{"email": "user@example.com"}'
+
+    # Reset password with token (from email)
+    curl -X POST http://localhost:8080/api/v1/auth/reset-password \
+      -H "Content-Type: application/json" \
+      -d '{"reset_token": "<token_from_email>", "new_password": "NewSecurePass123!"}'
+    ```
+
+    ### 5. Role Management (Admin)
+    ```bash
+    # Create a new role
+    curl -X POST http://localhost:8080/api/v1/roles \
+      -H "Authorization: Bearer <admin_token>" \
+      -H "Content-Type: application/json" \
+      -d '{"name": "editor", "display_name": "Editor", "description": "Content editor"}'
+
+    # Assign role to user
+    curl -X POST http://localhost:8080/api/v1/users/<user_id>/roles/<role_id> \
+      -H "Authorization: Bearer <admin_token>"
+    ```
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development server
+  - url: https://api.example.com/api/v1
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: User authentication endpoints
+  - name: Users
+    description: User management endpoints
+  - name: Roles
+    description: Role management endpoints
+  - name: Permissions
+    description: Permission management endpoints
+  - name: Health
+    description: Health check endpoints
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account with the default role assigned
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+              description: Seconds to wait before retrying
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate user
+      description: Authenticate with email and password, returns access and refresh tokens
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Account locked or inactive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Exchange a valid refresh token for new access and refresh tokens
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Tokens refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout current session
+      description: Revoke the current refresh token
+      operationId: logout
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Logged out successfully
+        '401':
+          description: Unauthorized
+
+  /auth/logout-all:
+    post:
+      tags:
+        - Authentication
+      summary: Logout all sessions
+      description: Revoke all refresh tokens for the current user
+      operationId: logoutAll
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: All sessions logged out
+        '401':
+          description: Unauthorized
+
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Request password reset
+      description: |
+        Request a password reset email. Always returns success to prevent email enumeration.
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: Password reset requested (always returns success)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPasswordResponse'
+        '429':
+          description: Rate limit exceeded
+
+  /auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Reset password
+      description: Reset password using a valid reset token
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Invalid or expired token, or weak password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get current user
+      description: Get the authenticated user's profile with roles and permissions
+      operationId: getCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthUserResponse'
+        '401':
+          description: Unauthorized
+
+  /auth/sessions:
+    get:
+      tags:
+        - Authentication
+      summary: List active sessions
+      description: Get all active sessions for the current user
+      operationId: getSessions
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of active sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SessionResponse'
+        '401':
+          description: Unauthorized
+
+  /auth/sessions/{id}:
+    delete:
+      tags:
+        - Authentication
+      summary: Revoke session
+      description: Revoke a specific session by ID
+      operationId: revokeSession
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Session revoked
+        '401':
+          description: Unauthorized
+        '404':
+          description: Session not found
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: List users
+      description: Get paginated list of users
+      operationId: listUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, banned]
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated list of users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires users:list permission
+    post:
+      tags:
+        - Users
+      summary: Create user
+      description: Create a new user (admin only)
+      operationId: createUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires users:create permission
+        '409':
+          description: Email already exists
+
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user
+      description: Get user by ID
+      operationId: getUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires users:read permission
+        '404':
+          description: User not found
+    put:
+      tags:
+        - Users
+      summary: Update user
+      description: Update user details
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires users:update permission
+        '404':
+          description: User not found
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      description: Soft delete a user
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '204':
+          description: User deleted
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires users:delete permission
+        '404':
+          description: User not found
+
+  /users/{id}/roles:
+    get:
+      tags:
+        - Users
+      summary: Get user roles
+      description: Get roles assigned to a user
+      operationId: getUserRoles
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: List of roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: User not found
+    put:
+      tags:
+        - Users
+      summary: Set user roles
+      description: Replace all roles for a user
+      operationId: setUserRoles
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetRolesRequest'
+      responses:
+        '200':
+          description: Roles updated
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires roles:assign permission
+        '404':
+          description: User not found
+
+  /users/{id}/roles/{roleId}:
+    post:
+      tags:
+        - Users
+      summary: Assign role to user
+      description: Assign a specific role to a user
+      operationId: assignRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/RoleId'
+      responses:
+        '200':
+          description: Role assigned
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires roles:assign permission
+        '404':
+          description: User or role not found
+        '409':
+          description: Role already assigned
+    delete:
+      tags:
+        - Users
+      summary: Revoke role from user
+      description: Remove a specific role from a user
+      operationId: revokeRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/RoleId'
+      responses:
+        '204':
+          description: Role revoked
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires roles:assign permission
+        '404':
+          description: User or role not found
+
+  /users/{id}/permissions:
+    get:
+      tags:
+        - Users
+      summary: Get user permissions
+      description: Get effective permissions for a user (aggregated from all roles)
+      operationId: getUserPermissions
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: List of permissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example: ["users:read", "users:list", "roles:read"]
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: User not found
+
+  /roles:
+    get:
+      tags:
+        - Roles
+      summary: List roles
+      description: Get all roles
+      operationId: listRoles
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires roles:list permission
+    post:
+      tags:
+        - Roles
+      summary: Create role
+      description: Create a new role
+      operationId: createRole
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRoleRequest'
+      responses:
+        '201':
+          description: Role created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleResponse'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires roles:create permission
+        '409':
+          description: Role name already exists
+
+  /roles/{id}:
+    get:
+      tags:
+        - Roles
+      summary: Get role
+      description: Get role with permissions
+      operationId: getRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RoleIdPath'
+      responses:
+        '200':
+          description: Role details with permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleWithPermissionsResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires roles:read permission
+        '404':
+          description: Role not found
+    put:
+      tags:
+        - Roles
+      summary: Update role
+      description: Update role details
+      operationId: updateRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RoleIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRoleRequest'
+      responses:
+        '200':
+          description: Role updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleResponse'
+        '400':
+          description: Invalid input or system role modification
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires roles:update permission
+        '404':
+          description: Role not found
+    delete:
+      tags:
+        - Roles
+      summary: Delete role
+      description: Delete a role (system roles cannot be deleted)
+      operationId: deleteRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RoleIdPath'
+      responses:
+        '204':
+          description: Role deleted
+        '400':
+          description: Cannot delete system or default role
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires roles:delete permission
+        '404':
+          description: Role not found
+        '409':
+          description: Role is assigned to users
+
+  /roles/{id}/permissions:
+    put:
+      tags:
+        - Roles
+      summary: Set role permissions
+      description: Replace all permissions for a role
+      operationId: setRolePermissions
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RoleIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetPermissionsRequest'
+      responses:
+        '200':
+          description: Permissions updated
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires roles:update permission
+        '404':
+          description: Role not found
+
+  /roles/{id}/permissions/{permissionId}:
+    post:
+      tags:
+        - Roles
+      summary: Add permission to role
+      operationId: addPermissionToRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RoleIdPath'
+        - $ref: '#/components/parameters/PermissionId'
+      responses:
+        '200':
+          description: Permission added
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires roles:update permission
+        '404':
+          description: Role or permission not found
+        '409':
+          description: Permission already assigned
+    delete:
+      tags:
+        - Roles
+      summary: Remove permission from role
+      operationId: removePermissionFromRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RoleIdPath'
+        - $ref: '#/components/parameters/PermissionId'
+      responses:
+        '204':
+          description: Permission removed
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires roles:update permission
+        '404':
+          description: Role or permission not found
+
+  /permissions:
+    get:
+      tags:
+        - Permissions
+      summary: List permissions
+      description: Get all permissions, optionally filtered by resource
+      operationId: listPermissions
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: resource
+          in: query
+          schema:
+            type: string
+          description: Filter by resource (e.g., "users", "roles")
+      responses:
+        '200':
+          description: List of permissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PermissionResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires permissions:list permission
+    post:
+      tags:
+        - Permissions
+      summary: Create permission
+      description: Create a custom permission
+      operationId: createPermission
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePermissionRequest'
+      responses:
+        '201':
+          description: Permission created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionResponse'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires permissions:create permission
+        '409':
+          description: Permission code already exists
+
+  /permissions/{id}:
+    get:
+      tags:
+        - Permissions
+      summary: Get permission
+      operationId: getPermission
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PermissionIdPath'
+      responses:
+        '200':
+          description: Permission details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires permissions:read permission
+        '404':
+          description: Permission not found
+    put:
+      tags:
+        - Permissions
+      summary: Update permission
+      description: Update permission description
+      operationId: updatePermission
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PermissionIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePermissionRequest'
+      responses:
+        '200':
+          description: Permission updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionResponse'
+        '400':
+          description: Invalid input or system permission
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires permissions:update permission
+        '404':
+          description: Permission not found
+    delete:
+      tags:
+        - Permissions
+      summary: Delete permission
+      description: Delete a custom permission (system permissions cannot be deleted)
+      operationId: deletePermission
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PermissionIdPath'
+      responses:
+        '204':
+          description: Permission deleted
+        '400':
+          description: Cannot delete system permission
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires permissions:delete permission
+        '404':
+          description: Permission not found
+        '409':
+          description: Permission is assigned to roles
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token
+
+  parameters:
+    UserId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: User ID
+    RoleId:
+      name: roleId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Role ID
+    RoleIdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Role ID
+    PermissionId:
+      name: permissionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Permission ID
+    PermissionIdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Permission ID
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - full_name
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: Must contain uppercase, lowercase, number, and special character
+          example: SecurePass123!
+        full_name:
+          type: string
+          minLength: 2
+          maxLength: 255
+          example: John Doe
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: SecurePass123!
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    ForgotPasswordRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+
+    ResetPasswordRequest:
+      type: object
+      required:
+        - reset_token
+        - new_password
+      properties:
+        reset_token:
+          type: string
+        new_password:
+          type: string
+          format: password
+          minLength: 8
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserResponse'
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+
+    AuthUserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        full_name:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, banned]
+        roles:
+          type: array
+          items:
+            type: string
+        permissions:
+          type: array
+          items:
+            type: string
+
+    SessionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        device_info:
+          $ref: '#/components/schemas/DeviceResponse'
+        ip_address:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        last_used_at:
+          type: string
+          format: date-time
+          nullable: true
+        is_current:
+          type: boolean
+
+    DeviceResponse:
+      type: object
+      properties:
+        user_agent:
+          type: string
+        platform:
+          type: string
+        browser:
+          type: string
+
+    ForgotPasswordResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: If an account exists with this email, a password reset link has been sent.
+        expires_at:
+          type: string
+          format: date-time
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        full_name:
+          type: string
+        avatar:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [active, inactive, banned]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UserListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponse'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_pages:
+          type: integer
+        has_next:
+          type: boolean
+        has_prev:
+          type: boolean
+
+    CreateUserRequest:
+      type: object
+      required:
+        - email
+        - password
+        - full_name
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        full_name:
+          type: string
+        role_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        full_name:
+          type: string
+        avatar:
+          type: string
+
+    SetRolesRequest:
+      type: object
+      required:
+        - role_ids
+      properties:
+        role_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    RoleResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        display_name:
+          type: string
+        description:
+          type: string
+        is_system:
+          type: boolean
+        is_default:
+          type: boolean
+        priority:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    RoleWithPermissionsResponse:
+      allOf:
+        - $ref: '#/components/schemas/RoleResponse'
+        - type: object
+          properties:
+            permissions:
+              type: array
+              items:
+                type: string
+              description: Permission codes (e.g., ["users:read", "users:create"])
+
+    CreateRoleRequest:
+      type: object
+      required:
+        - name
+        - display_name
+      properties:
+        name:
+          type: string
+          pattern: ^[a-z][a-z0-9_]*$
+          example: content_editor
+        display_name:
+          type: string
+          example: Content Editor
+        description:
+          type: string
+        permission_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    UpdateRoleRequest:
+      type: object
+      properties:
+        display_name:
+          type: string
+        description:
+          type: string
+
+    SetPermissionsRequest:
+      type: object
+      required:
+        - permission_ids
+      properties:
+        permission_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    PermissionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        resource:
+          type: string
+          example: users
+        action:
+          type: string
+          example: read
+        code:
+          type: string
+          example: users:read
+        description:
+          type: string
+        is_system:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreatePermissionRequest:
+      type: object
+      required:
+        - resource
+        - action
+      properties:
+        resource:
+          type: string
+          pattern: ^[a-z][a-z0-9_]*$
+          example: articles
+        action:
+          type: string
+          pattern: ^[a-z][a-z0-9_]*$
+          example: publish
+        description:
+          type: string
+          example: Publish articles
+
+    UpdatePermissionRequest:
+      type: object
+      properties:
+        description:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              example: Invalid input
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                  message:
+                    type: string

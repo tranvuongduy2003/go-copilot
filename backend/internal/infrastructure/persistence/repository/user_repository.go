@@ -50,6 +50,24 @@ const (
 	querySelectUsers = `
 		SELECT id, email, password_hash, full_name, status, created_at, updated_at, deleted_at
 		FROM users`
+
+	queryFindUserRoles = `
+		SELECT role_id FROM user_roles WHERE user_id = $1`
+
+	queryDeleteUserRoles = `
+		DELETE FROM user_roles WHERE user_id = $1`
+
+	queryInsertUserRole = `
+		INSERT INTO user_roles (user_id, role_id, assigned_at)
+		VALUES ($1, $2, $3)
+		ON CONFLICT (user_id, role_id) DO NOTHING`
+
+	queryFindUsersByRole = `
+		SELECT u.id, u.email, u.password_hash, u.full_name, u.status, u.created_at, u.updated_at, u.deleted_at
+		FROM users u
+		INNER JOIN user_roles ur ON u.id = ur.user_id
+		WHERE ur.role_id = $1 AND u.deleted_at IS NULL
+		ORDER BY u.created_at DESC`
 )
 
 const pgUniqueViolationCode = "23505"
@@ -65,13 +83,14 @@ type userRow struct {
 	DeletedAt    *time.Time
 }
 
-func (r *userRow) toDomain() (*user.User, error) {
+func (r *userRow) toDomain(roleIDs []uuid.UUID) (*user.User, error) {
 	return user.ReconstructUser(user.ReconstructUserParams{
 		ID:           r.ID,
 		Email:        r.Email,
 		PasswordHash: r.PasswordHash,
 		FullName:     r.FullName,
 		Status:       user.Status(r.Status),
+		RoleIDs:      roleIDs,
 		CreatedAt:    r.CreatedAt,
 		UpdatedAt:    r.UpdatedAt,
 		DeletedAt:    r.DeletedAt,
@@ -121,6 +140,10 @@ func (r *UserRepository) Create(ctx context.Context, u *user.User) error {
 		return postgres.NewDBError("create user", err)
 	}
 
+	if err := r.syncRoles(ctx, querier, u.ID(), u.RoleIDs()); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -147,6 +170,10 @@ func (r *UserRepository) Update(ctx context.Context, u *user.User) error {
 
 	if cmdTag.RowsAffected() == 0 {
 		return user.NewUserNotFoundError(row.ID.String())
+	}
+
+	if err := r.syncRoles(ctx, querier, u.ID(), u.RoleIDs()); err != nil {
+		return err
 	}
 
 	return nil
@@ -189,7 +216,12 @@ func (r *UserRepository) FindByID(ctx context.Context, id uuid.UUID) (*user.User
 		return nil, postgres.NewDBError("find user by id", err)
 	}
 
-	return row.toDomain()
+	roleIDs, err := r.loadRoleIDs(ctx, querier, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return row.toDomain(roleIDs)
 }
 
 func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*user.User, error) {
@@ -213,7 +245,12 @@ func (r *UserRepository) FindByEmail(ctx context.Context, email string) (*user.U
 		return nil, postgres.NewDBError("find user by email", err)
 	}
 
-	return row.toDomain()
+	roleIDs, err := r.loadRoleIDs(ctx, querier, row.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return row.toDomain(roleIDs)
 }
 
 func (r *UserRepository) ExistsByEmail(ctx context.Context, email string) (bool, error) {
@@ -300,7 +337,12 @@ func (r *UserRepository) List(ctx context.Context, filter user.Filter, paginatio
 			return nil, 0, postgres.NewDBError("scan user row", err)
 		}
 
-		u, err := row.toDomain()
+		roleIDs, err := r.loadRoleIDs(ctx, querier, row.ID)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		u, err := row.toDomain(roleIDs)
 		if err != nil {
 			return nil, 0, postgres.NewDBError("convert user row to domain", err)
 		}
@@ -312,4 +354,89 @@ func (r *UserRepository) List(ctx context.Context, filter user.Filter, paginatio
 	}
 
 	return users, total, nil
+}
+
+func (r *UserRepository) FindByRole(ctx context.Context, roleID uuid.UUID) ([]*user.User, error) {
+	querier := postgres.GetQuerier(ctx, r.pool)
+
+	rows, err := querier.Query(ctx, queryFindUsersByRole, roleID)
+	if err != nil {
+		return nil, postgres.NewDBError("find users by role", err)
+	}
+	defer rows.Close()
+
+	users := make([]*user.User, 0)
+	for rows.Next() {
+		row := &userRow{}
+		err := rows.Scan(
+			&row.ID,
+			&row.Email,
+			&row.PasswordHash,
+			&row.FullName,
+			&row.Status,
+			&row.CreatedAt,
+			&row.UpdatedAt,
+			&row.DeletedAt,
+		)
+		if err != nil {
+			return nil, postgres.NewDBError("scan user row", err)
+		}
+
+		roleIDs, err := r.loadRoleIDs(ctx, querier, row.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		u, err := row.toDomain(roleIDs)
+		if err != nil {
+			return nil, postgres.NewDBError("convert user row to domain", err)
+		}
+		users = append(users, u)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, postgres.NewDBError("iterate user rows", err)
+	}
+
+	return users, nil
+}
+
+func (r *UserRepository) loadRoleIDs(ctx context.Context, querier postgres.Querier, userID uuid.UUID) ([]uuid.UUID, error) {
+	rows, err := querier.Query(ctx, queryFindUserRoles, userID)
+	if err != nil {
+		return nil, postgres.NewDBError("load user roles", err)
+	}
+	defer rows.Close()
+
+	roleIDs := make([]uuid.UUID, 0)
+	for rows.Next() {
+		var roleID uuid.UUID
+		if err := rows.Scan(&roleID); err != nil {
+			return nil, postgres.NewDBError("scan role id", err)
+		}
+		roleIDs = append(roleIDs, roleID)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, postgres.NewDBError("iterate role ids", err)
+	}
+
+	return roleIDs, nil
+}
+
+func (r *UserRepository) syncRoles(ctx context.Context, querier postgres.Querier, userID uuid.UUID, roleIDs []uuid.UUID) error {
+	_, err := querier.Exec(ctx, queryDeleteUserRoles, userID)
+	if err != nil {
+		return postgres.NewDBError("delete user roles", err)
+	}
+
+	now := time.Now().UTC()
+	for _, roleID := range roleIDs {
+		_, err := querier.Exec(ctx, queryInsertUserRole, userID, roleID, now)
+		if err != nil {
+			return postgres.NewDBError("insert user role", err)
+		}
+	}
+
+	return nil
 }

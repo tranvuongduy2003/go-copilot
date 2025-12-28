@@ -305,37 +305,45 @@ backend/
 │   │   │   ├── repository.go          # Repository interface (port)
 │   │   │   ├── errors.go              # Domain-specific errors
 │   │   │   └── events.go              # Domain events
+│   │   ├── auth/                      # Auth aggregate
+│   │   ├── role/                      # Role aggregate
+│   │   ├── permission/                # Permission aggregate
 │   │   └── shared/                    # Shared domain concepts
 │   │       ├── errors.go
 │   │       └── valueobjects.go
 │   │
-│   ├── application/                   # Application Layer (CQRS)
-│   │   ├── command/                   # Commands (write operations)
-│   │   │   ├── create_user.go
-│   │   │   └── update_user.go
-│   │   ├── query/                     # Queries (read operations)
-│   │   │   ├── get_user.go
-│   │   │   └── list_users.go
-│   │   └── dto/                       # Data Transfer Objects
-│   │       └── user_dto.go
+│   ├── application/                   # Application Layer (CQRS, domain-aligned)
+│   │   ├── cqrs/                      # Base CQRS interfaces
+│   │   ├── user/                      # User bounded context
+│   │   │   ├── command/               # usercommand package
+│   │   │   │   ├── create_user.go
+│   │   │   │   └── update_user.go
+│   │   │   ├── query/                 # userquery package
+│   │   │   │   ├── get_user.go
+│   │   │   │   └── list_users.go
+│   │   │   └── dto/                   # userdto package
+│   │   │       └── user_dto.go
+│   │   └── auth/                      # Auth bounded context
+│   │       ├── command/               # authcommand package
+│   │       ├── query/                 # authquery package
+│   │       └── dto/                   # authdto package
 │   │
 │   ├── infrastructure/                # Infrastructure Layer (adapters)
 │   │   ├── persistence/
 │   │   │   ├── postgres/              # Database utilities
-│   │   │   │   ├── connection.go
-│   │   │   │   ├── unit_of_work.go
-│   │   │   │   ├── query_builder.go
-│   │   │   │   └── errors.go
+│   │   │   │   └── ...
 │   │   │   └── repository/            # Repository implementations
 │   │   │       └── user_repository.go # Implements domain.UserRepository
-│   │   └── cache/
-│   │       └── redis/
+│   │   ├── cache/
+│   │   │   └── redis/
+│   │   └── audit/                     # Audit logging
 │   │
 │   └── interfaces/                    # Interface Adapters Layer
 │       └── http/
 │           ├── handler/
 │           │   └── user_handler.go
 │           ├── middleware/
+│           ├── dto/
 │           └── router/
 │
 ├── migrations/                        # golang-migrate migrations
@@ -345,6 +353,22 @@ backend/
     ├── config/
     ├── logger/
     └── validator/
+```
+
+### Application Layer Package Imports
+
+Use aliased imports for domain-specific application packages:
+
+```go
+import (
+    usercommand "yourapp/internal/application/user/command"
+    userquery "yourapp/internal/application/user/query"
+    userdto "yourapp/internal/application/user/dto"
+
+    authcommand "yourapp/internal/application/auth/command"
+    authquery "yourapp/internal/application/auth/query"
+    authdto "yourapp/internal/application/auth/dto"
+)
 ```
 
 ### Frontend (React)

@@ -1,0 +1,38 @@
+# =============================================================================
+# Backend Test Dockerfile
+# =============================================================================
+# Multi-stage build for Go backend testing with all necessary tools
+
+FROM golang:1.23-alpine AS test-runner
+
+# Install system dependencies
+RUN apk add --no-cache \
+    git \
+    gcc \
+    musl-dev \
+    postgresql-client \
+    curl
+
+# Install golang-migrate
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+# Install golangci-lint
+RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.55.2
+
+# Set working directory
+WORKDIR /app
+
+# Copy go mod files first for better caching
+COPY backend/go.mod backend/go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy the rest of the source code
+COPY backend/ ./
+
+# Create coverage directory
+RUN mkdir -p /app/coverage
+
+# Default command runs tests
+CMD ["go", "test", "-v", "-cover", "-coverprofile=/app/coverage/coverage.out", "./..."]

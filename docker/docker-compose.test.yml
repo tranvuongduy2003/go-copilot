@@ -8,24 +8,50 @@ version: "3.9"
 
 services:
   # ---------------------------------------------------------------------------
-  # Test Runner
+  # Backend Test Runner (Go)
   # ---------------------------------------------------------------------------
-  test-runner:
+  backend-test:
     build:
       context: ..
-      dockerfile: docker/Dockerfile.backend
-      target: builder
-    container_name: app-test-runner
+      dockerfile: docker/Dockerfile.backend.test
+    container_name: app-backend-test
     volumes:
       - ../backend:/app
-      - /app/node_modules
+      - go_mod_cache:/go/pkg/mod
+      - go_build_cache:/root/.cache/go-build
       - test_coverage:/app/coverage
     environment:
-      - NODE_ENV=test
-      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/app_test
-      - REDIS_URL=redis://redis-test:6379
-      - JWT_SECRET=test-secret
-    command: npm run test:ci
+      - APP_ENV=test
+      - DATABASE_HOST=postgres-test
+      - DATABASE_PORT=5432
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=app_test
+      - DATABASE_SSL_MODE=disable
+      - DATABASE_MAX_OPEN_CONNS=10
+      - DATABASE_MAX_IDLE_CONNS=5
+      - REDIS_HOST=redis-test
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
+      - REDIS_DB=0
+      - JWT_SECRET=test-secret-key-for-testing-purposes-only
+      - JWT_ACCESS_TOKEN_TTL=15m
+      - JWT_REFRESH_TOKEN_TTL=24h
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8080
+      - LOG_LEVEL=debug
+      - LOG_FORMAT=console
+    command: >
+      sh -c "
+        echo 'Waiting for PostgreSQL...' &&
+        until pg_isready -h postgres-test -p 5432 -U postgres; do sleep 1; done &&
+        echo 'PostgreSQL is ready!' &&
+        echo 'Running migrations...' &&
+        migrate -path /app/migrations -database 'postgresql://postgres:postgres@postgres-test:5432/app_test?sslmode=disable' up &&
+        echo 'Running tests...' &&
+        go test -v -cover -coverprofile=/app/coverage/coverage.out ./... &&
+        go tool cover -html=/app/coverage/coverage.out -o /app/coverage/coverage.html
+      "
     depends_on:
       postgres-test:
         condition: service_healthy
@@ -53,6 +79,8 @@ services:
     command: npm run test:ci
     networks:
       - test-network
+    profiles:
+      - frontend
 
   # ---------------------------------------------------------------------------
   # E2E Tests (Playwright/Cypress)
@@ -122,7 +150,7 @@ services:
     container_name: app-nginx-test
     depends_on:
       - frontend-test
-      - test-runner
+      - backend-test
     networks:
       - test-network
     profiles:
@@ -141,3 +169,5 @@ networks:
 volumes:
   test_coverage:
   e2e_results:
+  go_mod_cache:
+  go_build_cache:

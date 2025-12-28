@@ -79,6 +79,8 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("jwt.secret", "")
 	v.SetDefault("jwt.access_token_ttl", 15*time.Minute)
 	v.SetDefault("jwt.refresh_token_ttl", 7*24*time.Hour)
+	v.SetDefault("jwt.issuer", "go-copilot")
+	v.SetDefault("jwt.audience", "go-copilot-users")
 
 	v.SetDefault("log.level", "info")
 	v.SetDefault("log.format", "json")
@@ -122,6 +124,8 @@ func bindEnvVars(v *viper.Viper) {
 		"jwt.secret":            "JWT_SECRET",
 		"jwt.access_token_ttl":  "JWT_ACCESS_TOKEN_TTL",
 		"jwt.refresh_token_ttl": "JWT_REFRESH_TOKEN_TTL",
+		"jwt.issuer":            "JWT_ISSUER",
+		"jwt.audience":          "JWT_AUDIENCE",
 
 		"log.level":  "LOG_LEVEL",
 		"log.format": "LOG_FORMAT",

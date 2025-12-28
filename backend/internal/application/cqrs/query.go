@@ -18,19 +18,28 @@ type QueryHandler[Q Query, R any] interface {
 type QueryBus interface {
 	Dispatch(ctx context.Context, query Query) (interface{}, error)
 	Register(queryType Query, handler interface{})
+	Use(middleware ...QueryMiddleware)
 }
 
 type InMemoryQueryBus struct {
-	handlers map[reflect.Type]interface{}
-	mutex    sync.RWMutex
-	logger   logger.Logger
+	handlers    map[reflect.Type]interface{}
+	mutex       sync.RWMutex
+	logger      logger.Logger
+	middlewares []QueryMiddleware
 }
 
 func NewInMemoryQueryBus(log logger.Logger) *InMemoryQueryBus {
 	return &InMemoryQueryBus{
-		handlers: make(map[reflect.Type]interface{}),
-		logger:   log,
+		handlers:    make(map[reflect.Type]interface{}),
+		logger:      log,
+		middlewares: make([]QueryMiddleware, 0),
 	}
+}
+
+func (bus *InMemoryQueryBus) Use(middlewares ...QueryMiddleware) {
+	bus.mutex.Lock()
+	defer bus.mutex.Unlock()
+	bus.middlewares = append(bus.middlewares, middlewares...)
 }
 
 func (bus *InMemoryQueryBus) Register(queryType Query, handler interface{}) {
@@ -46,6 +55,20 @@ func (bus *InMemoryQueryBus) Register(queryType Query, handler interface{}) {
 }
 
 func (bus *InMemoryQueryBus) Dispatch(ctx context.Context, query Query) (interface{}, error) {
+	coreDispatcher := func(dispatchContext context.Context, dispatchQuery Query) (interface{}, error) {
+		return bus.executeHandler(dispatchContext, dispatchQuery)
+	}
+
+	bus.mutex.RLock()
+	middlewareChain := make([]QueryMiddleware, len(bus.middlewares))
+	copy(middlewareChain, bus.middlewares)
+	bus.mutex.RUnlock()
+
+	finalDispatcher := ChainQueryMiddleware(middlewareChain...)(coreDispatcher)
+	return finalDispatcher(ctx, query)
+}
+
+func (bus *InMemoryQueryBus) executeHandler(ctx context.Context, query Query) (interface{}, error) {
 	bus.mutex.RLock()
 	qryType := reflect.TypeOf(query)
 	handler, exists := bus.handlers[qryType]
@@ -75,12 +98,16 @@ func (bus *InMemoryQueryBus) Dispatch(ctx context.Context, query Query) (interfa
 
 	if len(results) == 2 {
 		var result interface{}
-		if !results[0].IsNil() {
+		if canBeNil(results[0]) {
+			if !results[0].IsNil() {
+				result = results[0].Interface()
+			}
+		} else {
 			result = results[0].Interface()
 		}
 
 		var err error
-		if !results[1].IsNil() {
+		if canBeNil(results[1]) && !results[1].IsNil() {
 			err = results[1].Interface().(error)
 		}
 
@@ -88,7 +115,7 @@ func (bus *InMemoryQueryBus) Dispatch(ctx context.Context, query Query) (interfa
 	}
 
 	if len(results) == 1 {
-		if results[0].IsNil() {
+		if canBeNil(results[0]) && results[0].IsNil() {
 			return nil, nil
 		}
 		if errVal, ok := results[0].Interface().(error); ok {

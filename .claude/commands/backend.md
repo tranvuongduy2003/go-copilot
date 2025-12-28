@@ -52,25 +52,45 @@ backend/
 │   │   │   └── events.go              # Domain events
 │   │   └── shared/                    # Shared domain concepts
 │   │
-│   ├── application/                   # Application Layer (CQRS)
-│   │   ├── command/                   # Commands (write operations)
-│   │   ├── query/                     # Queries (read operations)
-│   │   └── dto/                       # Data Transfer Objects
+│   ├── application/                   # Application Layer (CQRS, domain-aligned)
+│   │   ├── cqrs/                      # Base CQRS interfaces
+│   │   └── <domain>/                  # Per-domain bounded context
+│   │       ├── command/               # Commands (write operations)
+│   │       ├── query/                 # Queries (read operations)
+│   │       └── dto/                   # Data Transfer Objects
 │   │
 │   ├── infrastructure/                # Infrastructure Layer
 │   │   ├── persistence/
 │   │   │   ├── postgres/              # Database utilities
 │   │   │   └── repository/            # Repository implementations
 │   │   ├── messaging/                 # Event bus implementations
-│   │   └── cache/                     # Cache implementations
+│   │   ├── cache/                     # Cache implementations
+│   │   └── audit/                     # Audit logging
 │   │
 │   └── interfaces/http/               # Interface Adapters Layer
 │       ├── handler/
 │       ├── middleware/
+│       ├── dto/
 │       └── router/
 │
 ├── migrations/                        # golang-migrate migrations
 └── pkg/                               # Shared packages
+```
+
+### Application Layer Package Naming
+
+Each domain has its own bounded context with aliased packages:
+
+```go
+import (
+    usercommand "yourapp/internal/application/user/command"
+    userquery "yourapp/internal/application/user/query"
+    userdto "yourapp/internal/application/user/dto"
+
+    authcommand "yourapp/internal/application/auth/command"
+    authquery "yourapp/internal/application/auth/query"
+    authdto "yourapp/internal/application/auth/dto"
+)
 ```
 
 ## Code Patterns

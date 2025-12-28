@@ -154,17 +154,19 @@ func (status Status) IsValid() bool {
 }
 ```
 
-### 2. Application Layer (CQRS)
+### 2. Application Layer (CQRS, Domain-Aligned)
 
-**`internal/application/command/create_product.go`**
+The application layer is organized by domain/bounded context. Each domain has its own `command/`, `query/`, and `dto/` packages.
+
+**`internal/application/product/command/create_product.go`**
 ```go
-package command
+package productcommand
 
 import (
     "context"
     "fmt"
 
-    "yourapp/internal/application/dto"
+    productdto "yourapp/internal/application/product/dto"
     "yourapp/internal/domain/product"
 )
 
@@ -182,7 +184,7 @@ func NewCreateProductHandler(repository product.Repository) *CreateProductHandle
     return &CreateProductHandler{repository: repository}
 }
 
-func (handler *CreateProductHandler) Handle(context context.Context, command CreateProductCommand) (*dto.ProductDTO, error) {
+func (handler *CreateProductHandler) Handle(context context.Context, command CreateProductCommand) (*productdto.ProductDTO, error) {
     newProduct, err := product.NewProduct(command.Name, command.Description, command.Price)
     if err != nil {
         return nil, fmt.Errorf("invalid product: %w", err)
@@ -192,19 +194,19 @@ func (handler *CreateProductHandler) Handle(context context.Context, command Cre
         return nil, fmt.Errorf("save product: %w", err)
     }
 
-    return dto.ProductFromDomain(newProduct), nil
+    return productdto.ProductFromDomain(newProduct), nil
 }
 ```
 
-**`internal/application/query/get_product.go`**
+**`internal/application/product/query/get_product.go`**
 ```go
-package query
+package productquery
 
 import (
     "context"
 
     "github.com/google/uuid"
-    "yourapp/internal/application/dto"
+    productdto "yourapp/internal/application/product/dto"
     "yourapp/internal/domain/product"
 )
 
@@ -220,18 +222,18 @@ func NewGetProductHandler(repository product.Repository) *GetProductHandler {
     return &GetProductHandler{repository: repository}
 }
 
-func (handler *GetProductHandler) Handle(context context.Context, query GetProductQuery) (*dto.ProductDTO, error) {
+func (handler *GetProductHandler) Handle(context context.Context, query GetProductQuery) (*productdto.ProductDTO, error) {
     foundProduct, err := handler.repository.FindByID(context, query.ID)
     if err != nil {
         return nil, err
     }
-    return dto.ProductFromDomain(foundProduct), nil
+    return productdto.ProductFromDomain(foundProduct), nil
 }
 ```
 
-**`internal/application/dto/product_dto.go`**
+**`internal/application/product/dto/product_dto.go`**
 ```go
-package dto
+package productdto
 
 import (
     "time"
@@ -353,22 +355,22 @@ import (
 
     "github.com/go-chi/chi/v5"
     "github.com/google/uuid"
-    "yourapp/internal/application/command"
-    "yourapp/internal/application/query"
+    productcommand "yourapp/internal/application/product/command"
+    productquery "yourapp/internal/application/product/query"
     "yourapp/internal/domain/product"
     "yourapp/internal/interfaces/http/response"
 )
 
 type ProductHandler struct {
-    createHandler *command.CreateProductHandler
-    getHandler    *query.GetProductHandler
-    listHandler   *query.ListProductsHandler
+    createHandler *productcommand.CreateProductHandler
+    getHandler    *productquery.GetProductHandler
+    listHandler   *productquery.ListProductsHandler
 }
 
 func NewProductHandler(
-    createHandler *command.CreateProductHandler,
-    getHandler *query.GetProductHandler,
-    listHandler *query.ListProductsHandler,
+    createHandler *productcommand.CreateProductHandler,
+    getHandler *productquery.GetProductHandler,
+    listHandler *productquery.ListProductsHandler,
 ) *ProductHandler {
     return &ProductHandler{
         createHandler: createHandler,
@@ -400,7 +402,7 @@ func (handler *ProductHandler) Create(writer http.ResponseWriter, request *http.
         return
     }
 
-    result, err := handler.createHandler.Handle(request.Context(), command.CreateProductCommand{
+    result, err := handler.createHandler.Handle(request.Context(), productcommand.CreateProductCommand{
         Name:        createRequest.Name,
         Description: createRequest.Description,
         Price:       createRequest.Price,
@@ -421,7 +423,7 @@ func (handler *ProductHandler) Get(writer http.ResponseWriter, request *http.Req
         return
     }
 
-    result, err := handler.getHandler.Handle(request.Context(), query.GetProductQuery{ID: id})
+    result, err := handler.getHandler.Handle(request.Context(), productquery.GetProductQuery{ID: id})
     if err != nil {
         if err == product.ErrNotFound {
             response.NotFound(writer, "Product not found")

@@ -14,6 +14,7 @@ type User struct {
 	passwordHash shared.PasswordHash
 	fullName     shared.FullName
 	status       Status
+	roleIDs      []uuid.UUID
 	createdAt    time.Time
 	updatedAt    time.Time
 	deletedAt    *time.Time
@@ -48,6 +49,7 @@ func NewUser(params NewUserParams) (*User, error) {
 		passwordHash:  passwordHash,
 		fullName:      fullName,
 		status:        StatusPending,
+		roleIDs:       make([]uuid.UUID, 0),
 		createdAt:     now,
 		updatedAt:     now,
 		deletedAt:     nil,
@@ -64,6 +66,7 @@ type ReconstructUserParams struct {
 	PasswordHash string
 	FullName     string
 	Status       Status
+	RoleIDs      []uuid.UUID
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	DeletedAt    *time.Time
@@ -89,12 +92,18 @@ func ReconstructUser(params ReconstructUserParams) (*User, error) {
 		return nil, ErrInvalidStatus
 	}
 
+	roleIDs := make([]uuid.UUID, 0)
+	if params.RoleIDs != nil {
+		roleIDs = append(roleIDs, params.RoleIDs...)
+	}
+
 	return &User{
 		AggregateRoot: shared.NewAggregateRootWithID(params.ID),
 		email:         email,
 		passwordHash:  passwordHash,
 		fullName:      fullName,
 		status:        params.Status,
+		roleIDs:       roleIDs,
 		createdAt:     params.CreatedAt,
 		updatedAt:     params.UpdatedAt,
 		deletedAt:     params.DeletedAt,
@@ -225,4 +234,68 @@ func (u *User) Delete() error {
 	u.AddDomainEvent(NewUserDeletedEvent(u.ID(), now))
 
 	return nil
+}
+
+func (u *User) RoleIDs() []uuid.UUID {
+	result := make([]uuid.UUID, len(u.roleIDs))
+	copy(result, u.roleIDs)
+	return result
+}
+
+func (u *User) HasRole(roleID uuid.UUID) bool {
+	for _, id := range u.roleIDs {
+		if id == roleID {
+			return true
+		}
+	}
+	return false
+}
+
+func (u *User) AssignRole(roleID uuid.UUID) error {
+	if u.HasRole(roleID) {
+		return ErrRoleAlreadyAssigned
+	}
+
+	u.roleIDs = append(u.roleIDs, roleID)
+	u.updatedAt = time.Now().UTC()
+	u.AddDomainEvent(NewUserRoleAssignedEvent(u.ID(), roleID))
+
+	return nil
+}
+
+func (u *User) RevokeRole(roleID uuid.UUID) error {
+	index := -1
+	for i, id := range u.roleIDs {
+		if id == roleID {
+			index = i
+			break
+		}
+	}
+
+	if index == -1 {
+		return ErrRoleNotAssigned
+	}
+
+	u.roleIDs = append(u.roleIDs[:index], u.roleIDs[index+1:]...)
+	u.updatedAt = time.Now().UTC()
+	u.AddDomainEvent(NewUserRoleRevokedEvent(u.ID(), roleID))
+
+	return nil
+}
+
+func (u *User) SetRoles(roleIDs []uuid.UUID) {
+	oldRoleIDs := u.roleIDs
+
+	seen := make(map[uuid.UUID]bool)
+	newRoleIDs := make([]uuid.UUID, 0)
+	for _, id := range roleIDs {
+		if !seen[id] {
+			newRoleIDs = append(newRoleIDs, id)
+			seen[id] = true
+		}
+	}
+
+	u.roleIDs = newRoleIDs
+	u.updatedAt = time.Now().UTC()
+	u.AddDomainEvent(NewUserRolesUpdatedEvent(u.ID(), oldRoleIDs, newRoleIDs))
 }

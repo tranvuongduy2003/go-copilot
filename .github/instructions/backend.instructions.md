@@ -19,34 +19,41 @@ backend/
 │   │   │   ├── user.go                # Entity + Value Objects
 │   │   │   ├── repository.go          # Repository interface (port)
 │   │   │   └── events.go              # Domain events
+│   │   ├── auth/                      # Auth aggregate
+│   │   ├── role/                      # Role aggregate
+│   │   ├── permission/                # Permission aggregate
 │   │   └── shared/                    # Shared domain concepts
 │   │       ├── errors.go              # Domain errors
 │   │       └── valueobjects.go        # Shared value objects
 │   │
-│   ├── application/                   # Application Layer (use cases)
-│   │   ├── command/                   # CQRS Commands (write operations)
-│   │   │   ├── create_user.go
-│   │   │   └── update_user.go
-│   │   ├── query/                     # CQRS Queries (read operations)
-│   │   │   ├── get_user.go
-│   │   │   └── list_users.go
-│   │   └── dto/                       # Data Transfer Objects
-│   │       └── user_dto.go
+│   ├── application/                   # Application Layer (CQRS, domain-aligned)
+│   │   ├── cqrs/                      # Base CQRS interfaces
+│   │   ├── user/                      # User bounded context
+│   │   │   ├── command/               # usercommand package
+│   │   │   │   ├── create_user.go
+│   │   │   │   └── update_user.go
+│   │   │   ├── query/                 # userquery package
+│   │   │   │   ├── get_user.go
+│   │   │   │   └── list_users.go
+│   │   │   └── dto/                   # userdto package
+│   │   │       └── user_dto.go
+│   │   └── auth/                      # Auth bounded context
+│   │       ├── command/               # authcommand package
+│   │       ├── query/                 # authquery package
+│   │       └── dto/                   # authdto package
 │   │
 │   ├── infrastructure/                # Infrastructure Layer (adapters)
 │   │   ├── persistence/               # Database implementations
 │   │   │   ├── postgres/              # Database utilities
-│   │   │   │   ├── connection.go      # Connection pool management
-│   │   │   │   ├── unit_of_work.go    # Transaction support
-│   │   │   │   ├── query_builder.go   # SQL query helpers
-│   │   │   │   └── errors.go          # Database error types
+│   │   │   │   └── ...
 │   │   │   └── repository/            # Repository implementations
 │   │   │       └── user_repository.go # Implements domain.UserRepository
 │   │   ├── cache/                     # Cache implementations
 │   │   │   └── redis/
-│   │   └── messaging/                 # Event bus implementations
-│   │       └── memory/
-│   │           └── event_bus.go       # In-memory event bus
+│   │   ├── messaging/                 # Event bus implementations
+│   │   │   └── memory/
+│   │   │       └── event_bus.go
+│   │   └── audit/                     # Audit logging
 │   │
 │   └── interfaces/                    # Interface Adapters Layer
 │       └── http/
@@ -252,18 +259,35 @@ var (
 )
 ```
 
-## Application Layer (CQRS)
+## Application Layer (CQRS, Domain-Aligned)
+
+The application layer is organized by domain/bounded context. Each domain has its own `command/`, `query/`, and `dto/` packages with unique package names.
+
+### Package Naming Convention
+
+```go
+import (
+    usercommand "yourapp/internal/application/user/command"
+    userquery "yourapp/internal/application/user/query"
+    userdto "yourapp/internal/application/user/dto"
+
+    authcommand "yourapp/internal/application/auth/command"
+    authquery "yourapp/internal/application/auth/query"
+    authdto "yourapp/internal/application/auth/dto"
+)
+```
 
 ### Commands (Write Operations)
 
 ```go
-// internal/application/command/create_user.go
-package command
+// internal/application/user/command/create_user.go
+package usercommand
 
 import (
     "context"
     "fmt"
 
+    userdto "github.com/yourorg/app/internal/application/user/dto"
     "github.com/yourorg/app/internal/domain/shared"
     "github.com/yourorg/app/internal/domain/user"
 )
@@ -274,23 +298,21 @@ type CreateUserCommand struct {
 }
 
 type CreateUserHandler struct {
-    repo   user.Repository
-    logger Logger
+    repository user.Repository
+    logger     Logger
 }
 
-func NewCreateUserHandler(repo user.Repository, logger Logger) *CreateUserHandler {
-    return &CreateUserHandler{repo: repo, logger: logger}
+func NewCreateUserHandler(repository user.Repository, logger Logger) *CreateUserHandler {
+    return &CreateUserHandler{repository: repository, logger: logger}
 }
 
-func (h *CreateUserHandler) Handle(ctx context.Context, cmd CreateUserCommand) (*user.User, error) {
-    // Validate and create value objects
-    email, err := user.NewEmail(cmd.Email)
+func (handler *CreateUserHandler) Handle(ctx context.Context, command CreateUserCommand) (*userdto.UserDTO, error) {
+    email, err := user.NewEmail(command.Email)
     if err != nil {
         return nil, fmt.Errorf("invalid email: %w", err)
     }
 
-    // Check for existing user (business rule)
-    existing, err := h.repo.FindByEmail(ctx, email)
+    existing, err := handler.repository.FindByEmail(ctx, email)
     if err != nil && err != user.ErrUserNotFound {
         return nil, fmt.Errorf("check existing user: %w", err)
     }
@@ -298,34 +320,32 @@ func (h *CreateUserHandler) Handle(ctx context.Context, cmd CreateUserCommand) (
         return nil, shared.ErrConflict
     }
 
-    // Create domain entity
-    u, err := user.NewUser(email, cmd.Name)
+    newUser, err := user.NewUser(email, command.Name)
     if err != nil {
         return nil, fmt.Errorf("create user: %w", err)
     }
 
-    // Persist
-    if err := h.repo.Save(ctx, u); err != nil {
+    if err := handler.repository.Save(ctx, newUser); err != nil {
         return nil, fmt.Errorf("save user: %w", err)
     }
 
-    h.logger.Info("user created", "id", u.ID(), "email", email.String())
+    handler.logger.Info("user created", "id", newUser.ID(), "email", email.String())
 
-    return u, nil
+    return userdto.UserFromDomain(newUser), nil
 }
 ```
 
 ### Queries (Read Operations)
 
 ```go
-// internal/application/query/get_user.go
-package query
+// internal/application/user/query/get_user.go
+package userquery
 
 import (
     "context"
 
     "github.com/google/uuid"
-    "github.com/yourorg/app/internal/application/dto"
+    userdto "github.com/yourorg/app/internal/application/user/dto"
     "github.com/yourorg/app/internal/domain/user"
 )
 
@@ -334,28 +354,28 @@ type GetUserQuery struct {
 }
 
 type GetUserHandler struct {
-    repo user.Repository
+    repository user.Repository
 }
 
-func NewGetUserHandler(repo user.Repository) *GetUserHandler {
-    return &GetUserHandler{repo: repo}
+func NewGetUserHandler(repository user.Repository) *GetUserHandler {
+    return &GetUserHandler{repository: repository}
 }
 
-func (h *GetUserHandler) Handle(ctx context.Context, q GetUserQuery) (*dto.UserResponse, error) {
-    u, err := h.repo.FindByID(ctx, q.ID)
+func (handler *GetUserHandler) Handle(ctx context.Context, query GetUserQuery) (*userdto.UserDTO, error) {
+    foundUser, err := handler.repository.FindByID(ctx, query.ID)
     if err != nil {
         return nil, err
     }
 
-    return dto.UserResponseFromDomain(u), nil
+    return userdto.UserFromDomain(foundUser), nil
 }
 ```
 
 ### DTOs (Data Transfer Objects)
 
 ```go
-// internal/application/dto/user_dto.go
-package dto
+// internal/application/user/dto/user_dto.go
+package userdto
 
 import (
     "time"
@@ -364,7 +384,7 @@ import (
     "github.com/yourorg/app/internal/domain/user"
 )
 
-type UserResponse struct {
+type UserDTO struct {
     ID        uuid.UUID `json:"id"`
     Email     string    `json:"email"`
     Name      string    `json:"name"`
@@ -373,14 +393,14 @@ type UserResponse struct {
     UpdatedAt time.Time `json:"updated_at"`
 }
 
-func UserResponseFromDomain(u *user.User) *UserResponse {
-    return &UserResponse{
-        ID:        u.ID(),
-        Email:     u.Email().String(),
-        Name:      u.Name(),
-        Role:      string(u.Role()),
-        CreatedAt: u.CreatedAt(),
-        UpdatedAt: u.UpdatedAt(),
+func UserFromDomain(domainUser *user.User) *UserDTO {
+    return &UserDTO{
+        ID:        domainUser.ID(),
+        Email:     domainUser.Email().String(),
+        Name:      domainUser.Name(),
+        Role:      string(domainUser.Role()),
+        CreatedAt: domainUser.CreatedAt(),
+        UpdatedAt: domainUser.UpdatedAt(),
     }
 }
 ```
@@ -484,24 +504,24 @@ import (
 
     "github.com/go-chi/chi/v5"
     "github.com/google/uuid"
-    "github.com/yourorg/app/internal/application/command"
-    "github.com/yourorg/app/internal/application/query"
+    usercommand "github.com/yourorg/app/internal/application/user/command"
+    userquery "github.com/yourorg/app/internal/application/user/query"
     "github.com/yourorg/app/internal/domain/shared"
     "github.com/yourorg/app/internal/domain/user"
 )
 
 type UserHandler struct {
-    createUser *command.CreateUserHandler
-    getUser    *query.GetUserHandler
+    createUserHandler *usercommand.CreateUserHandler
+    getUserHandler    *userquery.GetUserHandler
 }
 
 func NewUserHandler(
-    createUser *command.CreateUserHandler,
-    getUser *query.GetUserHandler,
+    createUserHandler *usercommand.CreateUserHandler,
+    getUserHandler *userquery.GetUserHandler,
 ) *UserHandler {
     return &UserHandler{
-        createUser: createUser,
-        getUser:    getUser,
+        createUserHandler: createUserHandler,
+        getUserHandler:    getUserHandler,
     }
 }
 
@@ -510,55 +530,55 @@ type CreateUserRequest struct {
     Name  string `json:"name" validate:"required,min=2,max=100"`
 }
 
-func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
-    var req CreateUserRequest
-    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        respondError(w, http.StatusBadRequest, "invalid request body")
+func (handler *UserHandler) Create(writer http.ResponseWriter, request *http.Request) {
+    var requestBody CreateUserRequest
+    if err := json.NewDecoder(request.Body).Decode(&requestBody); err != nil {
+        respondError(writer, http.StatusBadRequest, "invalid request body")
         return
     }
 
-    cmd := command.CreateUserCommand{
-        Email: req.Email,
-        Name:  req.Name,
+    command := usercommand.CreateUserCommand{
+        Email: requestBody.Email,
+        Name:  requestBody.Name,
     }
 
-    u, err := h.createUser.Handle(r.Context(), cmd)
+    result, err := handler.createUserHandler.Handle(request.Context(), command)
     if err != nil {
-        handleDomainError(w, err)
+        handleDomainError(writer, err)
         return
     }
 
-    respondJSON(w, http.StatusCreated, dto.UserResponseFromDomain(u))
+    respondJSON(writer, http.StatusCreated, result)
 }
 
-func (h *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
-    idStr := chi.URLParam(r, "id")
-    id, err := uuid.Parse(idStr)
+func (handler *UserHandler) Get(writer http.ResponseWriter, request *http.Request) {
+    idParam := chi.URLParam(request, "id")
+    id, err := uuid.Parse(idParam)
     if err != nil {
-        respondError(w, http.StatusBadRequest, "invalid user id")
+        respondError(writer, http.StatusBadRequest, "invalid user id")
         return
     }
 
-    q := query.GetUserQuery{ID: id}
-    result, err := h.getUser.Handle(r.Context(), q)
+    query := userquery.GetUserQuery{ID: id}
+    result, err := handler.getUserHandler.Handle(request.Context(), query)
     if err != nil {
-        handleDomainError(w, err)
+        handleDomainError(writer, err)
         return
     }
 
-    respondJSON(w, http.StatusOK, result)
+    respondJSON(writer, http.StatusOK, result)
 }
 
-func handleDomainError(w http.ResponseWriter, err error) {
+func handleDomainError(writer http.ResponseWriter, err error) {
     switch {
     case errors.Is(err, user.ErrUserNotFound), errors.Is(err, shared.ErrNotFound):
-        respondError(w, http.StatusNotFound, "resource not found")
+        respondError(writer, http.StatusNotFound, "resource not found")
     case errors.Is(err, shared.ErrConflict):
-        respondError(w, http.StatusConflict, "resource already exists")
+        respondError(writer, http.StatusConflict, "resource already exists")
     case errors.Is(err, user.ErrInvalidEmail), errors.Is(err, user.ErrInvalidName):
-        respondError(w, http.StatusBadRequest, err.Error())
+        respondError(writer, http.StatusBadRequest, err.Error())
     default:
-        respondError(w, http.StatusInternalServerError, "internal server error")
+        respondError(writer, http.StatusInternalServerError, "internal server error")
     }
 }
 ```

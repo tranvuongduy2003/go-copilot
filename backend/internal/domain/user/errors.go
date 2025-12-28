@@ -13,6 +13,8 @@ var (
 	ErrUserAlreadyActive = shared.NewBusinessRuleViolationError("user_already_active", "user is already active")
 	ErrUserAlreadyInactive = shared.NewBusinessRuleViolationError("user_already_inactive", "user is already inactive")
 	ErrUserIsBanned = shared.NewBusinessRuleViolationError("user_is_banned", "user is banned and cannot perform this action")
+	ErrRoleAlreadyAssigned = shared.NewBusinessRuleViolationError("role_already_assigned", "role is already assigned to this user")
+	ErrRoleNotAssigned = shared.NewBusinessRuleViolationError("role_not_assigned", "role is not assigned to this user")
 )
 
 func NewUserNotFoundError(identifier string) *shared.NotFoundError {

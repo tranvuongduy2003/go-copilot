@@ -8,8 +8,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 
-	"github.com/tranvuongduy2003/go-copilot/internal/application/command"
-	"github.com/tranvuongduy2003/go-copilot/internal/application/query"
+	usercommand "github.com/tranvuongduy2003/go-copilot/internal/application/user/command"
+	userquery "github.com/tranvuongduy2003/go-copilot/internal/application/user/query"
 	"github.com/tranvuongduy2003/go-copilot/internal/interfaces/http/dto"
 	"github.com/tranvuongduy2003/go-copilot/internal/interfaces/http/response"
 	"github.com/tranvuongduy2003/go-copilot/pkg/logger"
@@ -17,44 +17,61 @@ import (
 )
 
 type UserHandler struct {
-	createUserHandler     *command.CreateUserHandler
-	updateUserHandler     *command.UpdateUserHandler
-	deleteUserHandler     *command.DeleteUserHandler
-	changePasswordHandler *command.ChangePasswordHandler
-	activateUserHandler   *command.ActivateUserHandler
-	deactivateUserHandler *command.DeactivateUserHandler
-	banUserHandler        *command.BanUserHandler
-	getUserHandler        *query.GetUserHandler
-	listUsersHandler      *query.ListUsersHandler
-	validator             *validator.Validator
-	logger                logger.Logger
+	createUserHandler        *usercommand.CreateUserHandler
+	updateUserHandler        *usercommand.UpdateUserHandler
+	deleteUserHandler        *usercommand.DeleteUserHandler
+	changePasswordHandler    *usercommand.ChangePasswordHandler
+	activateUserHandler      *usercommand.ActivateUserHandler
+	deactivateUserHandler    *usercommand.DeactivateUserHandler
+	banUserHandler           *usercommand.BanUserHandler
+	assignRoleToUserHandler  *usercommand.AssignRoleToUserHandler
+	revokeRoleFromUserHandler *usercommand.RevokeRoleFromUserHandler
+	setUserRolesHandler      *usercommand.SetUserRolesHandler
+	getUserHandler           *userquery.GetUserHandler
+	listUsersHandler         *userquery.ListUsersHandler
+	getUserRolesHandler      *userquery.GetUserRolesHandler
+	getUserPermissionsHandler *userquery.GetUserPermissionsHandler
+	validator                *validator.Validator
+	logger                   logger.Logger
 }
 
-func NewUserHandler(
-	createUserHandler *command.CreateUserHandler,
-	updateUserHandler *command.UpdateUserHandler,
-	deleteUserHandler *command.DeleteUserHandler,
-	changePasswordHandler *command.ChangePasswordHandler,
-	activateUserHandler *command.ActivateUserHandler,
-	deactivateUserHandler *command.DeactivateUserHandler,
-	banUserHandler *command.BanUserHandler,
-	getUserHandler *query.GetUserHandler,
-	listUsersHandler *query.ListUsersHandler,
-	validator *validator.Validator,
-	logger logger.Logger,
-) *UserHandler {
+type UserHandlerParams struct {
+	CreateUserHandler         *usercommand.CreateUserHandler
+	UpdateUserHandler         *usercommand.UpdateUserHandler
+	DeleteUserHandler         *usercommand.DeleteUserHandler
+	ChangePasswordHandler     *usercommand.ChangePasswordHandler
+	ActivateUserHandler       *usercommand.ActivateUserHandler
+	DeactivateUserHandler     *usercommand.DeactivateUserHandler
+	BanUserHandler            *usercommand.BanUserHandler
+	AssignRoleToUserHandler   *usercommand.AssignRoleToUserHandler
+	RevokeRoleFromUserHandler *usercommand.RevokeRoleFromUserHandler
+	SetUserRolesHandler       *usercommand.SetUserRolesHandler
+	GetUserHandler            *userquery.GetUserHandler
+	ListUsersHandler          *userquery.ListUsersHandler
+	GetUserRolesHandler       *userquery.GetUserRolesHandler
+	GetUserPermissionsHandler *userquery.GetUserPermissionsHandler
+	Validator                 *validator.Validator
+	Logger                    logger.Logger
+}
+
+func NewUserHandler(params UserHandlerParams) *UserHandler {
 	return &UserHandler{
-		createUserHandler:     createUserHandler,
-		updateUserHandler:     updateUserHandler,
-		deleteUserHandler:     deleteUserHandler,
-		changePasswordHandler: changePasswordHandler,
-		activateUserHandler:   activateUserHandler,
-		deactivateUserHandler: deactivateUserHandler,
-		banUserHandler:        banUserHandler,
-		getUserHandler:        getUserHandler,
-		listUsersHandler:      listUsersHandler,
-		validator:             validator,
-		logger:                logger,
+		createUserHandler:         params.CreateUserHandler,
+		updateUserHandler:         params.UpdateUserHandler,
+		deleteUserHandler:         params.DeleteUserHandler,
+		changePasswordHandler:     params.ChangePasswordHandler,
+		activateUserHandler:       params.ActivateUserHandler,
+		deactivateUserHandler:     params.DeactivateUserHandler,
+		banUserHandler:            params.BanUserHandler,
+		assignRoleToUserHandler:   params.AssignRoleToUserHandler,
+		revokeRoleFromUserHandler: params.RevokeRoleFromUserHandler,
+		setUserRolesHandler:       params.SetUserRolesHandler,
+		getUserHandler:            params.GetUserHandler,
+		listUsersHandler:          params.ListUsersHandler,
+		getUserRolesHandler:       params.GetUserRolesHandler,
+		getUserPermissionsHandler: params.GetUserPermissionsHandler,
+		validator:                 params.Validator,
+		logger:                    params.Logger,
 	}
 }
 
@@ -74,7 +91,7 @@ func (handler *UserHandler) Create(writer http.ResponseWriter, request *http.Req
 		return
 	}
 
-	cmd := command.CreateUserCommand{
+	cmd := usercommand.CreateUserCommand{
 		Email:    requestBody.Email,
 		Password: requestBody.Password,
 		FullName: requestBody.FullName,
@@ -105,7 +122,7 @@ func (handler *UserHandler) Get(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	userQuery := query.GetUserQuery{UserID: userID}
+	userQuery := userquery.GetUserQuery{UserID: userID}
 	userDTO, err := handler.getUserHandler.Handle(request.Context(), userQuery)
 	if err != nil {
 		response.Error(writer, request, err)
@@ -170,7 +187,7 @@ func (handler *UserHandler) List(writer http.ResponseWriter, request *http.Reque
 		dateTo = &dateToStr
 	}
 
-	listQuery := query.ListUsersQuery{
+	listQuery := userquery.ListUsersQuery{
 		Page:      page,
 		Limit:     limit,
 		Status:    status,
@@ -233,7 +250,7 @@ func (handler *UserHandler) Update(writer http.ResponseWriter, request *http.Req
 		return
 	}
 
-	cmd := command.UpdateUserCommand{
+	cmd := usercommand.UpdateUserCommand{
 		UserID:   userID,
 		FullName: requestBody.FullName,
 	}
@@ -262,7 +279,7 @@ func (handler *UserHandler) Delete(writer http.ResponseWriter, request *http.Req
 		return
 	}
 
-	cmd := command.DeleteUserCommand{UserID: userID}
+	cmd := usercommand.DeleteUserCommand{UserID: userID}
 	if err := handler.deleteUserHandler.Handle(request.Context(), cmd); err != nil {
 		response.Error(writer, request, err)
 		return
@@ -293,7 +310,7 @@ func (handler *UserHandler) ChangePassword(writer http.ResponseWriter, request *
 		return
 	}
 
-	cmd := command.ChangePasswordCommand{
+	cmd := usercommand.ChangePasswordCommand{
 		UserID:          userID,
 		CurrentPassword: requestBody.CurrentPassword,
 		NewPassword:     requestBody.NewPassword,
@@ -314,7 +331,7 @@ func (handler *UserHandler) Activate(writer http.ResponseWriter, request *http.R
 		return
 	}
 
-	cmd := command.ActivateUserCommand{UserID: userID}
+	cmd := usercommand.ActivateUserCommand{UserID: userID}
 	userDTO, err := handler.activateUserHandler.Handle(request.Context(), cmd)
 	if err != nil {
 		response.Error(writer, request, err)
@@ -339,7 +356,7 @@ func (handler *UserHandler) Deactivate(writer http.ResponseWriter, request *http
 		return
 	}
 
-	cmd := command.DeactivateUserCommand{UserID: userID}
+	cmd := usercommand.DeactivateUserCommand{UserID: userID}
 	userDTO, err := handler.deactivateUserHandler.Handle(request.Context(), cmd)
 	if err != nil {
 		response.Error(writer, request, err)
@@ -379,7 +396,7 @@ func (handler *UserHandler) Ban(writer http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	cmd := command.BanUserCommand{
+	cmd := usercommand.BanUserCommand{
 		UserID: userID,
 		Reason: requestBody.Reason,
 	}
@@ -401,7 +418,190 @@ func (handler *UserHandler) Ban(writer http.ResponseWriter, request *http.Reques
 	})
 }
 
+func (handler *UserHandler) GetRoles(writer http.ResponseWriter, request *http.Request) {
+	userID, err := handler.parseUserID(request)
+	if err != nil {
+		response.BadRequest(writer, request, "invalid user id")
+		return
+	}
+
+	query := userquery.GetUserRolesQuery{UserID: userID}
+	roles, err := handler.getUserRolesHandler.Handle(request.Context(), query)
+	if err != nil {
+		response.Error(writer, request, err)
+		return
+	}
+
+	roleResponses := make([]dto.RoleResponse, len(roles))
+	for i, roleDTO := range roles {
+		roleResponses[i] = dto.RoleResponse{
+			ID:            roleDTO.ID,
+			Name:          roleDTO.Name,
+			DisplayName:   roleDTO.DisplayName,
+			Description:   roleDTO.Description,
+			PermissionIDs: roleDTO.PermissionIDs,
+			IsSystem:      roleDTO.IsSystem,
+			IsDefault:     roleDTO.IsDefault,
+			Priority:      roleDTO.Priority,
+			CreatedAt:     roleDTO.CreatedAt,
+			UpdatedAt:     roleDTO.UpdatedAt,
+		}
+	}
+
+	response.Success(writer, roleResponses)
+}
+
+func (handler *UserHandler) SetRoles(writer http.ResponseWriter, request *http.Request) {
+	userID, err := handler.parseUserID(request)
+	if err != nil {
+		response.BadRequest(writer, request, "invalid user id")
+		return
+	}
+
+	var requestBody dto.SetUserRolesRequest
+	if err := json.NewDecoder(request.Body).Decode(&requestBody); err != nil {
+		response.BadRequest(writer, request, "invalid request body")
+		return
+	}
+
+	if err := handler.validator.Validate(requestBody); err != nil {
+		if validationErrors, ok := validator.GetValidationErrors(err); ok {
+			response.ValidationError(writer, request, validationErrors)
+			return
+		}
+		response.BadRequest(writer, request, err.Error())
+		return
+	}
+
+	cmd := usercommand.SetUserRolesCommand{
+		UserID:  userID,
+		RoleIDs: requestBody.RoleIDs,
+	}
+
+	userDTO, err := handler.setUserRolesHandler.Handle(request.Context(), cmd)
+	if err != nil {
+		response.Error(writer, request, err)
+		return
+	}
+
+	response.Success(writer, dto.UserResponse{
+		ID:        userDTO.ID,
+		Email:     userDTO.Email,
+		FullName:  userDTO.FullName,
+		Status:    userDTO.Status,
+		CreatedAt: userDTO.CreatedAt,
+		UpdatedAt: userDTO.UpdatedAt,
+		DeletedAt: userDTO.DeletedAt,
+	})
+}
+
+func (handler *UserHandler) AssignRole(writer http.ResponseWriter, request *http.Request) {
+	userID, err := handler.parseUserID(request)
+	if err != nil {
+		response.BadRequest(writer, request, "invalid user id")
+		return
+	}
+
+	roleID, err := handler.parseRoleID(request)
+	if err != nil {
+		response.BadRequest(writer, request, "invalid role id")
+		return
+	}
+
+	cmd := usercommand.AssignRoleToUserCommand{
+		UserID: userID,
+		RoleID: roleID,
+	}
+
+	userDTO, err := handler.assignRoleToUserHandler.Handle(request.Context(), cmd)
+	if err != nil {
+		response.Error(writer, request, err)
+		return
+	}
+
+	response.Success(writer, dto.UserResponse{
+		ID:        userDTO.ID,
+		Email:     userDTO.Email,
+		FullName:  userDTO.FullName,
+		Status:    userDTO.Status,
+		CreatedAt: userDTO.CreatedAt,
+		UpdatedAt: userDTO.UpdatedAt,
+		DeletedAt: userDTO.DeletedAt,
+	})
+}
+
+func (handler *UserHandler) RevokeRole(writer http.ResponseWriter, request *http.Request) {
+	userID, err := handler.parseUserID(request)
+	if err != nil {
+		response.BadRequest(writer, request, "invalid user id")
+		return
+	}
+
+	roleID, err := handler.parseRoleID(request)
+	if err != nil {
+		response.BadRequest(writer, request, "invalid role id")
+		return
+	}
+
+	cmd := usercommand.RevokeRoleFromUserCommand{
+		UserID: userID,
+		RoleID: roleID,
+	}
+
+	userDTO, err := handler.revokeRoleFromUserHandler.Handle(request.Context(), cmd)
+	if err != nil {
+		response.Error(writer, request, err)
+		return
+	}
+
+	response.Success(writer, dto.UserResponse{
+		ID:        userDTO.ID,
+		Email:     userDTO.Email,
+		FullName:  userDTO.FullName,
+		Status:    userDTO.Status,
+		CreatedAt: userDTO.CreatedAt,
+		UpdatedAt: userDTO.UpdatedAt,
+		DeletedAt: userDTO.DeletedAt,
+	})
+}
+
+func (handler *UserHandler) GetPermissions(writer http.ResponseWriter, request *http.Request) {
+	userID, err := handler.parseUserID(request)
+	if err != nil {
+		response.BadRequest(writer, request, "invalid user id")
+		return
+	}
+
+	query := userquery.GetUserPermissionsQuery{UserID: userID}
+	permissions, err := handler.getUserPermissionsHandler.Handle(request.Context(), query)
+	if err != nil {
+		response.Error(writer, request, err)
+		return
+	}
+
+	permissionResponses := make([]dto.PermissionResponse, len(permissions))
+	for i, permission := range permissions {
+		permissionResponses[i] = dto.PermissionResponse{
+			ID:          permission.ID,
+			Resource:    permission.Resource,
+			Action:      permission.Action,
+			Code:        permission.Code,
+			Description: permission.Description,
+			IsSystem:    permission.IsSystem,
+			CreatedAt:   permission.CreatedAt,
+			UpdatedAt:   permission.UpdatedAt,
+		}
+	}
+
+	response.Success(writer, permissionResponses)
+}
+
 func (handler *UserHandler) parseUserID(request *http.Request) (uuid.UUID, error) {
 	userIDParam := chi.URLParam(request, "id")
 	return uuid.Parse(userIDParam)
+}
+
+func (handler *UserHandler) parseRoleID(request *http.Request) (uuid.UUID, error) {
+	roleIDParam := chi.URLParam(request, "roleId")
+	return uuid.Parse(roleIDParam)
 }

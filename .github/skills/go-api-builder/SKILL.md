@@ -19,14 +19,27 @@ This skill guides you through building complete REST API endpoints in Go followi
 internal/
 ├── domain/product/           # Domain Layer (entities, repository interface)
 ├── application/
-│   ├── command/              # Write operations (Create, Update, Delete)
-│   ├── query/                # Read operations (Get, List)
-│   └── dto/                  # Data Transfer Objects
+│   └── product/              # Product bounded context (domain-aligned)
+│       ├── command/          # productcommand package (Create, Update, Delete)
+│       ├── query/            # productquery package (Get, List)
+│       └── dto/              # productdto package
 ├── infrastructure/
 │   └── persistence/
 │       ├── postgres/         # Database utilities (connection, unit_of_work, errors)
 │       └── repository/       # Repository implementations
 └── interfaces/http/handler/  # HTTP handlers
+```
+
+### Application Layer Package Imports
+
+Use aliased imports for domain-specific application packages:
+
+```go
+import (
+    productcommand "yourapp/internal/application/product/command"
+    productquery "yourapp/internal/application/product/query"
+    productdto "yourapp/internal/application/product/dto"
+)
 ```
 
 ## Step-by-Step Process
@@ -333,24 +346,23 @@ func (r *productRepository) Delete(ctx context.Context, id uuid.UUID) error {
 
 ### Step 5: Implement Command/Query Handlers (Application Layer - CQRS)
 
-Create separate **command handlers** (writes) and **query handlers** (reads).
+Create separate **command handlers** (writes) and **query handlers** (reads) in domain-aligned folders.
 
 #### Command: Create Product
 
 ```go
-// internal/application/command/create_product.go
-package command
+// internal/application/product/command/create_product.go
+package productcommand
 
 import (
     "context"
     "fmt"
     "log/slog"
 
-    "github.com/yourorg/app/internal/application/dto"
+    productdto "github.com/yourorg/app/internal/application/product/dto"
     "github.com/yourorg/app/internal/domain/product"
 )
 
-// CreateProductCommand contains the data needed to create a product.
 type CreateProductCommand struct {
     Name        string
     Description string
@@ -359,51 +371,46 @@ type CreateProductCommand struct {
     Stock       int
 }
 
-// CreateProductHandler handles the CreateProductCommand.
 type CreateProductHandler struct {
-    repo   product.Repository
-    logger *slog.Logger
+    repository product.Repository
+    logger     *slog.Logger
 }
 
-func NewCreateProductHandler(repo product.Repository, logger *slog.Logger) *CreateProductHandler {
-    return &CreateProductHandler{repo: repo, logger: logger}
+func NewCreateProductHandler(repository product.Repository, logger *slog.Logger) *CreateProductHandler {
+    return &CreateProductHandler{repository: repository, logger: logger}
 }
 
-// Handle executes the create product command.
-func (h *CreateProductHandler) Handle(ctx context.Context, cmd CreateProductCommand) (*dto.ProductDTO, error) {
-    // Create domain entity with validation
-    p, err := product.NewProduct(cmd.Name, cmd.Description, cmd.Category, cmd.Price, cmd.Stock)
+func (handler *CreateProductHandler) Handle(ctx context.Context, command CreateProductCommand) (*productdto.ProductDTO, error) {
+    newProduct, err := product.NewProduct(command.Name, command.Description, command.Category, command.Price, command.Stock)
     if err != nil {
         return nil, fmt.Errorf("invalid product: %w", err)
     }
 
-    // Persist via repository
-    if err := h.repo.Save(ctx, p); err != nil {
+    if err := handler.repository.Save(ctx, newProduct); err != nil {
         return nil, fmt.Errorf("save product: %w", err)
     }
 
-    h.logger.Info("product created", "id", p.ID(), "name", p.Name())
+    handler.logger.Info("product created", "id", newProduct.ID(), "name", newProduct.Name())
 
-    return dto.ProductFromDomain(p), nil
+    return productdto.ProductFromDomain(newProduct), nil
 }
 ```
 
 #### Command: Update Product
 
 ```go
-// internal/application/command/update_product.go
-package command
+// internal/application/product/command/update_product.go
+package productcommand
 
 import (
     "context"
     "fmt"
 
     "github.com/google/uuid"
-    "github.com/yourorg/app/internal/application/dto"
+    productdto "github.com/yourorg/app/internal/application/product/dto"
     "github.com/yourorg/app/internal/domain/product"
 )
 
-// UpdateProductCommand contains the data needed to update a product.
 type UpdateProductCommand struct {
     ID          uuid.UUID
     Name        *string
@@ -413,45 +420,39 @@ type UpdateProductCommand struct {
     Stock       *int
 }
 
-// UpdateProductHandler handles the UpdateProductCommand.
 type UpdateProductHandler struct {
-    repo product.Repository
+    repository product.Repository
 }
 
-func NewUpdateProductHandler(repo product.Repository) *UpdateProductHandler {
-    return &UpdateProductHandler{repo: repo}
+func NewUpdateProductHandler(repository product.Repository) *UpdateProductHandler {
+    return &UpdateProductHandler{repository: repository}
 }
 
-// Handle executes the update product command.
-func (h *UpdateProductHandler) Handle(ctx context.Context, cmd UpdateProductCommand) (*dto.ProductDTO, error) {
-    // Fetch existing product
-    p, err := h.repo.FindByID(ctx, cmd.ID)
+func (handler *UpdateProductHandler) Handle(ctx context.Context, command UpdateProductCommand) (*productdto.ProductDTO, error) {
+    existingProduct, err := handler.repository.FindByID(ctx, command.ID)
     if err != nil {
         return nil, err
     }
 
-    // Apply updates via domain methods
-    if cmd.Price != nil {
-        if err := p.UpdatePrice(*cmd.Price); err != nil {
+    if command.Price != nil {
+        if err := existingProduct.UpdatePrice(*command.Price); err != nil {
             return nil, err
         }
     }
-    // ... apply other updates via domain methods
 
-    // Persist changes
-    if err := h.repo.Save(ctx, p); err != nil {
+    if err := handler.repository.Save(ctx, existingProduct); err != nil {
         return nil, fmt.Errorf("save product: %w", err)
     }
 
-    return dto.ProductFromDomain(p), nil
+    return productdto.ProductFromDomain(existingProduct), nil
 }
 ```
 
 #### Command: Delete Product
 
 ```go
-// internal/application/command/delete_product.go
-package command
+// internal/application/product/command/delete_product.go
+package productcommand
 
 import (
     "context"
@@ -460,113 +461,103 @@ import (
     "github.com/yourorg/app/internal/domain/product"
 )
 
-// DeleteProductCommand contains the ID of the product to delete.
 type DeleteProductCommand struct {
     ID uuid.UUID
 }
 
-// DeleteProductHandler handles the DeleteProductCommand.
 type DeleteProductHandler struct {
-    repo product.Repository
+    repository product.Repository
 }
 
-func NewDeleteProductHandler(repo product.Repository) *DeleteProductHandler {
-    return &DeleteProductHandler{repo: repo}
+func NewDeleteProductHandler(repository product.Repository) *DeleteProductHandler {
+    return &DeleteProductHandler{repository: repository}
 }
 
-// Handle executes the delete product command.
-func (h *DeleteProductHandler) Handle(ctx context.Context, cmd DeleteProductCommand) error {
-    return h.repo.Delete(ctx, cmd.ID)
+func (handler *DeleteProductHandler) Handle(ctx context.Context, command DeleteProductCommand) error {
+    return handler.repository.Delete(ctx, command.ID)
 }
 ```
 
 #### Query: Get Product
 
 ```go
-// internal/application/query/get_product.go
-package query
+// internal/application/product/query/get_product.go
+package productquery
 
 import (
     "context"
 
     "github.com/google/uuid"
-    "github.com/yourorg/app/internal/application/dto"
+    productdto "github.com/yourorg/app/internal/application/product/dto"
     "github.com/yourorg/app/internal/domain/product"
 )
 
-// GetProductQuery contains the ID of the product to retrieve.
 type GetProductQuery struct {
     ID uuid.UUID
 }
 
-// GetProductHandler handles the GetProductQuery.
 type GetProductHandler struct {
-    repo product.Repository
+    repository product.Repository
 }
 
-func NewGetProductHandler(repo product.Repository) *GetProductHandler {
-    return &GetProductHandler{repo: repo}
+func NewGetProductHandler(repository product.Repository) *GetProductHandler {
+    return &GetProductHandler{repository: repository}
 }
 
-// Handle executes the get product query.
-func (h *GetProductHandler) Handle(ctx context.Context, q GetProductQuery) (*dto.ProductDTO, error) {
-    p, err := h.repo.FindByID(ctx, q.ID)
+func (handler *GetProductHandler) Handle(ctx context.Context, query GetProductQuery) (*productdto.ProductDTO, error) {
+    foundProduct, err := handler.repository.FindByID(ctx, query.ID)
     if err != nil {
         return nil, err
     }
-    return dto.ProductFromDomain(p), nil
+    return productdto.ProductFromDomain(foundProduct), nil
 }
 ```
 
 #### Query: List Products
 
 ```go
-// internal/application/query/list_products.go
-package query
+// internal/application/product/query/list_products.go
+package productquery
 
 import (
     "context"
 
-    "github.com/yourorg/app/internal/application/dto"
+    productdto "github.com/yourorg/app/internal/application/product/dto"
     "github.com/yourorg/app/internal/domain/product"
 )
 
-// ListProductsQuery contains pagination options.
 type ListProductsQuery struct {
     Page     int
     PerPage  int
     Category string
 }
 
-// ListProductsResult contains the paginated results.
 type ListProductsResult struct {
-    Products []*dto.ProductDTO
+    Products []*productdto.ProductDTO
     Total    int
 }
 
-// ListProductsHandler handles the ListProductsQuery.
 type ListProductsHandler struct {
-    repo product.Repository
+    repository product.Repository
 }
 
-func NewListProductsHandler(repo product.Repository) *ListProductsHandler {
-    return &ListProductsHandler{repo: repo}
+func NewListProductsHandler(repository product.Repository) *ListProductsHandler {
+    return &ListProductsHandler{repository: repository}
 }
 
-// Handle executes the list products query.
-func (h *ListProductsHandler) Handle(ctx context.Context, q ListProductsQuery) (*ListProductsResult, error) {
-    products, total, err := h.repo.FindAll(ctx, product.ListOptions{
-        Page:     q.Page,
-        PerPage:  q.PerPage,
-        Category: q.Category,
+func (handler *ListProductsHandler) Handle(ctx context.Context, query ListProductsQuery) (*ListProductsResult, error) {
+    products, total, err := handler.repository.FindAll(ctx, product.ListOptions{
+        Page:     query.Page,
+        PerPage:  query.PerPage,
+        Category: query.Category,
     })
     if err != nil {
         return nil, err
     }
 
-    dtos := make([]*dto.ProductDTO, len(products))
-    for i, p := range products {
-        dtos[i] = dto.ProductFromDomain(p)
+    dtos := make([]*productdto.ProductDTO, len(products))
+    for i, foundProduct := range products {
+        dtos[i] = productdto.ProductFromDomain(foundProduct)
     }
 
     return &ListProductsResult{Products: dtos, Total: total}, nil
@@ -576,8 +567,8 @@ func (h *ListProductsHandler) Handle(ctx context.Context, q ListProductsQuery) (
 #### DTO: Product Data Transfer Object
 
 ```go
-// internal/application/dto/product_dto.go
-package dto
+// internal/application/product/dto/product_dto.go
+package productdto
 
 import (
     "time"
@@ -586,7 +577,6 @@ import (
     "github.com/yourorg/app/internal/domain/product"
 )
 
-// ProductDTO is the data transfer object for API responses.
 type ProductDTO struct {
     ID          uuid.UUID `json:"id"`
     Name        string    `json:"name"`
@@ -598,24 +588,23 @@ type ProductDTO struct {
     UpdatedAt   time.Time `json:"updated_at"`
 }
 
-// ProductFromDomain converts a domain entity to DTO using getter methods.
-func ProductFromDomain(p *product.Product) *ProductDTO {
+func ProductFromDomain(domainProduct *product.Product) *ProductDTO {
     return &ProductDTO{
-        ID:          p.ID(),
-        Name:        p.Name(),
-        Description: p.Description(),
-        Price:       p.Price(),
-        Category:    p.Category(),
-        Stock:       p.Stock(),
-        CreatedAt:   p.CreatedAt(),
-        UpdatedAt:   p.UpdatedAt(),
+        ID:          domainProduct.ID(),
+        Name:        domainProduct.Name(),
+        Description: domainProduct.Description(),
+        Price:       domainProduct.Price(),
+        Category:    domainProduct.Category(),
+        Stock:       domainProduct.Stock(),
+        CreatedAt:   domainProduct.CreatedAt(),
+        UpdatedAt:   domainProduct.UpdatedAt(),
     }
 }
 ```
 
 ### Step 6: Implement the HTTP Handler (Interface Layer)
 
-Create the HTTP handler that uses command/query handlers.
+Create the HTTP handler that uses command/query handlers with domain-aligned imports.
 
 ```go
 // internal/interfaces/http/handler/product_handler.go
@@ -630,30 +619,28 @@ import (
     "github.com/go-chi/chi/v5"
     "github.com/go-playground/validator/v10"
     "github.com/google/uuid"
-    "github.com/yourorg/app/internal/application/command"
-    "github.com/yourorg/app/internal/application/query"
+    productcommand "github.com/yourorg/app/internal/application/product/command"
+    productquery "github.com/yourorg/app/internal/application/product/query"
     "github.com/yourorg/app/internal/domain/product"
     "github.com/yourorg/app/pkg/response"
 )
 
 var validate = validator.New()
 
-// ProductHandler handles HTTP requests for products.
 type ProductHandler struct {
-    createHandler *command.CreateProductHandler
-    updateHandler *command.UpdateProductHandler
-    deleteHandler *command.DeleteProductHandler
-    getHandler    *query.GetProductHandler
-    listHandler   *query.ListProductsHandler
+    createHandler *productcommand.CreateProductHandler
+    updateHandler *productcommand.UpdateProductHandler
+    deleteHandler *productcommand.DeleteProductHandler
+    getHandler    *productquery.GetProductHandler
+    listHandler   *productquery.ListProductsHandler
 }
 
-// NewProductHandler creates a new product handler with CQRS handlers.
 func NewProductHandler(
-    createHandler *command.CreateProductHandler,
-    updateHandler *command.UpdateProductHandler,
-    deleteHandler *command.DeleteProductHandler,
-    getHandler *query.GetProductHandler,
-    listHandler *query.ListProductsHandler,
+    createHandler *productcommand.CreateProductHandler,
+    updateHandler *productcommand.UpdateProductHandler,
+    deleteHandler *productcommand.DeleteProductHandler,
+    getHandler *productquery.GetProductHandler,
+    listHandler *productquery.ListProductsHandler,
 ) *ProductHandler {
     return &ProductHandler{
         createHandler: createHandler,
@@ -664,68 +651,65 @@ func NewProductHandler(
     }
 }
 
-func (h *ProductHandler) RegisterRoutes(r chi.Router) {
-    r.Route("/products", func(r chi.Router) {
-        r.Get("/", h.List)
-        r.Post("/", h.Create)
-        r.Get("/{id}", h.Get)
-        r.Put("/{id}", h.Update)
-        r.Delete("/{id}", h.Delete)
+func (handler *ProductHandler) RegisterRoutes(router chi.Router) {
+    router.Route("/products", func(router chi.Router) {
+        router.Get("/", handler.List)
+        router.Post("/", handler.Create)
+        router.Get("/{id}", handler.Get)
+        router.Put("/{id}", handler.Update)
+        router.Delete("/{id}", handler.Delete)
     })
 }
 
-// List handles GET /products
-func (h *ProductHandler) List(w http.ResponseWriter, r *http.Request) {
-    ctx := r.Context()
+func (handler *ProductHandler) List(writer http.ResponseWriter, request *http.Request) {
+    ctx := request.Context()
 
-    page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+    page, _ := strconv.Atoi(request.URL.Query().Get("page"))
     if page < 1 {
         page = 1
     }
-    perPage, _ := strconv.Atoi(r.URL.Query().Get("per_page"))
+    perPage, _ := strconv.Atoi(request.URL.Query().Get("per_page"))
     if perPage < 1 || perPage > 100 {
         perPage = 20
     }
 
-    result, err := h.listHandler.Handle(ctx, query.ListProductsQuery{
+    result, err := handler.listHandler.Handle(ctx, productquery.ListProductsQuery{
         Page:    page,
         PerPage: perPage,
     })
     if err != nil {
-        response.InternalError(w, err)
+        response.InternalError(writer, err)
         return
     }
 
-    response.JSONWithMeta(w, http.StatusOK, result.Products, &response.Meta{
+    response.JSONWithMeta(writer, http.StatusOK, result.Products, &response.Meta{
         Page:    page,
         PerPage: perPage,
         Total:   result.Total,
     })
 }
 
-// Get handles GET /products/{id}
-func (h *ProductHandler) Get(w http.ResponseWriter, r *http.Request) {
-    ctx := r.Context()
-    id, err := uuid.Parse(chi.URLParam(r, "id"))
+func (handler *ProductHandler) Get(writer http.ResponseWriter, request *http.Request) {
+    ctx := request.Context()
+    id, err := uuid.Parse(chi.URLParam(request, "id"))
     if err != nil {
-        response.BadRequest(w, "Invalid product ID")
+        response.BadRequest(writer, "Invalid product ID")
         return
     }
 
-    result, err := h.getHandler.Handle(ctx, query.GetProductQuery{ID: id})
+    result, err := handler.getHandler.Handle(ctx, productquery.GetProductQuery{ID: id})
     if err != nil {
         if errors.Is(err, product.ErrNotFound) {
-            response.NotFound(w, "Product not found")
+            response.NotFound(writer, "Product not found")
             return
         }
-        response.InternalError(w, err)
+        response.InternalError(writer, err)
         return
     }
 
-    response.JSON(w, http.StatusOK, result)
+    response.JSON(writer, http.StatusOK, result)
 }
 
-// CreateProductRequest is the request body for creating a product.
 type CreateProductRequest struct {
     Name        string `json:"name" validate:"required,min=1,max=255"`
     Description string `json:"description" validate:"max=1000"`
@@ -734,38 +718,35 @@ type CreateProductRequest struct {
     Stock       int    `json:"stock" validate:"gte=0"`
 }
 
-// Create handles POST /products
-func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
-    ctx := r.Context()
+func (handler *ProductHandler) Create(writer http.ResponseWriter, request *http.Request) {
+    ctx := request.Context()
 
-    var req CreateProductRequest
-    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        response.BadRequest(w, "Invalid request body")
+    var requestBody CreateProductRequest
+    if err := json.NewDecoder(request.Body).Decode(&requestBody); err != nil {
+        response.BadRequest(writer, "Invalid request body")
         return
     }
 
-    if err := validate.Struct(req); err != nil {
-        response.ValidationError(w, formatValidationErrors(err.(validator.ValidationErrors)))
+    if err := validate.Struct(requestBody); err != nil {
+        response.ValidationError(writer, formatValidationErrors(err.(validator.ValidationErrors)))
         return
     }
 
-    // Convert request to command
-    result, err := h.createHandler.Handle(ctx, command.CreateProductCommand{
-        Name:        req.Name,
-        Description: req.Description,
-        Price:       req.Price,
-        Category:    req.Category,
-        Stock:       req.Stock,
+    result, err := handler.createHandler.Handle(ctx, productcommand.CreateProductCommand{
+        Name:        requestBody.Name,
+        Description: requestBody.Description,
+        Price:       requestBody.Price,
+        Category:    requestBody.Category,
+        Stock:       requestBody.Stock,
     })
     if err != nil {
-        response.InternalError(w, err)
+        response.InternalError(writer, err)
         return
     }
 
-    response.JSON(w, http.StatusCreated, result)
+    response.JSON(writer, http.StatusCreated, result)
 }
 
-// UpdateProductRequest is the request body for updating a product.
 type UpdateProductRequest struct {
     Name        *string `json:"name" validate:"omitempty,min=1,max=255"`
     Description *string `json:"description" validate:"omitempty,max=1000"`
@@ -774,66 +755,63 @@ type UpdateProductRequest struct {
     Stock       *int    `json:"stock" validate:"omitempty,gte=0"`
 }
 
-// Update handles PUT /products/{id}
-func (h *ProductHandler) Update(w http.ResponseWriter, r *http.Request) {
-    ctx := r.Context()
-    id, err := uuid.Parse(chi.URLParam(r, "id"))
+func (handler *ProductHandler) Update(writer http.ResponseWriter, request *http.Request) {
+    ctx := request.Context()
+    id, err := uuid.Parse(chi.URLParam(request, "id"))
     if err != nil {
-        response.BadRequest(w, "Invalid product ID")
+        response.BadRequest(writer, "Invalid product ID")
         return
     }
 
-    var req UpdateProductRequest
-    if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-        response.BadRequest(w, "Invalid request body")
+    var requestBody UpdateProductRequest
+    if err := json.NewDecoder(request.Body).Decode(&requestBody); err != nil {
+        response.BadRequest(writer, "Invalid request body")
         return
     }
 
-    if err := validate.Struct(req); err != nil {
-        response.ValidationError(w, formatValidationErrors(err.(validator.ValidationErrors)))
+    if err := validate.Struct(requestBody); err != nil {
+        response.ValidationError(writer, formatValidationErrors(err.(validator.ValidationErrors)))
         return
     }
 
-    // Convert request to command
-    result, err := h.updateHandler.Handle(ctx, command.UpdateProductCommand{
+    result, err := handler.updateHandler.Handle(ctx, productcommand.UpdateProductCommand{
         ID:          id,
-        Name:        req.Name,
-        Description: req.Description,
-        Price:       req.Price,
-        Category:    req.Category,
-        Stock:       req.Stock,
+        Name:        requestBody.Name,
+        Description: requestBody.Description,
+        Price:       requestBody.Price,
+        Category:    requestBody.Category,
+        Stock:       requestBody.Stock,
     })
     if err != nil {
         if errors.Is(err, product.ErrNotFound) {
-            response.NotFound(w, "Product not found")
+            response.NotFound(writer, "Product not found")
             return
         }
-        response.InternalError(w, err)
+        response.InternalError(writer, err)
         return
     }
 
-    response.JSON(w, http.StatusOK, result)
+    response.JSON(writer, http.StatusOK, result)
 }
 
-// Delete handles DELETE /products/{id}
-func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
-    ctx := r.Context()
-    id, err := uuid.Parse(chi.URLParam(r, "id"))
+func (handler *ProductHandler) Delete(writer http.ResponseWriter, request *http.Request) {
+    ctx := request.Context()
+    id, err := uuid.Parse(chi.URLParam(request, "id"))
     if err != nil {
-        response.BadRequest(w, "Invalid product ID")
+        response.BadRequest(writer, "Invalid product ID")
         return
     }
 
-    if err := h.deleteHandler.Handle(ctx, command.DeleteProductCommand{ID: id}); err != nil {
+    if err := handler.deleteHandler.Handle(ctx, productcommand.DeleteProductCommand{ID: id}); err != nil {
         if errors.Is(err, product.ErrNotFound) {
-            response.NotFound(w, "Product not found")
+            response.NotFound(writer, "Product not found")
             return
         }
-        response.InternalError(w, err)
+        response.InternalError(writer, err)
         return
     }
 
-    w.WriteHeader(http.StatusNoContent)
+    writer.WriteHeader(http.StatusNoContent)
 }
 ```
 

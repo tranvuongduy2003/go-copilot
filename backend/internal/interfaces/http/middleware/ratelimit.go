@@ -172,3 +172,68 @@ func extractClientIP(request *http.Request) string {
 
 	return request.RemoteAddr
 }
+
+func RateLimitByUser(limiter *RateLimiter) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+			var key string
+
+			authContext, ok := GetAuthContext(request.Context())
+			if ok {
+				key = "user:" + authContext.UserID.String()
+			} else {
+				key = extractClientIP(request)
+			}
+
+			if !limiter.Allow(key) {
+				retryAfter := limiter.RetryAfter(key)
+				writer.Header().Set("Retry-After", strconv.Itoa(int(retryAfter.Seconds())+1))
+				writer.Header().Set("X-RateLimit-Limit", strconv.FormatFloat(limiter.requestsPerSecond, 'f', 0, 64))
+				writer.Header().Set("X-RateLimit-Remaining", "0")
+
+				response.JSON(writer, http.StatusTooManyRequests, response.ErrorResponse{
+					Error: response.ErrorDetail{
+						Code:    "RATE_LIMIT_EXCEEDED",
+						Message: "too many requests, please try again later",
+					},
+					TraceID: GetRequestID(request.Context()),
+				})
+				return
+			}
+
+			next.ServeHTTP(writer, request)
+		})
+	}
+}
+
+func LoginRateLimiterConfig() RateLimiterConfig {
+	return RateLimiterConfig{
+		RequestsPerSecond: 1,
+		BurstSize:         5,
+		CleanupInterval:   15 * time.Minute,
+	}
+}
+
+func RegisterRateLimiterConfig() RateLimiterConfig {
+	return RateLimiterConfig{
+		RequestsPerSecond: 1,
+		BurstSize:         3,
+		CleanupInterval:   time.Hour,
+	}
+}
+
+func PasswordResetRateLimiterConfig() RateLimiterConfig {
+	return RateLimiterConfig{
+		RequestsPerSecond: 1,
+		BurstSize:         3,
+		CleanupInterval:   time.Hour,
+	}
+}
+
+func TokenRefreshRateLimiterConfig() RateLimiterConfig {
+	return RateLimiterConfig{
+		RequestsPerSecond: 1,
+		BurstSize:         30,
+		CleanupInterval:   time.Minute,
+	}
+}

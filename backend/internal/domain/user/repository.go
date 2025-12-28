@@ -27,5 +27,7 @@ type Repository interface {
 
 	ExistsByEmail(ctx context.Context, email string) (bool, error)
 
+	FindByRole(ctx context.Context, roleID uuid.UUID) ([]*User, error)
+
 	List(ctx context.Context, filter Filter, pagination shared.Pagination) ([]*User, int64, error)
 }

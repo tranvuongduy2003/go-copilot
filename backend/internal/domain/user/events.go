@@ -9,13 +9,16 @@ import (
 )
 
 const (
-	EventTypeUserCreated      = "user.created"
-	EventTypeUserActivated    = "user.activated"
-	EventTypeUserDeactivated  = "user.deactivated"
-	EventTypeUserBanned       = "user.banned"
-	EventTypePasswordChanged  = "user.password_changed"
-	EventTypeProfileUpdated   = "user.profile_updated"
-	EventTypeUserDeleted      = "user.deleted"
+	EventTypeUserCreated       = "user.created"
+	EventTypeUserActivated     = "user.activated"
+	EventTypeUserDeactivated   = "user.deactivated"
+	EventTypeUserBanned        = "user.banned"
+	EventTypePasswordChanged   = "user.password_changed"
+	EventTypeProfileUpdated    = "user.profile_updated"
+	EventTypeUserDeleted       = "user.deleted"
+	EventTypeUserRoleAssigned  = "user.role.assigned"
+	EventTypeUserRoleRevoked   = "user.role.revoked"
+	EventTypeUserRolesUpdated  = "user.roles.updated"
 )
 
 type UserCreatedEvent struct {
@@ -95,5 +98,43 @@ func NewUserDeletedEvent(userID uuid.UUID, deletedAt time.Time) UserDeletedEvent
 	return UserDeletedEvent{
 		BaseDomainEvent: shared.NewBaseDomainEvent(userID, EventTypeUserDeleted),
 		DeletedAt:       deletedAt,
+	}
+}
+
+type UserRoleAssignedEvent struct {
+	shared.BaseDomainEvent
+	RoleID uuid.UUID
+}
+
+func NewUserRoleAssignedEvent(userID, roleID uuid.UUID) UserRoleAssignedEvent {
+	return UserRoleAssignedEvent{
+		BaseDomainEvent: shared.NewBaseDomainEvent(userID, EventTypeUserRoleAssigned),
+		RoleID:          roleID,
+	}
+}
+
+type UserRoleRevokedEvent struct {
+	shared.BaseDomainEvent
+	RoleID uuid.UUID
+}
+
+func NewUserRoleRevokedEvent(userID, roleID uuid.UUID) UserRoleRevokedEvent {
+	return UserRoleRevokedEvent{
+		BaseDomainEvent: shared.NewBaseDomainEvent(userID, EventTypeUserRoleRevoked),
+		RoleID:          roleID,
+	}
+}
+
+type UserRolesUpdatedEvent struct {
+	shared.BaseDomainEvent
+	OldRoleIDs []uuid.UUID
+	NewRoleIDs []uuid.UUID
+}
+
+func NewUserRolesUpdatedEvent(userID uuid.UUID, oldRoleIDs, newRoleIDs []uuid.UUID) UserRolesUpdatedEvent {
+	return UserRolesUpdatedEvent{
+		BaseDomainEvent: shared.NewBaseDomainEvent(userID, EventTypeUserRolesUpdated),
+		OldRoleIDs:      oldRoleIDs,
+		NewRoleIDs:      newRoleIDs,
 	}
 }

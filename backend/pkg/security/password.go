@@ -7,6 +7,7 @@ import (
 type PasswordHasher interface {
 	Hash(password string) (string, error)
 	Compare(hashedPassword, password string) error
+	Verify(hashedPassword, plainPassword string) (bool, error)
 }
 
 type bcryptPasswordHasher struct {
@@ -34,4 +35,15 @@ func (hasher *bcryptPasswordHasher) Hash(password string) (string, error) {
 
 func (hasher *bcryptPasswordHasher) Compare(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+}
+
+func (hasher *bcryptPasswordHasher) Verify(hashedPassword, plainPassword string) (bool, error) {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainPassword))
+	if err != nil {
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }

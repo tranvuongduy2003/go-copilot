@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/tranvuongduy2003/go-copilot/internal/domain/shared"
 	"github.com/tranvuongduy2003/go-copilot/pkg/validator"
@@ -210,10 +211,19 @@ func mapErrorToResponse(err error) (int, ErrorResponse) {
 
 	var authzErr *shared.AuthorizationError
 	if errors.As(err, &authzErr) {
+		errorMessage := authzErr.Error()
+		if strings.Contains(errorMessage, "authenticate") || strings.Contains(errorMessage, "token") {
+			return http.StatusUnauthorized, ErrorResponse{
+				Error: ErrorDetail{
+					Code:    "UNAUTHORIZED",
+					Message: errorMessage,
+				},
+			}
+		}
 		return http.StatusForbidden, ErrorResponse{
 			Error: ErrorDetail{
 				Code:    string(shared.ErrCodeAuthorization),
-				Message: authzErr.Error(),
+				Message: errorMessage,
 			},
 		}
 	}

@@ -556,190 +556,190 @@
 
 ### 5.1.3 Middleware Support (Optional)
 
-- [ ] Define CommandMiddleware function type
-- [ ] Define QueryMiddleware function type
-- [ ] Implement logging middleware for commands
-- [ ] Implement logging middleware for queries
-- [ ] Implement validation middleware
-- [ ] Implement transaction middleware for commands
-- [ ] Add middleware chain execution in buses
+- [x] Define CommandMiddleware function type
+- [x] Define QueryMiddleware function type
+- [x] Implement logging middleware for commands
+- [x] Implement logging middleware for queries
+- [x] Implement validation middleware
+- [x] Implement transaction middleware for commands
+- [x] Add middleware chain execution in buses
 
-## 5.2 DTOs (`internal/application/dto/`)
+## 5.2 DTOs (`internal/application/user/dto/`)
 
 ### 5.2.1 User DTOs
 
-- [ ] Define UserDTO struct for responses
-- [ ] Include ID as string (UUID string representation)
-- [ ] Include Email as string
-- [ ] Include FullName as string
-- [ ] Include Status as string
-- [ ] Include CreatedAt as time.Time or string
-- [ ] Include UpdatedAt as time.Time or string
-- [ ] Exclude sensitive fields (password hash)
-- [ ] Add JSON tags for serialization
-- [ ] Implement ToDTO(user \*domain.User) UserDTO mapper function
-- [ ] Implement ToDTOs(users []\*domain.User) []UserDTO mapper function
+- [x] Define UserDTO struct for responses
+- [x] Include ID as string (UUID string representation)
+- [x] Include Email as string
+- [x] Include FullName as string
+- [x] Include Status as string
+- [x] Include CreatedAt as time.Time or string
+- [x] Include UpdatedAt as time.Time or string
+- [x] Exclude sensitive fields (password hash)
+- [x] Add JSON tags for serialization
+- [x] Implement ToDTO(user \*domain.User) UserDTO mapper function
+- [x] Implement ToDTOs(users []\*domain.User) []UserDTO mapper function
 
 ### 5.2.2 Pagination DTOs
 
-- [ ] Define PaginationRequest struct with Page, Limit fields
-- [ ] Add validation tags for minimum and maximum values
-- [ ] Implement Offset() method to calculate SQL offset
-- [ ] Define PaginatedResponse[T] generic struct
-- [ ] Include Items []T field
-- [ ] Include Total int64 field
-- [ ] Include Page int field
-- [ ] Include Limit int field
-- [ ] Include TotalPages int field (calculated)
-- [ ] Include HasNext bool field (calculated)
-- [ ] Include HasPrev bool field (calculated)
+- [x] Define PaginationRequest struct with Page, Limit fields
+- [x] Add validation tags for minimum and maximum values
+- [x] Implement Offset() method to calculate SQL offset
+- [x] Define PaginatedResponse[T] generic struct
+- [x] Include Items []T field
+- [x] Include Total int64 field
+- [x] Include Page int field
+- [x] Include Limit int field
+- [x] Include TotalPages int field (calculated)
+- [x] Include HasNext bool field (calculated)
+- [x] Include HasPrev bool field (calculated)
 
-## 5.3 User Commands (`internal/application/command/`)
+## 5.3 User Commands (`internal/application/user/command/`)
 
 ### 5.3.1 CreateUser Command
 
-- [ ] Define CreateUserCommand struct
-- [ ] Include Email field with validation tags
-- [ ] Include Password field with validation tags
-- [ ] Include FullName field with validation tags
-- [ ] Define CreateUserHandler struct
-- [ ] Inject UserRepository dependency
-- [ ] Inject PasswordHasher dependency (interface for bcrypt)
-- [ ] Inject EventBus dependency
-- [ ] Inject Logger dependency
-- [ ] Implement Handle(ctx, cmd) (string, error) method returning created user ID
-- [ ] Validate command input using validator
-- [ ] Check if email already exists
-- [ ] Return ErrEmailAlreadyExists if duplicate
-- [ ] Hash password using injected hasher
-- [ ] Create new User domain entity
-- [ ] Save user using repository
-- [ ] Publish domain events from aggregate
-- [ ] Return created user ID
-- [ ] Log successful creation
-- [ ] Write unit tests with mocked repository
-- [ ] Test successful creation flow
-- [ ] Test duplicate email rejection
-- [ ] Test validation failures
-- [ ] Test password hashing integration
+- [x] Define CreateUserCommand struct
+- [x] Include Email field with validation tags
+- [x] Include Password field with validation tags
+- [x] Include FullName field with validation tags
+- [x] Define CreateUserHandler struct
+- [x] Inject UserRepository dependency
+- [x] Inject PasswordHasher dependency (interface for bcrypt)
+- [x] Inject EventBus dependency
+- [x] Inject Logger dependency
+- [x] Implement Handle(ctx, cmd) (string, error) method returning created user ID
+- [x] Validate command input using validator
+- [x] Check if email already exists
+- [x] Return ErrEmailAlreadyExists if duplicate
+- [x] Hash password using injected hasher
+- [x] Create new User domain entity
+- [x] Save user using repository
+- [x] Publish domain events from aggregate
+- [x] Return created user ID
+- [x] Log successful creation
+- [x] Write unit tests with mocked repository
+- [x] Test successful creation flow
+- [x] Test duplicate email rejection
+- [x] Test validation failures
+- [x] Test password hashing integration
 
 ### 5.3.2 UpdateUser Command
 
-- [ ] Define UpdateUserCommand struct
-- [ ] Include UserID field (required)
-- [ ] Include FullName field (optional, pointer or wrapper type)
-- [ ] Include other updatable fields as optional
-- [ ] Define UpdateUserHandler struct
-- [ ] Inject dependencies
-- [ ] Implement Handle(ctx, cmd) error method
-- [ ] Validate command input
-- [ ] Fetch existing user by ID
-- [ ] Return ErrUserNotFound if not exists
-- [ ] Apply updates to domain entity using business methods
-- [ ] Save updated user
-- [ ] Publish domain events
-- [ ] Write unit tests for update scenarios
+- [x] Define UpdateUserCommand struct
+- [x] Include UserID field (required)
+- [x] Include FullName field (optional, pointer or wrapper type)
+- [x] Include other updatable fields as optional
+- [x] Define UpdateUserHandler struct
+- [x] Inject dependencies
+- [x] Implement Handle(ctx, cmd) error method
+- [x] Validate command input
+- [x] Fetch existing user by ID
+- [x] Return ErrUserNotFound if not exists
+- [x] Apply updates to domain entity using business methods
+- [x] Save updated user
+- [x] Publish domain events
+- [x] Write unit tests for update scenarios
 
 ### 5.3.3 DeleteUser Command
 
-- [ ] Define DeleteUserCommand struct with UserID field
-- [ ] Define DeleteUserHandler struct
-- [ ] Inject dependencies
-- [ ] Implement Handle(ctx, cmd) error method
-- [ ] Validate command input
-- [ ] Fetch existing user by ID
-- [ ] Return ErrUserNotFound if not exists
-- [ ] Call Delete() method on domain entity
-- [ ] Save updated user (soft delete)
-- [ ] Publish domain events
-- [ ] Write unit tests for delete scenarios
+- [x] Define DeleteUserCommand struct with UserID field
+- [x] Define DeleteUserHandler struct
+- [x] Inject dependencies
+- [x] Implement Handle(ctx, cmd) error method
+- [x] Validate command input
+- [x] Fetch existing user by ID
+- [x] Return ErrUserNotFound if not exists
+- [x] Call Delete() method on domain entity
+- [x] Save updated user (soft delete)
+- [x] Publish domain events
+- [x] Write unit tests for delete scenarios
 
 ### 5.3.4 ChangePassword Command
 
-- [ ] Define ChangePasswordCommand struct
-- [ ] Include UserID field
-- [ ] Include CurrentPassword field
-- [ ] Include NewPassword field with validation
-- [ ] Define ChangePasswordHandler struct
-- [ ] Inject dependencies including PasswordHasher
-- [ ] Implement Handle(ctx, cmd) error method
-- [ ] Fetch existing user by ID
-- [ ] Verify current password matches stored hash
-- [ ] Return ErrInvalidPassword if mismatch
-- [ ] Validate new password strength
-- [ ] Hash new password
-- [ ] Call ChangePassword() on domain entity
-- [ ] Save updated user
-- [ ] Publish domain events
-- [ ] Write unit tests including password verification
+- [x] Define ChangePasswordCommand struct
+- [x] Include UserID field
+- [x] Include CurrentPassword field
+- [x] Include NewPassword field with validation
+- [x] Define ChangePasswordHandler struct
+- [x] Inject dependencies including PasswordHasher
+- [x] Implement Handle(ctx, cmd) error method
+- [x] Fetch existing user by ID
+- [x] Verify current password matches stored hash
+- [x] Return ErrInvalidPassword if mismatch
+- [x] Validate new password strength
+- [x] Hash new password
+- [x] Call ChangePassword() on domain entity
+- [x] Save updated user
+- [x] Publish domain events
+- [x] Write unit tests including password verification
 
 ### 5.3.5 ActivateUser Command
 
-- [ ] Define ActivateUserCommand struct with UserID field
-- [ ] Define ActivateUserHandler struct
-- [ ] Inject dependencies
-- [ ] Implement Handle(ctx, cmd) error method
-- [ ] Fetch existing user by ID
-- [ ] Call Activate() on domain entity
-- [ ] Handle InvalidStatusTransition error from domain
-- [ ] Save updated user
-- [ ] Publish domain events
-- [ ] Write unit tests
+- [x] Define ActivateUserCommand struct with UserID field
+- [x] Define ActivateUserHandler struct
+- [x] Inject dependencies
+- [x] Implement Handle(ctx, cmd) error method
+- [x] Fetch existing user by ID
+- [x] Call Activate() on domain entity
+- [x] Handle InvalidStatusTransition error from domain
+- [x] Save updated user
+- [x] Publish domain events
+- [x] Write unit tests
 
 ### 5.3.6 DeactivateUser Command
 
-- [ ] Define DeactivateUserCommand struct with UserID field
-- [ ] Define DeactivateUserHandler struct
-- [ ] Implement Handle() method similar to ActivateUser
-- [ ] Write unit tests
+- [x] Define DeactivateUserCommand struct with UserID field
+- [x] Define DeactivateUserHandler struct
+- [x] Implement Handle() method similar to ActivateUser
+- [x] Write unit tests
 
-## 5.4 User Queries (`internal/application/query/`)
+## 5.4 User Queries (`internal/application/user/query/`)
 
 ### 5.4.1 GetUser Query
 
-- [ ] Define GetUserQuery struct with UserID field
-- [ ] Define GetUserHandler struct
-- [ ] Inject UserRepository dependency (can use same repo or dedicated read repo)
-- [ ] Inject Logger dependency
-- [ ] Implement Handle(ctx, query) (\*UserDTO, error) method
-- [ ] Validate query input
-- [ ] Fetch user from repository
-- [ ] Return ErrUserNotFound if not exists
-- [ ] Map domain entity to DTO
-- [ ] Return DTO
-- [ ] Write unit tests with mocked repository
+- [x] Define GetUserQuery struct with UserID field
+- [x] Define GetUserHandler struct
+- [x] Inject UserRepository dependency (can use same repo or dedicated read repo)
+- [x] Inject Logger dependency
+- [x] Implement Handle(ctx, query) (\*UserDTO, error) method
+- [x] Validate query input
+- [x] Fetch user from repository
+- [x] Return ErrUserNotFound if not exists
+- [x] Map domain entity to DTO
+- [x] Return DTO
+- [x] Write unit tests with mocked repository
 
 ### 5.4.2 ListUsers Query
 
-- [ ] Define ListUsersQuery struct
-- [ ] Include pagination fields (Page, Limit)
-- [ ] Include filter fields (Status, Search)
-- [ ] Include sort fields (SortBy, SortOrder)
-- [ ] Define ListUsersHandler struct
-- [ ] Inject dependencies
-- [ ] Implement Handle(ctx, query) (\*PaginatedResponse[UserDTO], error) method
-- [ ] Validate query input
-- [ ] Apply default pagination if not specified
-- [ ] Build filter from query fields
-- [ ] Fetch users from repository with filter and pagination
-- [ ] Map domain entities to DTOs
-- [ ] Build paginated response with metadata
-- [ ] Return response
-- [ ] Write unit tests for various filter combinations
+- [x] Define ListUsersQuery struct
+- [x] Include pagination fields (Page, Limit)
+- [x] Include filter fields (Status, Search)
+- [x] Include sort fields (SortBy, SortOrder)
+- [x] Define ListUsersHandler struct
+- [x] Inject dependencies
+- [x] Implement Handle(ctx, query) (\*PaginatedResponse[UserDTO], error) method
+- [x] Validate query input
+- [x] Apply default pagination if not specified
+- [x] Build filter from query fields
+- [x] Fetch users from repository with filter and pagination
+- [x] Map domain entities to DTOs
+- [x] Build paginated response with metadata
+- [x] Return response
+- [x] Write unit tests for various filter combinations
 
 ### 5.4.3 GetUserByEmail Query
 
-- [ ] Define GetUserByEmailQuery struct with Email field
-- [ ] Define GetUserByEmailHandler struct
-- [ ] Implement Handle() method
-- [ ] Write unit tests
+- [x] Define GetUserByEmailQuery struct with Email field
+- [x] Define GetUserByEmailHandler struct
+- [x] Implement Handle() method
+- [x] Write unit tests
 
 ### 5.4.4 CheckEmailExists Query
 
-- [ ] Define CheckEmailExistsQuery struct with Email field
-- [ ] Define CheckEmailExistsHandler struct
-- [ ] Implement Handle(ctx, query) (bool, error) method
-- [ ] Write unit tests
+- [x] Define CheckEmailExistsQuery struct with Email field
+- [x] Define CheckEmailExistsHandler struct
+- [x] Implement Handle(ctx, query) (bool, error) method
+- [x] Write unit tests
 
 ---
 
@@ -1133,11 +1133,11 @@
 
 ### 8.2.1 Test Infrastructure
 
-- [ ] Create `docker-compose.test.yml` for test dependencies
-- [ ] Configure test database with separate schema or database
-- [ ] Implement test database setup and teardown
-- [ ] Implement test data fixtures/factories
-- [ ] Create helper functions for common test operations
+- [x] Create `docker-compose.test.yml` for test dependencies
+- [x] Configure test database with separate schema or database
+- [x] Implement test database setup and teardown
+- [x] Implement test data fixtures/factories
+- [x] Create helper functions for common test operations
 
 ### 8.2.2 Repository Integration Tests
 
@@ -1227,7 +1227,7 @@
 - [x] Validate all user input at API boundary
 - [x] Sanitize strings to prevent XSS (if rendering HTML)
 - [x] Limit request body size
-- [ ] Limit query parameter lengths
+- [x] Limit query parameter lengths
 
 ### 9.2.2 Authentication & Authorization (don't implement)
 
@@ -1310,85 +1310,6 @@
 ---
 
 # Phase 10: DevOps & Deployment
-
-## 10.1 Docker
-
-### 10.1.1 Dockerfile
-
-- [ ] Use multi-stage build
-- [ ] Stage 1: Build binary with Go image
-- [ ] Stage 2: Runtime with minimal base image (distroless or alpine)
-- [ ] Set appropriate labels
-- [ ] Create non-root user for runtime
-- [ ] Copy only necessary files
-- [ ] Set appropriate EXPOSE port
-- [ ] Define ENTRYPOINT and CMD
-
-### 10.1.2 Docker Compose
-
-- [ ] Define application service
-- [ ] Define database service with health check
-- [ ] Define Redis service (if used)
-- [ ] Configure networking between services
-- [ ] Define volumes for data persistence
-- [ ] Create environment-specific compose files
-
-### 10.1.3 Docker Optimization
-
-- [ ] Use .dockerignore to reduce context size
-- [ ] Order Dockerfile instructions for optimal caching
-- [ ] Pin base image versions
-- [ ] Scan images for vulnerabilities
-
-## 10.2 CI/CD Pipeline
-
-### 10.2.1 CI Pipeline
-
-- [ ] Trigger on push and pull request
-- [ ] Lint stage
-- [ ] Run golangci-lint
-- [ ] Fail on lint errors
-- [ ] Test stage
-- [ ] Run unit tests with coverage
-- [ ] Run integration tests
-- [ ] Upload coverage report
-- [ ] Security stage
-- [ ] Run gosec for security issues
-- [ ] Run dependency vulnerability scan
-- [ ] Build stage
-- [ ] Build Docker image
-- [ ] Tag with commit SHA and branch
-- [ ] Push to container registry
-
-### 10.2.2 CD Pipeline
-
-- [ ] Deploy to staging on merge to develop
-- [ ] Run smoke tests against staging
-- [ ] Deploy to production on merge to main
-- [ ] Implement deployment strategy (rolling, blue-green, canary)
-- [ ] Implement rollback mechanism
-- [ ] Send deployment notifications
-
-## 10.3 Kubernetes (Optional)
-
-### 10.3.1 Manifests
-
-- [ ] Create Deployment manifest
-- [ ] Define resource requests and limits
-- [ ] Configure liveness and readiness probes
-- [ ] Set appropriate replica count
-- [ ] Create Service manifest
-- [ ] Create ConfigMap for non-sensitive config
-- [ ] Create Secret for sensitive config
-- [ ] Create Ingress for external access
-- [ ] Create HorizontalPodAutoscaler
-
-### 10.3.2 Helm Chart (Optional)
-
-- [ ] Create Helm chart structure
-- [ ] Parameterize environment-specific values
-- [ ] Create values files for each environment
-- [ ] Document chart usage
 
 ## 10.4 Documentation
 

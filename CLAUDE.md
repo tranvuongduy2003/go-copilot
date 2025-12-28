@@ -226,27 +226,52 @@ backend/
 │   │   │   ├── repository.go          # Repository interface (port)
 │   │   │   ├── errors.go              # Domain-specific errors
 │   │   │   └── events.go              # Domain events
+│   │   ├── auth/                      # Auth aggregate
+│   │   ├── role/                      # Role aggregate
+│   │   ├── permission/                # Permission aggregate
 │   │   └── shared/                    # Shared domain concepts
 │   │       ├── entity.go
 │   │       ├── errors.go
 │   │       ├── event_bus.go
 │   │       └── valueobjects.go
 │   │
-│   ├── application/                   # Application Layer (CQRS)
-│   │   ├── command/                   # Commands (write operations)
-│   │   ├── query/                     # Queries (read operations)
-│   │   └── dto/                       # Data Transfer Objects
+│   ├── application/                   # Application Layer (CQRS, domain-aligned)
+│   │   ├── cqrs/                      # Base CQRS interfaces
+│   │   │   ├── command.go
+│   │   │   └── query.go
+│   │   ├── user/                      # User bounded context
+│   │   │   ├── command/               # usercommand package
+│   │   │   │   ├── create_user.go
+│   │   │   │   ├── update_user.go
+│   │   │   │   └── ...
+│   │   │   ├── query/                 # userquery package
+│   │   │   │   ├── get_user.go
+│   │   │   │   └── list_users.go
+│   │   │   └── dto/                   # userdto package
+│   │   │       └── user_dto.go
+│   │   └── auth/                      # Auth bounded context
+│   │       ├── command/               # authcommand package
+│   │       │   ├── login.go
+│   │       │   ├── register.go
+│   │       │   └── ...
+│   │       ├── query/                 # authquery package
+│   │       │   ├── get_current_user.go
+│   │       │   └── get_user_sessions.go
+│   │       └── dto/                   # authdto package
+│   │           └── auth_dto.go
 │   │
 │   ├── infrastructure/                # Infrastructure Layer (adapters)
 │   │   ├── persistence/
 │   │   │   ├── postgres/
 │   │   │   └── repository/
 │   │   ├── messaging/
-│   │   └── cache/
+│   │   ├── cache/
+│   │   └── audit/
 │   │
 │   └── interfaces/http/               # Interface Adapters Layer
 │       ├── handler/
 │       ├── middleware/
+│       ├── dto/
 │       └── router/
 │
 ├── migrations/                        # golang-migrate migrations
