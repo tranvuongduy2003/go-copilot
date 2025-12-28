@@ -19,6 +19,7 @@ type RouterDependencies struct {
 	RoleHandler       *handler.RoleHandler
 	HealthHandler     *handler.HealthHandler
 	MetricsHandler    *handler.MetricsHandler
+	DocsHandler       *handler.DocsHandler
 	AuthMiddleware    *middleware.AuthMiddleware
 	Logger            logger.Logger
 	Config            *config.Config
@@ -46,6 +47,13 @@ func NewRouter(dependencies RouterDependencies) http.Handler {
 
 	if dependencies.MetricsHandler != nil {
 		router.Handle("/metrics", dependencies.MetricsHandler.Metrics())
+	}
+
+	if dependencies.DocsHandler != nil {
+		router.Route("/docs", func(docsRouter chi.Router) {
+			docsRouter.Get("/", dependencies.DocsHandler.SwaggerUI)
+			docsRouter.Get("/openapi.yaml", dependencies.DocsHandler.OpenAPISpec)
+		})
 	}
 
 	loginRateLimiter := middleware.NewRateLimiter(middleware.LoginRateLimiterConfig())

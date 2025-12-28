@@ -91,6 +91,8 @@ servers:
     description: Production server
 
 tags:
+  - name: Health
+    description: Health check and metrics endpoints
   - name: Authentication
     description: User authentication endpoints
   - name: Users
@@ -99,10 +101,75 @@ tags:
     description: Role management endpoints
   - name: Permissions
     description: Permission management endpoints
-  - name: Health
-    description: Health check endpoints
 
 paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Readiness check
+      description: Check if the service and all dependencies are ready
+      operationId: checkReadiness
+      responses:
+        '200':
+          description: Service is ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Service is not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /health/live:
+    get:
+      tags:
+        - Health
+      summary: Liveness check
+      description: Check if the service is alive
+      operationId: checkLiveness
+      responses:
+        '200':
+          description: Service is alive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LivenessResponse'
+
+  /health/ready:
+    get:
+      tags:
+        - Health
+      summary: Readiness check (alias)
+      description: Alias for /health endpoint
+      operationId: checkReady
+      responses:
+        '200':
+          description: Service is ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /metrics:
+    get:
+      tags:
+        - Health
+      summary: Prometheus metrics
+      description: Expose Prometheus metrics for monitoring
+      operationId: getMetrics
+      responses:
+        '200':
+          description: Prometheus metrics in text format
+          content:
+            text/plain:
+              schema:
+                type: string
+
+
   /auth/register:
     post:
       tags:
@@ -383,7 +450,7 @@ paths:
           in: query
           schema:
             type: string
-            enum: [active, inactive, banned]
+            enum: [pending, active, inactive, banned]
         - name: search
           in: query
           schema:
@@ -503,6 +570,132 @@ paths:
           description: Forbidden - requires users:delete permission
         '404':
           description: User not found
+
+  /users/{id}/password:
+    post:
+      tags:
+        - Users
+      summary: Change password
+      description: Change user password (owner only or admin)
+      operationId: changePassword
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Invalid current password or weak new password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - can only change own password
+        '404':
+          description: User not found
+
+  /users/{id}/activate:
+    post:
+      tags:
+        - Users
+      summary: Activate user
+      description: Activate a pending or inactive user
+      operationId: activateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User activated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires users:manage permission
+        '404':
+          description: User not found
+        '422':
+          description: Invalid status transition
+
+  /users/{id}/deactivate:
+    post:
+      tags:
+        - Users
+      summary: Deactivate user
+      description: Deactivate an active user
+      operationId: deactivateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User deactivated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires users:manage permission
+        '404':
+          description: User not found
+        '422':
+          description: Invalid status transition
+
+  /users/{id}/ban:
+    post:
+      tags:
+        - Users
+      summary: Ban user
+      description: Ban a user with reason
+      operationId: banUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BanUserRequest'
+      responses:
+        '200':
+          description: User banned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires users:manage permission
+        '404':
+          description: User not found
+        '422':
+          description: Invalid status transition
 
   /users/{id}/roles:
     get:
@@ -827,6 +1020,33 @@ paths:
           description: Forbidden - requires roles:update permission
         '404':
           description: Role or permission not found
+
+  /roles/{id}/users:
+    get:
+      tags:
+        - Roles
+      summary: Get users with role
+      description: Get all users assigned to a specific role
+      operationId: getUsersWithRole
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RoleIdPath'
+      responses:
+        '200':
+          description: Users with role
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - requires roles:read permission
+        '404':
+          description: Role not found
 
   /permissions:
     get:
@@ -1183,7 +1403,7 @@ components:
           nullable: true
         status:
           type: string
-          enum: [active, inactive, banned]
+          enum: [pending, active, inactive, banned]
         created_at:
           type: string
           format: date-time
@@ -1378,6 +1598,67 @@ components:
         description:
           type: string
 
+    ChangePasswordRequest:
+      type: object
+      required:
+        - current_password
+        - new_password
+        - confirm_password
+      properties:
+        current_password:
+          type: string
+          format: password
+        new_password:
+          type: string
+          format: password
+          minLength: 8
+          description: Must contain uppercase, lowercase, number, and special character
+        confirm_password:
+          type: string
+          format: password
+          description: Must match new_password
+
+    BanUserRequest:
+      type: object
+      required:
+        - reason
+      properties:
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: Violation of terms of service
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+        checks:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: [healthy, unhealthy]
+              message:
+                type: string
+          example:
+            database:
+              status: healthy
+            redis:
+              status: healthy
+
+    LivenessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok]
+          example: ok
+
     ErrorResponse:
       type: object
       properties:
@@ -1399,3 +1680,6 @@ components:
                     type: string
                   message:
                     type: string
+        trace_id:
+          type: string
+          description: Request trace ID for debugging

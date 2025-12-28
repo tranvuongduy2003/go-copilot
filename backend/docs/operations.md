@@ -4,13 +4,197 @@ This guide covers common administrative operations for the authentication and RB
 
 ## Table of Contents
 
-1. [Creating Permissions](#creating-permissions)
-2. [Creating Roles](#creating-roles)
-3. [Assigning Roles to Users](#assigning-roles-to-users)
-4. [Handling Locked Accounts](#handling-locked-accounts)
-5. [Token Cleanup](#token-cleanup)
-6. [Audit Log Monitoring](#audit-log-monitoring)
-7. [Incident Response](#incident-response)
+1. [Health Checks & Monitoring](#health-checks--monitoring)
+2. [Metrics](#metrics)
+3. [Creating Permissions](#creating-permissions)
+4. [Creating Roles](#creating-roles)
+5. [Assigning Roles to Users](#assigning-roles-to-users)
+6. [Handling Locked Accounts](#handling-locked-accounts)
+7. [Token Cleanup](#token-cleanup)
+8. [Audit Log Monitoring](#audit-log-monitoring)
+9. [Incident Response](#incident-response)
+
+---
+
+## Health Checks & Monitoring
+
+### Endpoints
+
+| Endpoint | Purpose | Response Code |
+|----------|---------|---------------|
+| `GET /health` | Readiness check (all dependencies) | 200 OK / 503 Service Unavailable |
+| `GET /health/live` | Liveness probe (process alive) | 200 OK |
+| `GET /health/ready` | Alias for `/health` | 200 OK / 503 Service Unavailable |
+
+### Liveness Check
+
+The liveness endpoint checks if the application process is running. Use this for Kubernetes liveness probes.
+
+```bash
+curl http://localhost:8080/health/live
+```
+
+Response:
+```json
+{
+  "status": "ok"
+}
+```
+
+### Readiness Check
+
+The readiness endpoint verifies all dependencies are healthy before accepting traffic.
+
+```bash
+curl http://localhost:8080/health/ready
+```
+
+Response (healthy):
+```json
+{
+  "status": "healthy",
+  "checks": {
+    "database": {
+      "status": "healthy"
+    },
+    "redis": {
+      "status": "healthy"
+    }
+  }
+}
+```
+
+Response (unhealthy):
+```json
+{
+  "status": "unhealthy",
+  "checks": {
+    "database": {
+      "status": "healthy"
+    },
+    "redis": {
+      "status": "unhealthy",
+      "message": "connection refused"
+    }
+  }
+}
+```
+
+### Kubernetes Configuration
+
+```yaml
+# Deployment probe configuration
+livenessProbe:
+  httpGet:
+    path: /health/live
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+```
+
+---
+
+## Metrics
+
+### Prometheus Endpoint
+
+Metrics are exposed at `GET /metrics` in Prometheus format.
+
+```bash
+curl http://localhost:8080/metrics
+```
+
+### Available Metrics
+
+#### HTTP Request Metrics
+
+| Metric | Type | Description |
+|--------|------|-------------|
+| `http_requests_total` | Counter | Total HTTP requests by method, path, status |
+| `http_request_duration_seconds` | Histogram | Request duration in seconds |
+| `http_request_size_bytes` | Histogram | Request body size |
+| `http_response_size_bytes` | Histogram | Response body size |
+
+#### Database Metrics
+
+| Metric | Type | Description |
+|--------|------|-------------|
+| `db_pool_connections_total` | Gauge | Total connections in pool |
+| `db_pool_connections_idle` | Gauge | Idle connections in pool |
+| `db_pool_connections_in_use` | Gauge | Active connections in pool |
+| `db_query_duration_seconds` | Histogram | Query execution time |
+
+#### Business Metrics
+
+| Metric | Type | Description |
+|--------|------|-------------|
+| `user_registrations_total` | Counter | Total user registrations |
+| `user_logins_total` | Counter | Total login attempts (success/failure) |
+| `active_sessions_total` | Gauge | Current active sessions |
+
+### Prometheus Configuration
+
+```yaml
+# prometheus.yml
+scrape_configs:
+  - job_name: 'go-copilot'
+    static_configs:
+      - targets: ['localhost:8080']
+    metrics_path: /metrics
+    scrape_interval: 15s
+```
+
+### Grafana Dashboard
+
+Import the provided dashboard or create panels for:
+
+1. **Request Rate**: `rate(http_requests_total[5m])`
+2. **Error Rate**: `rate(http_requests_total{status=~"5.."}[5m])`
+3. **Latency P95**: `histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))`
+4. **DB Connection Usage**: `db_pool_connections_in_use / db_pool_connections_total`
+
+### Alerting Rules
+
+```yaml
+# alerting_rules.yml
+groups:
+  - name: go-copilot
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: High 5xx error rate
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: P95 latency above 1 second
+
+      - alert: DatabaseConnectionPoolExhausted
+        expr: db_pool_connections_in_use / db_pool_connections_total > 0.9
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: Database connection pool near capacity
+```
 
 ---
 

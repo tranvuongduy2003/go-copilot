@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/tranvuongduy2003/go-copilot/internal/infrastructure/cache/redis"
+	"github.com/tranvuongduy2003/go-copilot/internal/infrastructure/persistence/migrations"
 	"github.com/tranvuongduy2003/go-copilot/internal/infrastructure/persistence/postgres"
 	"github.com/tranvuongduy2003/go-copilot/pkg/config"
 	"github.com/tranvuongduy2003/go-copilot/pkg/logger"
@@ -56,6 +57,29 @@ func run() int {
 		return 1
 	}
 	logger.Info("database connection established")
+
+	if configuration.Database.AutoMigrate {
+		logger.Info("running database migrations",
+			logger.String("path", configuration.Database.MigrationsPath),
+		)
+		migrationRunner := migrations.NewRunner(
+			configuration.Database.MigrationsPath,
+			configuration.Database.DSN(),
+		)
+		if err := migrationRunner.Up(); err != nil {
+			logger.Error("failed to run database migrations", logger.Err(err))
+			return 1
+		}
+		version, dirty, err := migrationRunner.Version()
+		if err != nil {
+			logger.Warn("failed to get migration version", logger.Err(err))
+		} else {
+			logger.Info("database migrations completed",
+				logger.Int64("version", int64(version)),
+				logger.Bool("dirty", dirty),
+			)
+		}
+	}
 
 	var redisClient *redis.Client
 	if configuration.Redis.Host != "" {

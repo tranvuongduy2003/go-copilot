@@ -266,6 +266,10 @@ func provideMetricsHandler() *handler.MetricsHandler {
 	return handler.NewMetricsHandler()
 }
 
+func provideDocsHandler(log logger.Logger) *handler.DocsHandler {
+	return handler.NewDocsHandler(log)
+}
+
 func provideRevokeSessionHandler(
 	refreshTokenRepo auth.RefreshTokenRepository,
 	eventBus shared.EventBus,
@@ -313,6 +317,7 @@ func provideRouter(
 	roleHandler *handler.RoleHandler,
 	healthHandler *handler.HealthHandler,
 	metricsHandler *handler.MetricsHandler,
+	docsHandler *handler.DocsHandler,
 	authMiddleware *middleware.AuthMiddleware,
 	log logger.Logger,
 	cfg *config.Config,
@@ -324,6 +329,7 @@ func provideRouter(
 		RoleHandler:       roleHandler,
 		HealthHandler:     healthHandler,
 		MetricsHandler:    metricsHandler,
+		DocsHandler:       docsHandler,
 		AuthMiddleware:    authMiddleware,
 		Logger:            log,
 		Config:            cfg,
@@ -428,6 +434,7 @@ var HandlerSet = wire.NewSet(
 	provideAuthHandler,
 	provideHealthHandler,
 	provideMetricsHandler,
+	provideDocsHandler,
 )
 
 var RouterSet = wire.NewSet(

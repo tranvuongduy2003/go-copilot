@@ -1,25 +1,40 @@
 # Go Copilot Backend
 
-A production-ready backend API built with Go, following Clean Architecture, DDD, and CQRS patterns.
+A production-ready backend API built with Go, following Clean Architecture, DDD, and CQRS patterns. Includes complete authentication with JWT, role-based access control (RBAC), and comprehensive observability.
 
 ## Tech Stack
 
-- **Language**: Go 1.23+
+- **Language**: Go 1.24+
 - **HTTP Router**: chi/v5
-- **Database**: PostgreSQL with pgx/v5
-- **Cache**: Redis
+- **Database**: PostgreSQL 16+ with pgx/v5
+- **Cache**: Redis 7+
 - **Migrations**: golang-migrate/v4
+- **Dependency Injection**: Google Wire
 - **Logging**: zap
 - **Validation**: go-playground/validator
 - **Configuration**: viper
-- **Authentication**: JWT
+- **Authentication**: JWT with refresh token rotation
+- **Observability**: Prometheus metrics, OpenTelemetry tracing
+
+## Features
+
+- JWT authentication with access/refresh token rotation
+- Role-Based Access Control (RBAC) with permissions
+- Account lockout protection
+- Password reset flow
+- Rate limiting per endpoint type
+- Comprehensive audit logging
+- Prometheus metrics endpoint
+- Health check endpoints (liveness/readiness)
+- Swagger UI documentation
 
 ## Prerequisites
 
-- Go 1.23 or higher
+- Go 1.24 or higher
 - Docker and Docker Compose
 - Make
 - golangci-lint (for linting)
+- Wire (for dependency injection code generation)
 
 ## Project Structure
 
@@ -102,19 +117,64 @@ Configuration is loaded from environment variables. See `.env.example` for all a
 
 ### Required Environment Variables
 
-| Variable      | Description               | Default     |
-|---------------|---------------------------|-------------|
-| `SERVER_PORT` | HTTP server port          | `8080`      |
-| `DB_HOST`     | PostgreSQL host           | `localhost` |
-| `DB_PORT`     | PostgreSQL port           | `5432`      |
-| `DB_USER`     | PostgreSQL user           | `postgres`  |
-| `DB_PASSWORD` | PostgreSQL password       | `postgres`  |
-| `DB_NAME`     | PostgreSQL database name  | `app_dev`   |
-| `JWT_SECRET`  | JWT signing secret        | -           |
+| Variable       | Description               | Default     |
+|----------------|---------------------------|-------------|
+| `SERVER_PORT`  | HTTP server port          | `8080`      |
+| `DB_HOST`      | PostgreSQL host           | `localhost` |
+| `DB_PORT`      | PostgreSQL port           | `5432`      |
+| `DB_USER`      | PostgreSQL user           | `postgres`  |
+| `DB_PASSWORD`  | PostgreSQL password       | `postgres`  |
+| `DB_NAME`      | PostgreSQL database name  | `app_dev`   |
+| `REDIS_HOST`   | Redis host                | `localhost` |
+| `REDIS_PORT`   | Redis port                | `6379`      |
+| `JWT_SECRET`   | JWT signing secret (32+ chars) | -      |
+
+### Optional Configuration
+
+| Variable               | Description                    | Default     |
+|------------------------|--------------------------------|-------------|
+| `DB_AUTO_MIGRATE`      | Auto-run migrations on startup | `false`     |
+| `JWT_ACCESS_TOKEN_TTL` | Access token lifetime          | `15m`       |
+| `JWT_REFRESH_TOKEN_TTL`| Refresh token lifetime         | `168h` (7d) |
+| `LOG_LEVEL`            | Logging level                  | `debug`     |
+| `CORS_ALLOWED_ORIGINS` | Allowed CORS origins           | `*`         |
 
 ## API Documentation
 
-API documentation is available at `/api/docs` when running in development mode.
+API documentation is available via Swagger UI at `/docs` when the server is running.
+
+### Available Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /docs` | Swagger UI documentation |
+| `GET /docs/openapi.yaml` | OpenAPI specification |
+| `GET /health` | Readiness probe (checks all dependencies) |
+| `GET /health/live` | Liveness probe |
+| `GET /health/ready` | Readiness probe (alias) |
+| `GET /metrics` | Prometheus metrics |
+
+### Authentication Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `POST /api/v1/auth/register` | User registration |
+| `POST /api/v1/auth/login` | User login |
+| `POST /api/v1/auth/refresh` | Refresh access token |
+| `POST /api/v1/auth/logout` | Logout current session |
+| `POST /api/v1/auth/logout-all` | Logout all sessions |
+| `POST /api/v1/auth/forgot-password` | Request password reset |
+| `POST /api/v1/auth/reset-password` | Reset password with token |
+| `GET /api/v1/auth/me` | Get current user info |
+| `GET /api/v1/auth/sessions` | List active sessions |
+
+### Resource Endpoints
+
+All resource endpoints require authentication and appropriate permissions:
+
+- `/api/v1/users` - User management
+- `/api/v1/roles` - Role management
+- `/api/v1/permissions` - Permission management
 
 ## Database Migrations
 

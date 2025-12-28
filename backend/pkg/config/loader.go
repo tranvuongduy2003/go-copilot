@@ -70,6 +70,8 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("db.max_open_conns", 25)
 	v.SetDefault("db.max_idle_conns", 5)
 	v.SetDefault("db.conn_max_lifetime", 5*time.Minute)
+	v.SetDefault("db.auto_migrate", false)
+	v.SetDefault("db.migrations_path", "migrations")
 
 	v.SetDefault("redis.host", "localhost")
 	v.SetDefault("redis.port", 6379)
@@ -115,6 +117,8 @@ func bindEnvVars(v *viper.Viper) {
 		"db.max_open_conns":    "DB_MAX_OPEN_CONNS",
 		"db.max_idle_conns":    "DB_MAX_IDLE_CONNS",
 		"db.conn_max_lifetime": "DB_CONN_MAX_LIFETIME",
+		"db.auto_migrate":      "DB_AUTO_MIGRATE",
+		"db.migrations_path":   "DB_MIGRATIONS_PATH",
 
 		"redis.host":     "REDIS_HOST",
 		"redis.port":     "REDIS_PORT",
