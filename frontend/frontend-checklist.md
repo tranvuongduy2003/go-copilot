@@ -8,128 +8,134 @@
 
 ## 1.1 Project Initialization
 
-- [ ] Initialize project using Bun with Vite React TypeScript template
-- [ ] Configure `bunfig.toml` for Bun-specific settings
-- [ ] Update `package.json` with correct project metadata (name, version, description)
-- [ ] Configure `tsconfig.json` with strict TypeScript settings
-  - [ ] Enable strict mode, noImplicitAny, strictNullChecks
-  - [ ] Configure path aliases (@/ for src/)
-  - [ ] Set target to ES2022 for modern JavaScript features
-  - [ ] Enable skipLibCheck for faster builds
-- [ ] Create `.gitignore` with appropriate patterns (node_modules, dist, .env)
-- [ ] Create `.editorconfig` for consistent coding style
-- [ ] Create `README.md` with project overview and setup instructions
-- [ ] Initialize git repository with initial commit
+- [x] Initialize project using Bun with Vite React TypeScript template
+- [x] Configure `bunfig.toml` for Bun-specific settings
+- [x] Update `package.json` with correct project metadata (name, version, description)
+- [x] Configure `tsconfig.json` with strict TypeScript settings
+  - [x] Enable strict mode, noImplicitAny, strictNullChecks
+  - [x] Configure path aliases (@/ for src/)
+  - [x] Set target to ES2022 for modern JavaScript features
+  - [x] Enable skipLibCheck for faster builds
+- [x] Create `.gitignore` with appropriate patterns (node_modules, dist, .env)
+- [x] Create `.editorconfig` for consistent coding style
+- [x] Create `README.md` with project overview and setup instructions
+- [x] Initialize git repository with initial commit
 
 ## 1.2 Vite Configuration (`vite.config.ts`)
 
-- [ ] Configure path aliases to match tsconfig
-- [ ] Configure development server port and host
-- [ ] Enable CORS for API communication during development
-- [ ] Configure proxy for API requests to backend
-- [ ] Configure build output settings
-- [ ] Enable source maps for development
-- [ ] Configure chunk splitting strategy for production
-- [ ] Set up environment variable handling (VITE_ prefix)
-- [ ] Configure preview server for production build testing
-- [ ] Add build analysis plugin (rollup-plugin-visualizer) for bundle optimization
+- [x] Configure path aliases to match tsconfig
+- [x] Configure development server port and host
+- [x] Enable CORS for API communication during development
+- [x] Configure proxy for API requests to backend
+- [x] Configure build output settings
+- [x] Enable source maps for development
+- [x] Configure chunk splitting strategy for production
+- [x] Set up environment variable handling (VITE\_ prefix)
+- [x] Configure preview server for production build testing
+- [x] Add build analysis plugin (rollup-plugin-visualizer) for bundle optimization
 
 ## 1.3 Environment Configuration
 
-- [ ] Create `.env.example` with all required variables documented
-- [ ] Define `VITE_API_BASE_URL` for backend API endpoint
-- [ ] Define `VITE_APP_NAME` for application branding
-- [ ] Define `VITE_APP_VERSION` for version tracking
-- [ ] Define `VITE_ENABLE_MOCK` for mock API toggle (development)
-- [ ] Create `.env.development` for development defaults
-- [ ] Create `.env.production` for production defaults
-- [ ] Create environment type declarations (`env.d.ts`)
-- [ ] Implement environment validation on app startup
+- [x] Create `.env.example` with all required variables documented
+- [x] Define `VITE_API_BASE_URL` for backend API endpoint
+- [x] Define `VITE_APP_NAME` for application branding
+- [x] Define `VITE_APP_VERSION` for version tracking
+- [x] Define `VITE_ENABLE_MOCK` for mock API toggle (development)
+- [x] Create `.env.development` for development defaults
+- [x] Create `.env.production` for production defaults
+- [x] Create environment type declarations (`env.d.ts`)
+- [x] Implement environment validation on app startup
 
 ## 1.4 Package Dependencies
 
 ### Core Dependencies
-- [ ] Install React 18+ and React DOM
-- [ ] Install React Router DOM v6+ for routing
-- [ ] Install @tanstack/react-query for server state management
-- [ ] Install zustand for client state management
-- [ ] Install axios for HTTP requests
-- [ ] Install react-hook-form for form management
-- [ ] Install zod for schema validation
-- [ ] Install @hookform/resolvers for zod integration with react-hook-form
-- [ ] Install date-fns for date manipulation
-- [ ] Install clsx and tailwind-merge for className utilities
+
+- [x] Install React 18+ and React DOM
+- [x] Install React Router DOM v6+ for routing
+- [x] Install @tanstack/react-query for server state management
+- [x] Install zustand for client state management
+- [x] Install axios for HTTP requests
+- [x] Install react-hook-form for form management
+- [x] Install zod for schema validation
+- [x] Install @hookform/resolvers for zod integration with react-hook-form
+- [x] Install date-fns for date manipulation
+- [x] Install clsx and tailwind-merge for className utilities
 
 ### UI Dependencies
-- [ ] Install Tailwind CSS and required PostCSS plugins
-- [ ] Install shadcn/ui CLI and initialize
-- [ ] Install lucide-react for icons
-- [ ] Install class-variance-authority for component variants
-- [ ] Install @radix-ui primitives as needed by shadcn components
-- [ ] Install sonner or react-hot-toast for notifications
+
+- [x] Install Tailwind CSS and required PostCSS plugins
+- [x] Install shadcn/ui CLI and initialize
+- [x] Install lucide-react for icons
+- [x] Install class-variance-authority for component variants
+- [x] Install @radix-ui primitives as needed by shadcn components
+- [x] Install sonner or react-hot-toast for notifications
 - [ ] Install framer-motion for animations (optional)
 
 ### Development Dependencies
-- [ ] Install TypeScript and @types/react, @types/react-dom
-- [ ] Install ESLint with React and TypeScript plugins
-- [ ] Install Prettier for code formatting
-- [ ] Install @typescript-eslint/parser and @typescript-eslint/eslint-plugin
-- [ ] Install eslint-plugin-react-hooks for hooks linting
-- [ ] Install eslint-plugin-react-refresh for Fast Refresh compatibility
+
+- [x] Install TypeScript and @types/react, @types/react-dom
+- [x] Install ESLint with React and TypeScript plugins
+- [x] Install Prettier for code formatting
+- [x] Install @typescript-eslint/parser and @typescript-eslint/eslint-plugin
+- [x] Install eslint-plugin-react-hooks for hooks linting
+- [x] Install eslint-plugin-react-refresh for Fast Refresh compatibility
 - [ ] Install husky for git hooks
 - [ ] Install lint-staged for pre-commit linting
-- [ ] Install @testing-library/react for component testing
-- [ ] Install vitest for unit testing
-- [ ] Install msw for API mocking in tests
+- [x] Install @testing-library/react for component testing
+- [x] Install vitest for unit testing
+- [x] Install msw for API mocking in tests
 - [ ] Install playwright or cypress for E2E testing (optional)
 
 ## 1.5 Code Quality Setup
 
 ### ESLint Configuration (`.eslintrc.cjs` or `eslint.config.js`)
-- [ ] Configure parser for TypeScript
-- [ ] Enable React and React Hooks plugins
-- [ ] Enable import sorting rules
-- [ ] Configure no-unused-vars with TypeScript override
-- [ ] Enable strict type-checking rules
-- [ ] Configure path alias resolution for import plugin
-- [ ] Add custom rules for project conventions
+
+- [x] Configure parser for TypeScript
+- [x] Enable React and React Hooks plugins
+- [x] Enable import sorting rules
+- [x] Configure no-unused-vars with TypeScript override
+- [x] Enable strict type-checking rules
+- [x] Configure path alias resolution for import plugin
+- [x] Add custom rules for project conventions
 
 ### Prettier Configuration (`.prettierrc`)
-- [ ] Configure semi, singleQuote, tabWidth, trailingComma
-- [ ] Configure printWidth (80-120 recommended)
-- [ ] Configure endOfLine for cross-platform compatibility
-- [ ] Create `.prettierignore` for build artifacts
+
+- [x] Configure semi, singleQuote, tabWidth, trailingComma
+- [x] Configure printWidth (80-120 recommended)
+- [x] Configure endOfLine for cross-platform compatibility
+- [x] Create `.prettierignore` for build artifacts
 
 ### Git Hooks
-- [ ] Initialize husky with `bunx husky init`
-- [ ] Create pre-commit hook for lint-staged
+
+- [x] Initialize husky with `bunx husky init`
+- [x] Create pre-commit hook for lint-staged
 - [ ] Create commit-msg hook for conventional commits (optional)
-- [ ] Configure lint-staged in `package.json` or `.lintstagedrc`
-- [ ] Run ESLint and Prettier on staged files
+- [x] Configure lint-staged in `package.json` or `.lintstagedrc`
+- [x] Run ESLint and Prettier on staged files
 
 ## 1.6 Tailwind CSS Configuration
 
-- [ ] Initialize Tailwind CSS with `bunx tailwindcss init -p`
-- [ ] Configure content paths in `tailwind.config.js`
-- [ ] Extend theme with custom colors matching design system
-- [ ] Configure custom spacing, typography, and breakpoints
-- [ ] Add CSS variables for theming (light/dark mode support)
-- [ ] Configure animation keyframes for custom animations
-- [ ] Set up Tailwind plugins (forms, typography, aspect-ratio)
-- [ ] Create base styles in `index.css` with Tailwind directives
+- [x] Initialize Tailwind CSS with `bunx tailwindcss init -p`
+- [x] Configure content paths in `tailwind.config.js`
+- [x] Extend theme with custom colors matching design system
+- [x] Configure custom spacing, typography, and breakpoints
+- [x] Add CSS variables for theming (light/dark mode support)
+- [x] Configure animation keyframes for custom animations
+- [x] Set up Tailwind plugins (forms, typography, aspect-ratio)
+- [x] Create base styles in `index.css` with Tailwind directives
 
 ## 1.7 shadcn/ui Setup
 
-- [ ] Run `bunx shadcn-ui@latest init`
-- [ ] Configure components.json with correct paths
-- [ ] Select style (default or new-york)
-- [ ] Configure base color and CSS variables
-- [ ] Install essential components: button, input, card, form, label
-- [ ] Install feedback components: alert, toast, dialog, drawer
-- [ ] Install data display components: table, badge, avatar
-- [ ] Install navigation components: dropdown-menu, tabs, navigation-menu
-- [ ] Install form components: select, checkbox, radio-group, switch
-- [ ] Create component barrel exports for cleaner imports
+- [x] Run `bunx shadcn-ui@latest init`
+- [x] Configure components.json with correct paths
+- [x] Select style (default or new-york)
+- [x] Configure base color and CSS variables
+- [x] Install essential components: button, input, card, form, label
+- [x] Install feedback components: alert, toast, dialog, drawer
+- [x] Install data display components: table, badge, avatar
+- [x] Install navigation components: dropdown-menu, tabs, navigation-menu
+- [x] Install form components: select, checkbox, radio-group, switch
+- [x] Create component barrel exports for cleaner imports
 
 ---
 
@@ -162,139 +168,151 @@ src/
 └── constants/              # Application constants
 ```
 
-- [ ] Create folder structure as defined above
-- [ ] Move existing components to appropriate locations
-- [ ] Create barrel exports (index.ts) for each major folder
-- [ ] Configure path aliases for new folders in tsconfig and vite.config
+- [x] Create folder structure as defined above
+- [x] Move existing components to appropriate locations
+- [x] Create barrel exports (index.ts) for each major folder
+- [x] Configure path aliases for new folders in tsconfig and vite.config
 
 ## 2.2 API Layer Setup (`src/lib/api/`)
 
 ### 2.2.1 Axios Client Configuration
-- [ ] Create axios instance with base configuration
-- [ ] Configure base URL from environment variable
-- [ ] Set default headers (Content-Type, Accept)
-- [ ] Configure timeout (30 seconds recommended)
-- [ ] Create request interceptor for authentication
-  - [ ] Automatically attach access token to requests
-  - [ ] Skip token for public endpoints
-- [ ] Create response interceptor for error handling
-  - [ ] Handle 401 errors with token refresh logic
-  - [ ] Handle network errors gracefully
-  - [ ] Implement request retry for transient failures
-- [ ] Create response interceptor for data transformation
-  - [ ] Unwrap successful responses for cleaner data access
+
+- [x] Create axios instance with base configuration
+- [x] Configure base URL from environment variable
+- [x] Set default headers (Content-Type, Accept)
+- [x] Configure timeout (30 seconds recommended)
+- [x] Create request interceptor for authentication
+  - [x] Automatically attach access token to requests
+  - [x] Skip token for public endpoints
+- [x] Create response interceptor for error handling
+  - [x] Handle 401 errors with token refresh logic
+  - [x] Handle network errors gracefully
+  - [x] Implement request retry for transient failures
+- [x] Create response interceptor for data transformation
+  - [x] Unwrap successful responses for cleaner data access
 
 ### 2.2.2 Token Refresh Implementation
-- [ ] Implement token refresh mechanism
-- [ ] Queue failed requests during refresh
-- [ ] Retry queued requests after successful refresh
-- [ ] Redirect to login on refresh failure
-- [ ] Prevent multiple simultaneous refresh requests
-- [ ] Handle refresh token expiration
+
+- [x] Implement token refresh mechanism
+- [x] Queue failed requests during refresh
+- [x] Retry queued requests after successful refresh
+- [x] Redirect to login on refresh failure
+- [x] Prevent multiple simultaneous refresh requests
+- [x] Handle refresh token expiration
 
 ### 2.2.3 API Error Handling
-- [ ] Define ApiError class with typed error structure
-  - [ ] Include status code, message, and error details
-  - [ ] Include original error for debugging
-- [ ] Create error type guards for specific error types
-- [ ] Map backend error codes to user-friendly messages
-- [ ] Create error boundary for API errors
+
+- [x] Define ApiError class with typed error structure
+  - [x] Include status code, message, and error details
+  - [x] Include original error for debugging
+- [x] Create error type guards for specific error types
+- [x] Map backend error codes to user-friendly messages
+- [x] Create error boundary for API errors
 
 ### 2.2.4 API Endpoints Organization
-- [ ] Create endpoints constants file
-- [ ] Group endpoints by feature/resource
-- [ ] Use string templates for parameterized URLs
-- [ ] Document each endpoint with expected request/response
+
+- [x] Create endpoints constants file
+- [x] Group endpoints by feature/resource
+- [x] Use string templates for parameterized URLs
+- [x] Document each endpoint with expected request/response
 
 ## 2.3 React Query Setup (`src/lib/api/query-client.ts`)
 
 ### 2.3.1 Query Client Configuration
-- [ ] Create QueryClient instance with default options
-- [ ] Configure default staleTime (5 minutes for most data)
-- [ ] Configure default gcTime (cacheTime) (10 minutes)
-- [ ] Configure retry logic (3 retries with exponential backoff)
-- [ ] Configure refetchOnWindowFocus (false for most apps)
-- [ ] Configure refetchOnMount behavior
-- [ ] Set up query client provider in app providers
+
+- [x] Create QueryClient instance with default options
+- [x] Configure default staleTime (5 minutes for most data)
+- [x] Configure default gcTime (cacheTime) (10 minutes)
+- [x] Configure retry logic (3 retries with exponential backoff)
+- [x] Configure refetchOnWindowFocus (false for most apps)
+- [x] Configure refetchOnMount behavior
+- [x] Set up query client provider in app providers
 
 ### 2.3.2 Query Key Factory
-- [ ] Create query key factory for consistent key management
-- [ ] Define keys by feature (auth, users, etc.)
-- [ ] Include parameters in keys for cache granularity
-- [ ] Export typed query keys for type safety
-- [ ] Document query key patterns
+
+- [x] Create query key factory for consistent key management
+- [x] Define keys by feature (auth, users, etc.)
+- [x] Include parameters in keys for cache granularity
+- [x] Export typed query keys for type safety
+- [x] Document query key patterns
 
 ### 2.3.3 Custom Query Hooks Pattern
-- [ ] Define pattern for query hooks (useQuery wrapper)
-- [ ] Define pattern for mutation hooks (useMutation wrapper)
-- [ ] Include loading, error, and success states
-- [ ] Include automatic cache invalidation on mutations
-- [ ] Include optimistic updates where appropriate
+
+- [x] Define pattern for query hooks (useQuery wrapper)
+- [x] Define pattern for mutation hooks (useMutation wrapper)
+- [x] Include loading, error, and success states
+- [x] Include automatic cache invalidation on mutations
+- [x] Include optimistic updates where appropriate
 
 ## 2.4 State Management with Zustand (`src/stores/`)
 
 ### 2.4.1 Store Architecture
-- [ ] Define store slicing strategy (one store per domain)
-- [ ] Create auth store for authentication state
-- [ ] Create UI store for global UI state (sidebar, modals)
-- [ ] Create user preferences store (theme, language)
-- [ ] Implement persist middleware for relevant stores
-- [ ] Configure storage adapter (localStorage)
-- [ ] Define persisted vs non-persisted state
+
+- [x] Define store slicing strategy (one store per domain)
+- [x] Create auth store for authentication state
+- [x] Create UI store for global UI state (sidebar, modals)
+- [x] Create user preferences store (theme, language)
+- [x] Implement persist middleware for relevant stores
+- [x] Configure storage adapter (localStorage)
+- [x] Define persisted vs non-persisted state
 
 ### 2.4.2 Auth Store Implementation
-- [ ] Define auth state interface
-  - [ ] Include user object (nullable)
-  - [ ] Include authentication status (loading, authenticated, unauthenticated)
-  - [ ] Include tokens (if storing in memory)
-- [ ] Define auth actions
-  - [ ] setUser action
-  - [ ] clearAuth action
-  - [ ] updateUser action
-- [ ] Implement selectors for derived state
-  - [ ] isAuthenticated selector
-  - [ ] hasPermission selector (for RBAC)
-  - [ ] hasRole selector
+
+- [x] Define auth state interface
+  - [x] Include user object (nullable)
+  - [x] Include authentication status (loading, authenticated, unauthenticated)
+  - [x] Include tokens (if storing in memory)
+- [x] Define auth actions
+  - [x] setUser action
+  - [x] clearAuth action
+  - [x] updateUser action
+- [x] Implement selectors for derived state
+  - [x] isAuthenticated selector
+  - [x] hasPermission selector (for RBAC)
+  - [x] hasRole selector
 
 ### 2.4.3 UI Store Implementation
-- [ ] Define UI state interface
-  - [ ] Include sidebar collapsed state
-  - [ ] Include active modal state
-  - [ ] Include global loading state
-  - [ ] Include notification queue (if not using toast library)
-- [ ] Define UI actions for state mutations
-- [ ] Implement reset action for cleanup
+
+- [x] Define UI state interface
+  - [x] Include sidebar collapsed state
+  - [x] Include active modal state
+  - [x] Include global loading state
+  - [x] Include notification queue (if not using toast library)
+- [x] Define UI actions for state mutations
+- [x] Implement reset action for cleanup
 
 ## 2.5 Form Management Setup
 
 ### 2.5.1 Zod Schema Definitions (`src/lib/validations/`)
-- [ ] Create base validation schemas for common types
-  - [ ] Email schema with proper regex
-  - [ ] Password schema with strength requirements
-  - [ ] UUID schema for IDs
-  - [ ] Pagination schema for list queries
-- [ ] Create auth-related schemas
-  - [ ] Login schema (email, password)
-  - [ ] Register schema (email, password, confirmPassword, fullName)
-  - [ ] Forgot password schema
-  - [ ] Reset password schema
-  - [ ] Change password schema
-- [ ] Create user-related schemas
-  - [ ] Create user schema
-  - [ ] Update user schema (partial)
-  - [ ] User filter schema for list queries
-- [ ] Export TypeScript types inferred from schemas
+
+- [x] Create base validation schemas for common types
+  - [x] Email schema with proper regex
+  - [x] Password schema with strength requirements
+  - [x] UUID schema for IDs
+  - [x] Pagination schema for list queries
+- [x] Create auth-related schemas
+  - [x] Login schema (email, password)
+  - [x] Register schema (email, password, confirmPassword, fullName)
+  - [x] Forgot password schema
+  - [x] Reset password schema
+  - [x] Change password schema
+- [x] Create user-related schemas
+  - [x] Create user schema
+  - [x] Update user schema (partial)
+  - [x] User filter schema for list queries
+- [x] Export TypeScript types inferred from schemas
 
 ### 2.5.2 Form Components Pattern
-- [ ] Create form field wrapper component
-  - [ ] Integrate with react-hook-form Controller
-  - [ ] Display validation errors from form state
-  - [ ] Support all input types (text, password, select, etc.)
-- [ ] Create reusable form components
-  - [ ] FormInput component
-  - [ ] FormSelect component
-  - [ ] FormCheckbox component
-  - [ ] FormTextarea component
+
+- [x] Create form field wrapper component
+  - [x] Integrate with react-hook-form Controller
+  - [x] Display validation errors from form state
+  - [x] Support all input types (text, password, select, etc.)
+- [x] Create reusable form components
+  - [x] FormInput component
+  - [x] FormSelect component
+  - [x] FormCheckbox component
+  - [x] FormTextarea component
   - [ ] FormDatePicker component (if needed)
 
 ---
@@ -326,152 +344,163 @@ features/auth/
 └── index.ts
 ```
 
-- [ ] Create folder structure for auth feature
-- [ ] Create barrel export (index.ts) for public API
+- [x] Create folder structure for auth feature
+- [x] Create barrel export (index.ts) for public API
 
 ## 3.2 Auth Types (`types/auth.types.ts`)
 
-- [ ] Define User interface matching backend UserDTO
-  - [ ] Include id, email, fullName, status, roles, permissions
-- [ ] Define LoginRequest interface
-- [ ] Define LoginResponse interface with tokens and user
-- [ ] Define RegisterRequest interface
-- [ ] Define TokenPair interface (accessToken, refreshToken, expiresIn)
-- [ ] Define AuthState interface for store
-- [ ] Define Permission and Role types for RBAC
-- [ ] Define ForgotPasswordRequest interface
-- [ ] Define ResetPasswordRequest interface
-- [ ] Define ChangePasswordRequest interface
+- [x] Define User interface matching backend UserDTO
+  - [x] Include id, email, fullName, status, roles, permissions
+- [x] Define LoginRequest interface
+- [x] Define LoginResponse interface with tokens and user
+- [x] Define RegisterRequest interface
+- [x] Define TokenPair interface (accessToken, refreshToken, expiresIn)
+- [x] Define AuthState interface for store
+- [x] Define Permission and Role types for RBAC
+- [x] Define ForgotPasswordRequest interface
+- [x] Define ResetPasswordRequest interface
+- [x] Define ChangePasswordRequest interface
 
 ## 3.3 Auth API (`api/auth.api.ts`)
 
-- [ ] Implement login API function
-  - [ ] Accept credentials, return token pair and user
-- [ ] Implement register API function
-- [ ] Implement logout API function
-  - [ ] Call backend logout endpoint
-- [ ] Implement refresh token API function
-- [ ] Implement forgot password API function
-- [ ] Implement reset password API function
-- [ ] Implement change password API function
-- [ ] Implement get current user API function (GET /auth/me)
-- [ ] Implement get sessions API function
-- [ ] Implement revoke session API function
+- [x] Implement login API function
+  - [x] Accept credentials, return token pair and user
+- [x] Implement register API function
+- [x] Implement logout API function
+  - [x] Call backend logout endpoint
+- [x] Implement refresh token API function
+- [x] Implement forgot password API function
+- [x] Implement reset password API function
+- [x] Implement change password API function
+- [x] Implement get current user API function (GET /auth/me)
+- [x] Implement get sessions API function
+- [x] Implement revoke session API function
 
 ## 3.4 Auth React Query Hooks (`api/auth.queries.ts`)
 
 ### 3.4.1 Auth Mutations
-- [ ] Create useLogin mutation hook
-  - [ ] On success: store tokens, update auth store, redirect
-  - [ ] On error: display error message
-- [ ] Create useRegister mutation hook
-  - [ ] On success: auto-login or redirect to login
-- [ ] Create useLogout mutation hook
-  - [ ] On success: clear auth store, clear query cache, redirect
-- [ ] Create useForgotPassword mutation hook
-  - [ ] On success: display success message
-- [ ] Create useResetPassword mutation hook
-  - [ ] On success: redirect to login
-- [ ] Create useChangePassword mutation hook
-  - [ ] On success: display success message, optionally logout
+
+- [x] Create useLogin mutation hook
+  - [x] On success: store tokens, update auth store, redirect
+  - [x] On error: display error message
+- [x] Create useRegister mutation hook
+  - [x] On success: auto-login or redirect to login
+- [x] Create useLogout mutation hook
+  - [x] On success: clear auth store, clear query cache, redirect
+- [x] Create useForgotPassword mutation hook
+  - [x] On success: display success message
+- [x] Create useResetPassword mutation hook
+  - [x] On success: redirect to login
+- [x] Create useChangePassword mutation hook
+  - [x] On success: display success message, optionally logout
 
 ### 3.4.2 Auth Queries
-- [ ] Create useCurrentUser query hook
-  - [ ] Fetch current user data on app mount
-  - [ ] Update auth store with user data
-  - [ ] Handle unauthorized (token expired)
-- [ ] Create useSessions query hook for active sessions list
-- [ ] Create useRevokeSession mutation hook
+
+- [x] Create useCurrentUser query hook
+  - [x] Fetch current user data on app mount
+  - [x] Update auth store with user data
+  - [x] Handle unauthorized (token expired)
+- [x] Create useSessions query hook for active sessions list
+- [x] Create useRevokeSession mutation hook
 
 ## 3.5 Auth Components
 
 ### 3.5.1 Login Form Component
-- [ ] Integrate react-hook-form with zod resolver
-- [ ] Include email input with validation
-- [ ] Include password input with show/hide toggle
-- [ ] Include "Remember me" checkbox (optional)
-- [ ] Include "Forgot password" link
-- [ ] Include submit button with loading state
-- [ ] Display form-level errors from API
-- [ ] Display field-level validation errors
-- [ ] Handle form submission with useLogin hook
-- [ ] Redirect to dashboard on success
+
+- [x] Integrate react-hook-form with zod resolver
+- [x] Include email input with validation
+- [x] Include password input with show/hide toggle
+- [x] Include "Remember me" checkbox (optional)
+- [x] Include "Forgot password" link
+- [x] Include submit button with loading state
+- [x] Display form-level errors from API
+- [x] Display field-level validation errors
+- [x] Handle form submission with useLogin hook
+- [x] Redirect to dashboard on success
 
 ### 3.5.2 Register Form Component
-- [ ] Include email input with validation
-- [ ] Include full name input with validation
-- [ ] Include password input with strength indicator
-- [ ] Include confirm password input with match validation
-- [ ] Include terms acceptance checkbox
-- [ ] Include submit button with loading state
-- [ ] Display validation errors
-- [ ] Handle form submission with useRegister hook
-- [ ] Include link to login page
+
+- [x] Include email input with validation
+- [x] Include full name input with validation
+- [x] Include password input with strength indicator
+- [x] Include confirm password input with match validation
+- [x] Include terms acceptance checkbox
+- [x] Include submit button with loading state
+- [x] Display validation errors
+- [x] Handle form submission with useRegister hook
+- [x] Include link to login page
 
 ### 3.5.3 Forgot Password Form Component
-- [ ] Include email input with validation
-- [ ] Include submit button with loading state
-- [ ] Display success message after submission
-- [ ] Include link back to login
+
+- [x] Include email input with validation
+- [x] Include submit button with loading state
+- [x] Display success message after submission
+- [x] Include link back to login
 
 ### 3.5.4 Reset Password Form Component
-- [ ] Extract reset token from URL query params
-- [ ] Include new password input with strength indicator
-- [ ] Include confirm password input
-- [ ] Include submit button with loading state
-- [ ] Handle invalid/expired token error
-- [ ] Redirect to login on success
+
+- [x] Extract reset token from URL query params
+- [x] Include new password input with strength indicator
+- [x] Include confirm password input
+- [x] Include submit button with loading state
+- [x] Handle invalid/expired token error
+- [x] Redirect to login on success
 
 ### 3.5.5 Auth Guard Component
-- [ ] Check authentication status
-- [ ] Redirect to login if not authenticated
-- [ ] Show loading state while checking auth
-- [ ] Render children if authenticated
-- [ ] Accept required permissions/roles props
-- [ ] Check permissions if specified
-- [ ] Redirect to unauthorized page if permission denied
+
+- [x] Check authentication status
+- [x] Redirect to login if not authenticated
+- [x] Show loading state while checking auth
+- [x] Render children if authenticated
+- [x] Accept required permissions/roles props
+- [x] Check permissions if specified
+- [x] Redirect to unauthorized page if permission denied
 
 ## 3.6 Auth Pages
 
 ### 3.6.1 Login Page
-- [ ] Create page layout with centered form
-- [ ] Include app logo/branding
-- [ ] Include LoginForm component
-- [ ] Include link to register page
+
+- [x] Create page layout with centered form
+- [x] Include app logo/branding
+- [x] Include LoginForm component
+- [x] Include link to register page
 - [ ] Include social login options (if applicable)
-- [ ] Redirect if already authenticated
+- [x] Redirect if already authenticated
 
 ### 3.6.2 Register Page
-- [ ] Create page layout with centered form
-- [ ] Include app logo/branding
-- [ ] Include RegisterForm component
-- [ ] Include link to login page
-- [ ] Redirect if already authenticated
+
+- [x] Create page layout with centered form
+- [x] Include app logo/branding
+- [x] Include RegisterForm component
+- [x] Include link to login page
+- [x] Redirect if already authenticated
 
 ### 3.6.3 Forgot Password Page
-- [ ] Create page layout with centered form
-- [ ] Include ForgotPasswordForm component
-- [ ] Include link back to login
+
+- [x] Create page layout with centered form
+- [x] Include ForgotPasswordForm component
+- [x] Include link back to login
 
 ### 3.6.4 Reset Password Page
-- [ ] Create page layout with centered form
-- [ ] Validate token presence in URL
-- [ ] Include ResetPasswordForm component
-- [ ] Handle token validation errors
+
+- [x] Create page layout with centered form
+- [x] Validate token presence in URL
+- [x] Include ResetPasswordForm component
+- [x] Handle token validation errors
 
 ## 3.7 Token Management
 
-- [ ] Implement secure token storage strategy
+- [x] Implement secure token storage strategy
   - [ ] Option 1: Memory only (most secure, no persistence)
-  - [ ] Option 2: localStorage (convenient, less secure)
+  - [x] Option 2: localStorage (convenient, less secure)
   - [ ] Option 3: HttpOnly cookies (requires backend support)
-- [ ] Implement token persistence (if using localStorage)
-  - [ ] Store encrypted or obfuscated tokens
-  - [ ] Clear tokens on logout
-- [ ] Implement token refresh on app mount
-- [ ] Check token expiration before requests
-- [ ] Implement automatic token refresh before expiration
-  - [ ] Set up refresh interval or intercept 401 responses
+- [x] Implement token persistence (if using localStorage)
+  - [x] Store encrypted or obfuscated tokens
+  - [x] Clear tokens on logout
+- [x] Implement token refresh on app mount
+- [x] Check token expiration before requests
+- [x] Implement automatic token refresh before expiration
+  - [x] Set up refresh interval or intercept 401 responses
 
 ---
 
@@ -501,126 +530,136 @@ features/users/
 └── index.ts
 ```
 
-- [ ] Create folder structure for users feature
-- [ ] Create barrel export for public API
+- [x] Create folder structure for users feature
+- [x] Create barrel export for public API
 
 ## 4.2 User Types (`types/user.types.ts`)
 
-- [ ] Define User interface matching backend DTO
-- [ ] Define UserStatus enum (pending, active, inactive, banned)
-- [ ] Define CreateUserRequest interface
-- [ ] Define UpdateUserRequest interface
-- [ ] Define UserFilter interface for list queries
-- [ ] Define PaginatedUsers interface for list response
-- [ ] Define UserRole interface
-- [ ] Define UserPermission interface
+- [x] Define User interface matching backend DTO
+- [x] Define UserStatus enum (pending, active, inactive, banned)
+- [x] Define CreateUserRequest interface
+- [x] Define UpdateUserRequest interface
+- [x] Define UserFilter interface for list queries
+- [x] Define PaginatedUsers interface for list response
+- [x] Define UserRole interface
+- [x] Define UserPermission interface
 
 ## 4.3 User API (`api/users.api.ts`)
 
-- [ ] Implement getUsers API function with pagination and filters
-- [ ] Implement getUser API function by ID
-- [ ] Implement createUser API function
-- [ ] Implement updateUser API function
-- [ ] Implement deleteUser API function
-- [ ] Implement activateUser API function
-- [ ] Implement deactivateUser API function
-- [ ] Implement getUserRoles API function
-- [ ] Implement assignRole API function
-- [ ] Implement revokeRole API function
+- [x] Implement getUsers API function with pagination and filters
+- [x] Implement getUser API function by ID
+- [x] Implement createUser API function
+- [x] Implement updateUser API function
+- [x] Implement deleteUser API function
+- [x] Implement activateUser API function
+- [x] Implement deactivateUser API function
+- [x] Implement getUserRoles API function
+- [x] Implement assignRole API function
+- [x] Implement revokeRole API function
 
 ## 4.4 User React Query Hooks (`api/users.queries.ts`)
 
 ### 4.4.1 User Queries
-- [ ] Create useUsers query hook with pagination
-  - [ ] Accept page, limit, filters as parameters
-  - [ ] Return paginated data with metadata
-  - [ ] Enable keepPreviousData for smooth pagination
-- [ ] Create useUser query hook by ID
-  - [ ] Enable caching with appropriate staleTime
-- [ ] Create useUserRoles query hook
+
+- [x] Create useUsers query hook with pagination
+  - [x] Accept page, limit, filters as parameters
+  - [x] Return paginated data with metadata
+  - [x] Enable keepPreviousData for smooth pagination
+- [x] Create useUser query hook by ID
+  - [x] Enable caching with appropriate staleTime
+- [x] Create useUserRoles query hook
 
 ### 4.4.2 User Mutations
-- [ ] Create useCreateUser mutation
-  - [ ] Invalidate users list cache on success
-- [ ] Create useUpdateUser mutation
-  - [ ] Invalidate specific user and list cache
-  - [ ] Implement optimistic update (optional)
-- [ ] Create useDeleteUser mutation
-  - [ ] Invalidate users list cache on success
-- [ ] Create useActivateUser mutation
-- [ ] Create useDeactivateUser mutation
-- [ ] Create useAssignRole mutation
-- [ ] Create useRevokeRole mutation
+
+- [x] Create useCreateUser mutation
+  - [x] Invalidate users list cache on success
+- [x] Create useUpdateUser mutation
+  - [x] Invalidate specific user and list cache
+  - [x] Implement optimistic update (optional)
+- [x] Create useDeleteUser mutation
+  - [x] Invalidate users list cache on success
+- [x] Create useActivateUser mutation
+- [x] Create useDeactivateUser mutation
+- [x] Create useAssignRole mutation
+- [x] Create useRevokeRole mutation
 
 ## 4.5 User Components
 
 ### 4.5.1 User Table Component
-- [ ] Display users in responsive table
-- [ ] Include columns: name, email, status, roles, created, actions
-- [ ] Implement column sorting
-- [ ] Implement row selection (if bulk actions needed)
-- [ ] Include action buttons (edit, delete, activate/deactivate)
-- [ ] Display loading skeleton during fetch
-- [ ] Handle empty state with appropriate message
-- [ ] Implement pagination controls
+
+- [x] Display users in responsive table
+- [x] Include columns: name, email, status, roles, created, actions
+- [x] Implement column sorting
+- [x] Implement row selection (if bulk actions needed)
+- [x] Include action buttons (edit, delete, activate/deactivate)
+- [x] Display loading skeleton during fetch
+- [x] Handle empty state with appropriate message
+- [x] Implement pagination controls
 
 ### 4.5.2 User Form Component
-- [ ] Support create and edit modes
-- [ ] Include all user fields with validation
-- [ ] Include role assignment (multi-select)
-- [ ] Include status selection (for edit mode)
-- [ ] Handle form submission with appropriate mutation
-- [ ] Display loading state during submission
-- [ ] Display success/error feedback
+
+- [x] Support create and edit modes
+- [x] Include all user fields with validation
+- [x] Include role assignment (multi-select)
+- [x] Include status selection (for edit mode)
+- [x] Handle form submission with appropriate mutation
+- [x] Display loading state during submission
+- [x] Display success/error feedback
 
 ### 4.5.3 User Filters Component
-- [ ] Include search input (debounced)
-- [ ] Include status filter dropdown
-- [ ] Include role filter dropdown
+
+- [x] Include search input (debounced)
+- [x] Include status filter dropdown
+- [x] Include role filter dropdown
 - [ ] Include date range filter (optional)
-- [ ] Include clear filters button
-- [ ] Sync filters with URL query params
+- [x] Include clear filters button
+- [x] Sync filters with URL query params
 
 ### 4.5.4 User Card Component
-- [ ] Display user info in card format (for grid view)
-- [ ] Include avatar, name, email, status badge
-- [ ] Include quick action buttons
-- [ ] Support click to navigate to detail
+
+- [x] Display user info in card format (for grid view)
+- [x] Include avatar, name, email, status badge
+- [x] Include quick action buttons
+- [x] Support click to navigate to detail
 
 ### 4.5.5 User Actions Component
-- [ ] Dropdown menu for user actions
-- [ ] Include edit action
-- [ ] Include activate/deactivate action (conditional)
-- [ ] Include delete action with confirmation
+
+- [x] Dropdown menu for user actions
+- [x] Include edit action
+- [x] Include activate/deactivate action (conditional)
+- [x] Include delete action with confirmation
 - [ ] Include view sessions action
-- [ ] Check permissions before showing actions
+- [x] Check permissions before showing actions
 
 ## 4.6 User Pages
 
 ### 4.6.1 Users List Page
-- [ ] Include page header with title and create button
-- [ ] Include UserFilters component
-- [ ] Include UserTable component
-- [ ] Include pagination component
+
+- [x] Include page header with title and create button
+- [x] Include UserFilters component
+- [x] Include UserTable component
+- [x] Include pagination component
 - [ ] Support view toggle (table/grid) (optional)
-- [ ] Protect with required permission
+- [x] Protect with required permission
 
 ### 4.6.2 User Detail Page
-- [ ] Fetch user data by ID from URL params
-- [ ] Display user information
-- [ ] Display user roles and permissions
+
+- [x] Fetch user data by ID from URL params
+- [x] Display user information
+- [x] Display user roles and permissions
 - [ ] Display user sessions (optional)
-- [ ] Include edit button linking to edit form
-- [ ] Include back button to list
-- [ ] Handle user not found error
+- [x] Include edit button linking to edit form
+- [x] Include back button to list
+- [x] Handle user not found error
 
 ### 4.6.3 User Create/Edit Page
-- [ ] Include page header with appropriate title
-- [ ] Include UserForm component
-- [ ] Handle create vs edit based on route
-- [ ] Pre-populate form in edit mode
-- [ ] Navigate to list on success
-- [ ] Protect with required permission
+
+- [x] Include page header with appropriate title
+- [x] Include UserForm component
+- [x] Handle create vs edit based on route
+- [x] Pre-populate form in edit mode
+- [x] Navigate to list on success
+- [x] Protect with required permission
 
 ---
 
@@ -647,78 +686,84 @@ features/roles/
 └── index.ts
 ```
 
-- [ ] Create folder structure for roles feature
-- [ ] Create barrel export for public API
+- [x] Create folder structure for roles feature
+- [x] Create barrel export for public API
 
 ## 5.2 Role Types (`types/role.types.ts`)
 
-- [ ] Define Role interface matching backend DTO
-- [ ] Define Permission interface matching backend DTO
-- [ ] Define CreateRoleRequest interface
-- [ ] Define UpdateRoleRequest interface
-- [ ] Define RolePermissions interface
+- [x] Define Role interface matching backend DTO
+- [x] Define Permission interface matching backend DTO
+- [x] Define CreateRoleRequest interface
+- [x] Define UpdateRoleRequest interface
+- [x] Define RolePermissions interface
 
 ## 5.3 Role API Functions
 
-- [ ] Implement getRoles API function
-- [ ] Implement getRole API function by ID
-- [ ] Implement createRole API function
-- [ ] Implement updateRole API function
-- [ ] Implement deleteRole API function
-- [ ] Implement getRolePermissions API function
-- [ ] Implement setRolePermissions API function
-- [ ] Implement getPermissions API function (all permissions)
+- [x] Implement getRoles API function
+- [x] Implement getRole API function by ID
+- [x] Implement createRole API function
+- [x] Implement updateRole API function
+- [x] Implement deleteRole API function
+- [x] Implement getRolePermissions API function
+- [x] Implement setRolePermissions API function
+- [x] Implement getPermissions API function (all permissions)
 
 ## 5.4 Role React Query Hooks
 
-- [ ] Create useRoles query hook
-- [ ] Create useRole query hook by ID
-- [ ] Create usePermissions query hook (all available)
-- [ ] Create useCreateRole mutation
-- [ ] Create useUpdateRole mutation
-- [ ] Create useDeleteRole mutation
-- [ ] Create useSetRolePermissions mutation
+- [x] Create useRoles query hook
+- [x] Create useRole query hook by ID
+- [x] Create usePermissions query hook (all available)
+- [x] Create useCreateRole mutation
+- [x] Create useUpdateRole mutation
+- [x] Create useDeleteRole mutation
+- [x] Create useSetRolePermissions mutation
 
 ## 5.5 Role Components
 
 ### 5.5.1 Role Table Component
-- [ ] Display roles in table format
-- [ ] Include columns: name, display name, users count, permissions count, actions
-- [ ] Indicate system roles (non-deletable)
-- [ ] Include action buttons (edit, delete, manage permissions)
+
+- [x] Display roles in table format
+- [x] Include columns: name, display name, users count, permissions count, actions
+- [x] Indicate system roles (non-deletable)
+- [x] Include action buttons (edit, delete, manage permissions)
 
 ### 5.5.2 Role Form Component
-- [ ] Support create and edit modes
-- [ ] Include name input (disabled for system roles)
-- [ ] Include display name input
-- [ ] Include description textarea
-- [ ] Include permission selector component
-- [ ] Handle form submission
+
+- [x] Support create and edit modes
+- [x] Include name input (disabled for system roles)
+- [x] Include display name input
+- [x] Include description textarea
+- [x] Include permission selector component
+- [x] Handle form submission
 
 ### 5.5.3 Permission Selector Component
-- [ ] Display permissions grouped by resource
-- [ ] Support multi-select with checkboxes
-- [ ] Include select all / deselect all per group
-- [ ] Show current selection count
-- [ ] Support search/filter permissions
+
+- [x] Display permissions grouped by resource
+- [x] Support multi-select with checkboxes
+- [x] Include select all / deselect all per group
+- [x] Show current selection count
+- [x] Support search/filter permissions
 
 ### 5.5.4 Permission List Component
-- [ ] Display permissions in readable format
-- [ ] Group by resource
-- [ ] Show resource:action format with description
+
+- [x] Display permissions in readable format
+- [x] Group by resource
+- [x] Show resource:action format with description
 
 ## 5.6 Role Pages
 
 ### 5.6.1 Roles List Page
-- [ ] Include page header with create button
-- [ ] Include RoleTable component
-- [ ] Protect with roles:list permission
+
+- [x] Include page header with create button
+- [x] Include RoleTable component
+- [x] Protect with roles:list permission
 
 ### 5.6.2 Role Detail/Edit Page
-- [ ] Fetch role data by ID
-- [ ] Include RoleForm component
-- [ ] Handle system role restrictions
-- [ ] Protect with roles:read permission
+
+- [x] Fetch role data by ID
+- [x] Include RoleForm component
+- [x] Handle system role restrictions
+- [x] Protect with roles:read permission
 
 ---
 
@@ -727,69 +772,77 @@ features/roles/
 ## 6.1 Layout Components
 
 ### 6.1.1 Root Layout Component
-- [ ] Define overall page structure
-- [ ] Include header/navbar
-- [ ] Include sidebar (for authenticated routes)
-- [ ] Include main content area
-- [ ] Include footer (optional)
-- [ ] Handle responsive layout (mobile sidebar drawer)
+
+- [x] Define overall page structure
+- [x] Include header/navbar
+- [x] Include sidebar (for authenticated routes)
+- [x] Include main content area
+- [x] Include footer (optional)
+- [x] Handle responsive layout (mobile sidebar drawer)
 
 ### 6.1.2 Header Component
-- [ ] Include app logo/branding
-- [ ] Include navigation links (if not using sidebar)
-- [ ] Include user menu (avatar, dropdown)
+
+- [x] Include app logo/branding
+- [x] Include navigation links (if not using sidebar)
+- [x] Include user menu (avatar, dropdown)
 - [ ] Include notifications indicator (optional)
-- [ ] Include theme toggle (dark/light mode)
-- [ ] Handle responsive behavior (hamburger menu)
+- [x] Include theme toggle (dark/light mode)
+- [x] Handle responsive behavior (hamburger menu)
 
 ### 6.1.3 Sidebar Component
-- [ ] Display navigation menu items
-- [ ] Support nested/grouped menu items
-- [ ] Highlight active route
-- [ ] Support collapsed state
-- [ ] Filter menu items based on permissions
-- [ ] Include user info section (optional)
-- [ ] Include logout button
+
+- [x] Display navigation menu items
+- [x] Support nested/grouped menu items
+- [x] Highlight active route
+- [x] Support collapsed state
+- [x] Filter menu items based on permissions
+- [x] Include user info section (optional)
+- [x] Include logout button
 
 ### 6.1.4 User Menu Component
-- [ ] Display user avatar and name
-- [ ] Include dropdown with menu items
-  - [ ] Profile link
-  - [ ] Settings link
-  - [ ] Change password link
-  - [ ] Logout button
-- [ ] Handle loading state for user data
+
+- [x] Display user avatar and name
+- [x] Include dropdown with menu items
+  - [x] Profile link
+  - [x] Settings link
+  - [x] Change password link
+  - [x] Logout button
+- [x] Handle loading state for user data
 
 ### 6.1.5 Footer Component (optional)
-- [ ] Include copyright information
-- [ ] Include version number
-- [ ] Include useful links
+
+- [x] Include copyright information
+- [x] Include version number
+- [x] Include useful links
 
 ## 6.2 Navigation Configuration
 
-- [ ] Create navigation config object
-- [ ] Define menu items with labels, icons, paths
-- [ ] Define required permissions per menu item
-- [ ] Support nested menu groups
-- [ ] Create hook to filter navigation by permissions
+- [x] Create navigation config object
+- [x] Define menu items with labels, icons, paths
+- [x] Define required permissions per menu item
+- [x] Support nested menu groups
+- [x] Create hook to filter navigation by permissions
 
 ## 6.3 Page Layout Components
 
 ### 6.3.1 Page Header Component
-- [ ] Include page title
-- [ ] Include breadcrumbs
-- [ ] Include action buttons slot
-- [ ] Support back button
+
+- [x] Include page title
+- [x] Include breadcrumbs
+- [x] Include action buttons slot
+- [x] Support back button
 
 ### 6.3.2 Page Container Component
-- [ ] Apply consistent padding and max-width
-- [ ] Support full-width variant
-- [ ] Include loading state support
+
+- [x] Apply consistent padding and max-width
+- [x] Support full-width variant
+- [x] Include loading state support
 
 ### 6.3.3 Card Layout Component
-- [ ] Wrapper for page sections
-- [ ] Include optional title and description
-- [ ] Include action buttons slot
+
+- [x] Wrapper for page sections
+- [x] Include optional title and description
+- [x] Include action buttons slot
 
 ---
 
@@ -797,47 +850,50 @@ features/roles/
 
 ## 7.1 Router Configuration
 
-- [ ] Create router using createBrowserRouter
-- [ ] Define route structure with nested routes
-- [ ] Configure error boundaries per route level
-- [ ] Configure loading states for lazy routes
+- [x] Create router using createBrowserRouter
+- [x] Define route structure with nested routes
+- [x] Configure error boundaries per route level
+- [x] Configure loading states for lazy routes
 
 ## 7.2 Route Definitions
 
 ### 7.2.1 Public Routes
-- [ ] Define login route (/login)
-- [ ] Define register route (/register)
-- [ ] Define forgot password route (/forgot-password)
-- [ ] Define reset password route (/reset-password)
-- [ ] Redirect authenticated users away from public routes
+
+- [x] Define login route (/login)
+- [x] Define register route (/register)
+- [x] Define forgot password route (/forgot-password)
+- [x] Define reset password route (/reset-password)
+- [x] Redirect authenticated users away from public routes
 
 ### 7.2.2 Protected Routes
-- [ ] Define dashboard route (/)
-- [ ] Define users routes (/users, /users/:id, /users/create)
-- [ ] Define roles routes (/roles, /roles/:id, /roles/create)
-- [ ] Define profile route (/profile)
-- [ ] Define settings route (/settings)
-- [ ] Wrap protected routes with AuthGuard
+
+- [x] Define dashboard route (/)
+- [x] Define users routes (/users, /users/:id, /users/create)
+- [x] Define roles routes (/roles, /roles/:id, /roles/create)
+- [x] Define profile route (/profile)
+- [x] Define settings route (/settings)
+- [x] Wrap protected routes with AuthGuard
 
 ### 7.2.3 Error Routes
-- [ ] Define 404 not found route
-- [ ] Define 403 unauthorized route
-- [ ] Define 500 error route
-- [ ] Configure catch-all route for 404
+
+- [x] Define 404 not found route
+- [x] Define 403 unauthorized route
+- [x] Define 500 error route
+- [x] Configure catch-all route for 404
 
 ## 7.3 Route Guards
 
-- [ ] Implement AuthGuard component for protected routes
-- [ ] Implement PermissionGuard component for permission-based access
-- [ ] Implement RoleGuard component for role-based access
-- [ ] Handle loading state during auth check
-- [ ] Preserve intended URL for post-login redirect
+- [x] Implement AuthGuard component for protected routes
+- [x] Implement PermissionGuard component for permission-based access
+- [x] Implement RoleGuard component for role-based access
+- [x] Handle loading state during auth check
+- [x] Preserve intended URL for post-login redirect
 
 ## 7.4 Lazy Loading
 
-- [ ] Implement React.lazy for feature pages
-- [ ] Create Suspense wrapper with loading fallback
-- [ ] Group related routes for code splitting
+- [x] Implement React.lazy for feature pages
+- [x] Create Suspense wrapper with loading fallback
+- [x] Group related routes for code splitting
 - [ ] Preload critical routes on hover (optional)
 
 ---
@@ -847,98 +903,112 @@ features/roles/
 ## 8.1 Data Display Components
 
 ### 8.1.1 Data Table Component
-- [ ] Accept columns configuration
-- [ ] Accept data array
-- [ ] Support sorting by columns
-- [ ] Support row selection
-- [ ] Support pagination
-- [ ] Display loading skeleton
-- [ ] Display empty state
-- [ ] Support responsive behavior (horizontal scroll or card view)
+
+- [x] Accept columns configuration
+- [x] Accept data array
+- [x] Support sorting by columns
+- [x] Support row selection
+- [x] Support pagination
+- [x] Display loading skeleton
+- [x] Display empty state
+- [x] Support responsive behavior (horizontal scroll or card view)
 
 ### 8.1.2 Pagination Component
-- [ ] Display current page and total pages
-- [ ] Include previous/next buttons
-- [ ] Include page number buttons with truncation
-- [ ] Include items per page selector
-- [ ] Support controlled pagination
+
+- [x] Display current page and total pages
+- [x] Include previous/next buttons
+- [x] Include page number buttons with truncation
+- [x] Include items per page selector
+- [x] Support controlled pagination
 
 ### 8.1.3 Status Badge Component
-- [ ] Accept status value
-- [ ] Map status to color/variant
-- [ ] Support custom status mappings
+
+- [x] Accept status value
+- [x] Map status to color/variant
+- [x] Support custom status mappings
 
 ### 8.1.4 Empty State Component
-- [ ] Display icon and message
-- [ ] Support action button
-- [ ] Support different variants (no data, no results, error)
+
+- [x] Display icon and message
+- [x] Support action button
+- [x] Support different variants (no data, no results, error)
 
 ### 8.1.5 Loading Components
-- [ ] Spinner component
-- [ ] Skeleton component for content placeholders
-- [ ] Full page loading overlay
-- [ ] Button loading state
+
+- [x] Spinner component
+- [x] Skeleton component for content placeholders
+- [x] Full page loading overlay
+- [x] Button loading state
 
 ## 8.2 Feedback Components
 
 ### 8.2.1 Toast/Notification System
-- [ ] Configure toast provider (sonner or similar)
-- [ ] Create toast utility functions
-  - [ ] success(message)
-  - [ ] error(message)
-  - [ ] warning(message)
-  - [ ] info(message)
-- [ ] Support action buttons in toasts
-- [ ] Configure positioning and duration
+
+- [x] Configure toast provider (sonner or similar)
+- [x] Create toast utility functions
+  - [x] success(message)
+  - [x] error(message)
+  - [x] warning(message)
+  - [x] info(message)
+- [x] Support action buttons in toasts
+- [x] Configure positioning and duration
 
 ### 8.2.2 Confirmation Dialog Component
-- [ ] Accept title, message, confirm/cancel labels
-- [ ] Support destructive variant (red confirm button)
-- [ ] Accept onConfirm and onCancel callbacks
-- [ ] Create useConfirm hook for imperative usage
+
+- [x] Accept title, message, confirm/cancel labels
+- [x] Support destructive variant (red confirm button)
+- [x] Accept onConfirm and onCancel callbacks
+- [x] Create useConfirm hook for imperative usage
 
 ### 8.2.3 Alert Component
-- [ ] Support variants (info, success, warning, error)
-- [ ] Include icon based on variant
-- [ ] Support dismissible option
+
+- [x] Support variants (info, success, warning, error)
+- [x] Include icon based on variant
+- [x] Support dismissible option
 
 ## 8.3 Form Components
 
 ### 8.3.1 Form Field Wrapper
-- [ ] Accept label, description, error message
-- [ ] Display required indicator
-- [ ] Apply consistent spacing
-- [ ] Support horizontal/vertical layout
+
+- [x] Accept label, description, error message
+- [x] Display required indicator
+- [x] Apply consistent spacing
+- [x] Support horizontal/vertical layout
 
 ### 8.3.2 Search Input Component
-- [ ] Include search icon
-- [ ] Support clear button
-- [ ] Support debounced onChange
-- [ ] Support loading state
+
+- [x] Include search icon
+- [x] Support clear button
+- [x] Support debounced onChange
+- [x] Support loading state
 
 ### 8.3.3 Password Input Component
-- [ ] Include show/hide toggle button
-- [ ] Support password strength indicator
-- [ ] Inherit standard input props
+
+- [x] Include show/hide toggle button
+- [x] Support password strength indicator
+- [x] Inherit standard input props
 
 ### 8.3.4 Multi-Select Component
-- [ ] Display selected items as tags
-- [ ] Support search/filter options
-- [ ] Support select all option
+
+- [x] Display selected items as tags
+- [x] Support search/filter options
+- [x] Support select all option
 - [ ] Handle large lists with virtualization (if needed)
 
 ## 8.4 Navigation Components
 
 ### 8.4.1 Breadcrumbs Component
-- [ ] Accept items array with label and path
-- [ ] Display separator between items
-- [ ] Make last item non-clickable (current page)
+
+- [x] Accept items array with label and path
+- [x] Display separator between items
+- [x] Make last item non-clickable (current page)
 - [ ] Support auto-generation from route (optional)
 
 ### 8.4.2 Tabs Component
-- [ ] Support controlled and uncontrolled modes
-- [ ] Support URL-synced tabs (query param)
-- [ ] Include tab panels with lazy loading option
+
+- [x] Support controlled and uncontrolled modes
+- [x] Support URL-synced tabs (query param)
+- [x] Include tab panels with lazy loading option
 
 ---
 
@@ -947,49 +1017,57 @@ features/roles/
 ## 9.1 Provider Setup (`src/app/providers/`)
 
 ### 9.1.1 Query Provider
-- [ ] Create QueryClientProvider wrapper
-- [ ] Include ReactQueryDevtools (dev only)
-- [ ] Configure devtools position and default open state
+
+- [x] Create QueryClientProvider wrapper
+- [x] Include ReactQueryDevtools (dev only)
+- [x] Configure devtools position and default open state
 
 ### 9.1.2 Theme Provider
-- [ ] Implement dark/light mode toggle
-- [ ] Persist theme preference
-- [ ] Sync with system preference option
-- [ ] Provide theme context for components
+
+- [x] Implement dark/light mode toggle
+- [x] Persist theme preference
+- [x] Sync with system preference option
+- [x] Provide theme context for components
 
 ### 9.1.3 Toast Provider
-- [ ] Configure toast provider from chosen library
-- [ ] Set global toast configuration
+
+- [x] Configure toast provider from chosen library
+- [x] Set global toast configuration
 
 ### 9.1.4 Auth Provider (optional)
-- [ ] Provide auth context if not using Zustand exclusively
-- [ ] Initialize auth state on app mount
-- [ ] Handle token refresh on mount
+
+- [x] Provide auth context if not using Zustand exclusively
+- [x] Initialize auth state on app mount
+- [x] Handle token refresh on mount
 
 ### 9.1.5 Combined Providers Component
-- [ ] Create AppProviders component combining all providers
-- [ ] Order providers correctly (query outside, theme, toast, etc.)
-- [ ] Accept children prop
+
+- [x] Create AppProviders component combining all providers
+- [x] Order providers correctly (query outside, theme, toast, etc.)
+- [x] Accept children prop
 
 ## 9.2 App Initialization
 
 ### 9.2.1 App Entry Point (main.tsx)
-- [ ] Import global styles
-- [ ] Render App component inside React.StrictMode
-- [ ] Mount to root DOM element
+
+- [x] Import global styles
+- [x] Render App component inside React.StrictMode
+- [x] Mount to root DOM element
 
 ### 9.2.2 App Component (App.tsx)
-- [ ] Wrap with AppProviders
-- [ ] Include RouterProvider
-- [ ] Include global error boundary
-- [ ] Include initial data loading (auth check)
+
+- [x] Wrap with AppProviders
+- [x] Include RouterProvider
+- [x] Include global error boundary
+- [x] Include initial data loading (auth check)
 
 ### 9.2.3 Auth Initialization
-- [ ] Check for stored tokens on app mount
-- [ ] Validate tokens and fetch current user
-- [ ] Handle expired/invalid tokens
-- [ ] Set loading state during initialization
-- [ ] Redirect based on auth state
+
+- [x] Check for stored tokens on app mount
+- [x] Validate tokens and fetch current user
+- [x] Handle expired/invalid tokens
+- [x] Set loading state during initialization
+- [x] Redirect based on auth state
 
 ---
 
@@ -998,26 +1076,30 @@ features/roles/
 ## 10.1 Error Boundary Components
 
 ### 10.1.1 Global Error Boundary
-- [ ] Catch uncaught errors in React tree
-- [ ] Display friendly error message
-- [ ] Include "Reload" button
+
+- [x] Catch uncaught errors in React tree
+- [x] Display friendly error message
+- [x] Include "Reload" button
 - [ ] Log errors to monitoring service (production)
-- [ ] Show stack trace in development
+- [x] Show stack trace in development
 
 ### 10.1.2 Route Error Boundary
-- [ ] Handle errors within specific routes
-- [ ] Display route-specific error UI
-- [ ] Include navigation back to safe route
-- [ ] Handle 404 and other HTTP errors from loaders
+
+- [x] Handle errors within specific routes
+- [x] Display route-specific error UI
+- [x] Include navigation back to safe route
+- [x] Handle 404 and other HTTP errors from loaders
 
 ### 10.1.3 Feature Error Boundary
-- [ ] Wrap feature components
-- [ ] Show feature-specific error UI
-- [ ] Allow retry without full page reload
+
+- [x] Wrap feature components
+- [x] Show feature-specific error UI
+- [x] Allow retry without full page reload
 
 ## 10.2 Error Handling Utilities
 
 ### 10.2.1 Error Logging Service
+
 - [ ] Create error logging utility
 - [ ] Integrate with monitoring service (Sentry, LogRocket)
 - [ ] Include user context in error reports
@@ -1025,31 +1107,35 @@ features/roles/
 - [ ] Filter sensitive information
 
 ### 10.2.2 API Error Handler
-- [ ] Create central API error handling utility
-- [ ] Map error codes to user messages
-- [ ] Handle network errors
-- [ ] Handle timeout errors
-- [ ] Display appropriate toast/notification
+
+- [x] Create central API error handling utility
+- [x] Map error codes to user messages
+- [x] Handle network errors
+- [x] Handle timeout errors
+- [x] Display appropriate toast/notification
 
 ## 10.3 Not Found & Unauthorized Pages
 
 ### 10.3.1 404 Not Found Page
-- [ ] Display friendly message
-- [ ] Include illustration/icon
-- [ ] Include link to home/dashboard
+
+- [x] Display friendly message
+- [x] Include illustration/icon
+- [x] Include link to home/dashboard
 - [ ] Include search option (optional)
 
 ### 10.3.2 403 Unauthorized Page
-- [ ] Display permission denied message
-- [ ] Explain what permission is needed
+
+- [x] Display permission denied message
+- [x] Explain what permission is needed
 - [ ] Include link to request access (optional)
-- [ ] Include link to home/dashboard
+- [x] Include link to home/dashboard
 
 ### 10.3.3 500 Error Page
-- [ ] Display generic error message
-- [ ] Include error reference ID (for support)
-- [ ] Include retry button
-- [ ] Include contact support link
+
+- [x] Display generic error message
+- [x] Include error reference ID (for support)
+- [x] Include retry button
+- [x] Include contact support link
 
 ---
 
@@ -1058,90 +1144,103 @@ features/roles/
 ## 11.1 Testing Setup
 
 ### 11.1.1 Vitest Configuration
-- [ ] Configure vitest.config.ts
-- [ ] Set up test environment (jsdom)
-- [ ] Configure coverage thresholds
-- [ ] Set up path aliases for tests
-- [ ] Configure test globals
+
+- [x] Configure vitest.config.ts
+- [x] Set up test environment (jsdom)
+- [x] Configure coverage thresholds
+- [x] Set up path aliases for tests
+- [x] Configure test globals
 
 ### 11.1.2 Testing Library Setup
-- [ ] Configure @testing-library/react
-- [ ] Create custom render function with providers
-- [ ] Set up user-event for interactions
-- [ ] Configure screen queries
+
+- [x] Configure @testing-library/react
+- [x] Create custom render function with providers
+- [x] Set up user-event for interactions
+- [x] Configure screen queries
 
 ### 11.1.3 MSW Setup for API Mocking
-- [ ] Install and configure msw
-- [ ] Create mock handlers for auth endpoints
-- [ ] Create mock handlers for user endpoints
-- [ ] Create mock handlers for role endpoints
-- [ ] Set up mock server for tests
-- [ ] Configure request handlers reset between tests
+
+- [x] Install and configure msw
+- [x] Create mock handlers for auth endpoints
+- [x] Create mock handlers for user endpoints
+- [x] Create mock handlers for role endpoints
+- [x] Set up mock server for tests
+- [x] Configure request handlers reset between tests
 
 ## 11.2 Unit Tests
 
 ### 11.2.1 Utility Function Tests
-- [ ] Test API client utilities
-- [ ] Test form validation schemas
-- [ ] Test helper functions
-- [ ] Test formatters (date, currency, etc.)
+
+- [x] Test API client utilities
+- [x] Test form validation schemas
+- [x] Test helper functions
+- [x] Test formatters (date, currency, etc.)
 
 ### 11.2.2 Hook Tests
-- [ ] Test custom hooks with renderHook
-- [ ] Test auth hooks (useAuth, useLogin)
-- [ ] Test form hooks
-- [ ] Test query hooks with mock data
+
+- [x] Test custom hooks with renderHook
+- [x] Test auth hooks (useAuth, useLogin)
+- [x] Test form hooks
+- [x] Test query hooks with mock data
 
 ### 11.2.3 Store Tests
-- [ ] Test Zustand store actions
-- [ ] Test store selectors
-- [ ] Test store persistence
+
+- [x] Test Zustand store actions
+- [x] Test store selectors
+- [x] Test store persistence
 
 ## 11.3 Component Tests
 
 ### 11.3.1 UI Component Tests
-- [ ] Test Button component variants
-- [ ] Test Input component with validation
-- [ ] Test Form components
-- [ ] Test Dialog/Modal components
-- [ ] Test Table component
+
+- [x] Test Button component variants
+- [x] Test Input component with validation
+- [x] Test Form components
+- [x] Test Dialog/Modal components
+- [x] Test Table component
 
 ### 11.3.2 Feature Component Tests
-- [ ] Test LoginForm submission
-- [ ] Test RegisterForm validation
-- [ ] Test UserTable with mock data
-- [ ] Test UserForm create and edit modes
+
+- [x] Test LoginForm submission
+- [x] Test RegisterForm validation
+- [x] Test UserTable with mock data
+- [x] Test UserForm create and edit modes
 
 ### 11.3.3 Page Tests
-- [ ] Test page rendering with mock data
-- [ ] Test page navigation
-- [ ] Test protected page access
+
+- [x] Test page rendering with mock data
+- [x] Test page navigation
+- [x] Test protected page access
 
 ## 11.4 Integration Tests
 
 ### 11.4.1 Auth Flow Tests
-- [ ] Test complete login flow
-- [ ] Test complete registration flow
-- [ ] Test logout flow
-- [ ] Test token refresh flow
-- [ ] Test protected route access
+
+- [x] Test complete login flow
+- [x] Test complete registration flow
+- [x] Test logout flow
+- [x] Test token refresh flow
+- [x] Test protected route access
 
 ### 11.4.2 CRUD Flow Tests
-- [ ] Test user list with filters
-- [ ] Test user creation
-- [ ] Test user update
-- [ ] Test user deletion
-- [ ] Test role management
+
+- [x] Test user list with filters
+- [x] Test user creation
+- [x] Test user update
+- [x] Test user deletion
+- [x] Test role management
 
 ## 11.5 E2E Tests (Optional)
 
 ### 11.5.1 Playwright/Cypress Setup
+
 - [ ] Configure E2E testing framework
 - [ ] Set up test database/environment
 - [ ] Create test fixtures
 - [ ] Configure CI pipeline for E2E
 
 ### 11.5.2 Critical Path Tests
+
 - [ ] Test login to dashboard flow
 - [ ] Test user management flow
 - [ ] Test role assignment flow
@@ -1164,6 +1263,7 @@ features/roles/
 ## 12.2 React Performance
 
 ### 12.2.1 Component Optimization
+
 - [ ] Implement React.memo for expensive components
 - [ ] Use useMemo for expensive computations
 - [ ] Use useCallback for callback props
@@ -1171,12 +1271,14 @@ features/roles/
 - [ ] Profile with React DevTools
 
 ### 12.2.2 List Rendering
+
 - [ ] Use proper keys for list items
 - [ ] Implement virtualization for long lists (react-window)
 - [ ] Paginate large data sets
 - [ ] Implement infinite scroll where appropriate
 
 ### 12.2.3 State Management
+
 - [ ] Keep state as local as possible
 - [ ] Use selectors to prevent unnecessary rerenders
 - [ ] Split stores to minimize subscription scope
@@ -1185,6 +1287,7 @@ features/roles/
 ## 12.3 Network Optimization
 
 ### 12.3.1 API Optimization
+
 - [ ] Configure appropriate staleTime for queries
 - [ ] Implement request deduplication
 - [ ] Use prefetching for predictable navigations
@@ -1192,6 +1295,7 @@ features/roles/
 - [ ] Configure retry logic with backoff
 
 ### 12.3.2 Asset Optimization
+
 - [ ] Optimize images (WebP format, proper sizing)
 - [ ] Lazy load images below fold
 - [ ] Preload critical assets
@@ -1200,6 +1304,7 @@ features/roles/
 ## 12.4 Loading Performance
 
 ### 12.4.1 Initial Load
+
 - [ ] Minimize critical rendering path
 - [ ] Inline critical CSS
 - [ ] Defer non-critical JavaScript
@@ -1207,6 +1312,7 @@ features/roles/
 - [ ] Add loading indicators for chunks
 
 ### 12.4.2 Perceived Performance
+
 - [ ] Implement skeleton screens
 - [ ] Use optimistic UI updates
 - [ ] Add transition animations
@@ -1289,6 +1395,7 @@ features/roles/
 ## 15.1 Build Configuration
 
 ### 15.1.1 Production Build
+
 - [ ] Configure environment variables for production
 - [ ] Enable minification and tree shaking
 - [ ] Generate source maps for error tracking
@@ -1297,6 +1404,7 @@ features/roles/
 - [ ] Remove development-only code
 
 ### 15.1.2 Build Verification
+
 - [ ] Run production build locally
 - [ ] Test production build with preview server
 - [ ] Verify environment variables are applied
@@ -1306,6 +1414,7 @@ features/roles/
 ## 15.2 Docker Setup
 
 ### 15.2.1 Dockerfile
+
 - [ ] Create multi-stage Dockerfile
 - [ ] Use Bun image for build stage
 - [ ] Use nginx or static file server for runtime
@@ -1314,6 +1423,7 @@ features/roles/
 - [ ] Set proper security headers in nginx
 
 ### 15.2.2 Docker Compose
+
 - [ ] Create docker-compose for local testing
 - [ ] Configure environment variables
 - [ ] Set up health checks
@@ -1321,6 +1431,7 @@ features/roles/
 ## 15.3 CI/CD Pipeline
 
 ### 15.3.1 Continuous Integration
+
 - [ ] Configure CI workflow (GitHub Actions, GitLab CI)
 - [ ] Run linting on PRs
 - [ ] Run unit tests with coverage
@@ -1330,6 +1441,7 @@ features/roles/
 - [ ] Fail on coverage below threshold
 
 ### 15.3.2 Continuous Deployment
+
 - [ ] Configure deployment workflow
 - [ ] Build Docker image
 - [ ] Push to container registry
@@ -1341,12 +1453,14 @@ features/roles/
 ## 15.4 Environment Configuration
 
 ### 15.4.1 Staging Environment
+
 - [ ] Configure staging API URL
 - [ ] Enable verbose logging
 - [ ] Enable debug tools
 - [ ] Configure feature flags for testing
 
 ### 15.4.2 Production Environment
+
 - [ ] Configure production API URL
 - [ ] Disable debug tools
 - [ ] Configure error tracking
@@ -1356,6 +1470,7 @@ features/roles/
 ## 15.5 Monitoring & Analytics
 
 ### 15.5.1 Error Tracking
+
 - [ ] Integrate Sentry or similar
 - [ ] Configure error grouping
 - [ ] Set up alerts for error spikes
@@ -1363,12 +1478,14 @@ features/roles/
 - [ ] Configure source maps upload
 
 ### 15.5.2 Performance Monitoring
+
 - [ ] Configure web vitals tracking
 - [ ] Set up performance budgets
 - [ ] Monitor bundle size changes
 - [ ] Track API response times
 
 ### 15.5.3 Analytics (Optional)
+
 - [ ] Integrate analytics service
 - [ ] Track page views
 - [ ] Track key user actions
@@ -1389,6 +1506,7 @@ features/roles/
 ## 16.2 Component Documentation
 
 ### 16.2.1 Storybook Setup (Optional)
+
 - [ ] Install and configure Storybook
 - [ ] Create stories for UI components
 - [ ] Document component variants
@@ -1398,6 +1516,7 @@ features/roles/
 ## 16.3 Project Documentation
 
 ### 16.3.1 README
+
 - [ ] Project overview and purpose
 - [ ] Prerequisites and requirements
 - [ ] Installation instructions
@@ -1408,6 +1527,7 @@ features/roles/
 - [ ] Contributing guidelines
 
 ### 16.3.2 Architecture Documentation
+
 - [ ] Document folder structure
 - [ ] Document state management approach
 - [ ] Document API integration patterns
@@ -1416,6 +1536,7 @@ features/roles/
 - [ ] Create architecture diagrams
 
 ### 16.3.3 API Documentation
+
 - [ ] Document API client usage
 - [ ] Document query hooks
 - [ ] Document mutation hooks

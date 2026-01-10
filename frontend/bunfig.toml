@@ -1,0 +1,31 @@
+# Bun Configuration
+# https://bun.sh/docs/runtime/bunfig
+
+[install]
+# Concurrent install tasks
+concurrent-scripts = true
+
+# Produce a lockfile
+save = true
+
+# Install optional dependencies
+optional = true
+
+# Install peer dependencies
+peer = true
+
+[install.lockfile]
+# Generate lockfile in bun format
+save = true
+
+# Disk cache for packages
+save-disk-cache = true
+
+[test]
+# Test runner configuration
+coverage = true
+coverage-dir = "coverage"
+
+[run]
+# Automatically install missing packages
+auto-install = true
