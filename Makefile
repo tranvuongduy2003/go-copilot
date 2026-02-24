@@ -291,8 +291,8 @@ env-check: ## Check environment setup
 	@command -v terraform >/dev/null 2>&1 && echo "$(GREEN)Terraform: $$(terraform -v | head -1)$(NC)" || echo "$(YELLOW)Terraform: Not found$(NC)"
 
 generate-types: ## Generate TypeScript types
-	cd backend && pnpm generate:types
-	cp backend/src/types/api.d.ts frontend/src/types/
+	cd backend && make docs
+	npx openapi-typescript backend/docs/openapi.yaml -o frontend/src/types/api.d.ts
 
 docs: ## Generate documentation
 	cd backend && pnpm docs:generate

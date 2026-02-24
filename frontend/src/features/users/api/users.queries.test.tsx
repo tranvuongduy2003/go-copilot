@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useUsers, useUser, useCreateUser, useDeleteUser } from './users.queries';
+import { useCreateUser, useDeleteUser, useUser, useUsers } from './users.queries';
 
 vi.mock('./users.api', () => ({
   usersApi: {
@@ -70,7 +70,15 @@ describe('useUsers', () => {
           updatedAt: '',
         },
       ],
-      meta: { page: 1, pageSize: 10, total: 2, totalPages: 1 },
+      meta: {
+        page: 1,
+        pageSize: 10,
+        limit: 10,
+        total: 2,
+        totalPages: 1,
+        hasNext: false,
+        hasPrevious: false,
+      },
     };
 
     mockedUsersApi.getUsers.mockResolvedValue(mockUsersResponse);
@@ -100,7 +108,15 @@ describe('useUsers', () => {
           updatedAt: '',
         },
       ],
-      meta: { page: 1, pageSize: 10, total: 1, totalPages: 1 },
+      meta: {
+        page: 1,
+        pageSize: 10,
+        limit: 10,
+        total: 1,
+        totalPages: 1,
+        hasNext: false,
+        hasPrevious: false,
+      },
     };
 
     mockedUsersApi.getUsers.mockResolvedValue(mockUsersResponse);
